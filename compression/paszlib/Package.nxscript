@@ -1,0 +1,20 @@
+// Copyright (c) 2026 Kevin Collins.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses",
+// as defined by the Mozilla Public License, v. 2.0.
+//
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "nxpackage.Language.nxscript";
+
+// Requires matching RTL and FPC hash units; these are not separate catalog packages.
+Package PasZLib {
+    Id: "NXRP.Compression.PasZLib";
+    Author: "Jacques Nomssi Nzali and Free Pascal contributors";
+    Description: "Pascal DEFLATE, zlib, GZIP and ZIP runtime units.";
+    License: "zlib and LGPL with the Free Pascal linking exception";
+}

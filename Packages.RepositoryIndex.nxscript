@@ -18,6 +18,16 @@ RepositoryIndex NexusExternalPackages {
     }
 
     // Descriptor paths are relative to this repository catalog.
+    LocalPackage Abbrevia {
+        Id: "NXRP.Compression.Abbrevia";
+        Descriptor: "compression/abbrevia/Package.nxscript";
+        Description: "Archive and compression runtime units (Abbrevia).";
+    }
+    LocalPackage PasZLib {
+        Id: "NXRP.Compression.PasZLib";
+        Descriptor: "compression/paszlib/Package.nxscript";
+        Description: "Pascal DEFLATE, zlib, GZIP and ZIP runtime units.";
+    }
     LocalPackage Mustache {
         Id: "NXRP.Mustache";
         Descriptor: "mustache/Package.nxscript";

@@ -9,9 +9,9 @@
 //
 // SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
 
-dialect "PackageManager.Language.nxscript";
+dialect "nxpackage.Language.nxscript";
 
-PackageIndex NexusExternalPackages {
+RepositoryIndex NexusExternalPackages {
     // Discovery only; no traversal or acquisition is implied.
     TrustedRepository NexusOwned {
         Source: "https://github.com/nxrp-dev/nexus-packages.git";

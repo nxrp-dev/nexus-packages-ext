@@ -22,5 +22,5 @@ The source retains its upstream MPL/GPL/LGPL licensing. The existing
 `NEXUS_PATCHES.md` records the fork's additional `SynDoubleToText.inc`.
 Packaging does not change upstream code, licensing, or template behavior.
 
-The descriptor uses the caller's `PackageManager.Language.nxscript` dialect
+The descriptor uses the caller's `nxpackage.Language.nxscript` dialect
 catalog; it does not reach out to a project folder for that language.

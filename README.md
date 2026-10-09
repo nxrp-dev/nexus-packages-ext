@@ -4,7 +4,7 @@ This repository houses third-party libraries packaged for Nexus. Each package
 owns its descriptor and documentation; upstream source retains its own license
 and Git identity under `external/`.
 
-`Packages.PackageIndex.nxscript` explicitly lists the available packages.
+`Packages.RepositoryIndex.nxscript` explicitly lists the available packages.
 Trusted sister repositories are discovery information, not instructions to
 fetch or traverse them.
 

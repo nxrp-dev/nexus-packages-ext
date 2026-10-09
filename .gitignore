@@ -1,0 +1,12 @@
+output/
+bin/
+lib/
+*.compiled
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.ppu
+*.lps
+*.zip

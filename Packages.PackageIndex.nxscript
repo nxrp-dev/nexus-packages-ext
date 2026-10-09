@@ -1,0 +1,26 @@
+// Copyright (c) 2026 Kevin Collins.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses",
+// as defined by the Mozilla Public License, v. 2.0.
+//
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "PackageManager.Language.nxscript";
+
+PackageIndex NexusExternalPackages {
+    // Discovery only; no traversal or acquisition is implied.
+    TrustedRepository NexusOwned {
+        Source: "https://github.com/nxrp-dev/nexus-packages.git";
+    }
+
+    // Descriptor paths are relative to this repository catalog.
+    LocalPackage Mustache {
+        Id: "NXRP.Mustache";
+        Descriptor: "mustache/Package.nxscript";
+        Description: "Mustache template parsing and rendering (DMustache).";
+    }
+}

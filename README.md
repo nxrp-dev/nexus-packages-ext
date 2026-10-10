@@ -12,6 +12,8 @@ Current packages:
 
 - [Mustache](mustache/README.md): template parsing and rendering through the
   Nexus-maintained DMustache fork.
+- [RegExpr](regexpr/README.md): upstream Object Pascal regular expressions used
+  by fpGUI.
 
 After cloning this repository, populate its pinned source submodules with:
 

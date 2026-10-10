@@ -6,3 +6,6 @@
 	path = compression/abbrevia/external/abbrevia
 	url = https://github.com/TurboPack/Abbrevia.git
 	branch = master
+[submodule "regexpr/external/tregexpr"]
+	path = regexpr/external/tregexpr
+	url = https://github.com/andgineer/TRegExpr.git

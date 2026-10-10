@@ -33,4 +33,9 @@ RepositoryIndex NexusExternalPackages {
         Descriptor: "mustache/Package.nxscript";
         Description: "Mustache template parsing and rendering (DMustache).";
     }
+    LocalPackage RegExpr {
+        Id: "NXRP.RegExpr";
+        Descriptor: "regexpr/Package.nxscript";
+        Description: "Pure Object Pascal regular expression engine (TRegExpr).";
+    }
 }

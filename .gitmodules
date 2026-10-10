@@ -1,7 +1,3 @@
-[submodule "mustache/external/dmustache"]
-	path = mustache/external/dmustache
-	url = https://github.com/nxrp-dev/dmustache.git
-	branch = master
 [submodule "regexpr/external/tregexpr"]
 	path = regexpr/external/tregexpr
 	url = https://github.com/andgineer/TRegExpr.git

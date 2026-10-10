@@ -14,6 +14,6 @@ dialect "nxpackage.Language.nxscript";
 Package Mustache {
     Id: "NXRP.Mustache";
     Author: "Arnaud Bouchez and contributors";
-    Description: "Mustache template parsing and rendering through the Nexus-maintained DMustache fork.";
+    Description: "Mustache template parsing and rendering using the locally maintained DMustache sources.";
     License: "MPL 1.1 or later / GPL 2.0 or later / LGPL 2.1 or later";
 }

@@ -4,22 +4,13 @@ Package identity: `NXRP.Compression.Abbrevia`.
 
 `external/abbrevia` is maintained directly by `nexus-packages-ext`, including its
 NexusFPC corrections. It is an ordinary tracked directory, with no separate Git
-repository or fork required. The import originated at
-`https://github.com/TurboPack/Abbrevia.git`, revision
-`805915396d0cc597e7c55df9fbb36057e65748df` (2026-09-23). That revision records
-provenance; future maintenance belongs to this repository.
+repository or fork required. Nexus consumes runtime units directly; the default
+FPC bzip2 configuration uses runtime DLL loading.
 
-All 627 files from the former submodule are retained at the same paths, including
-the corrected working contents of 15 Pascal files, test archives, resources,
-bundled objects and C codec sources. Original MPL 1.1 and third-party notices are
-intact. The original README and Delphi IDE packages remain as supplied material;
-Nexus consumes runtime units directly.
-
-The retained local corrections cover FPC unit/directive compatibility, stream
-and byte-buffer handling, archive metadata conversions, path operations, TAR
-processing, CRT helpers, and WavPack helpers. The default FPC bzip2 configuration
-remains runtime DLL loading. This ownership conversion changes no Pascal or C
-source bytes and does not introduce a new runtime or threading design.
+Upstream revision, import history, authors, preserved corrections, and the separate
+SPDX indicators for Abbrevia and its bundled C codecs are maintained in the
+[central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#abbrevia).
+Original sources, resources, notices, test archives, and bundled objects remain here.
 
 ## LLVM codec build
 

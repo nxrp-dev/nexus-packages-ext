@@ -6,15 +6,13 @@ is `NXRP.RegExpr`. fpGUI uses the `regexpr` unit directly.
 ## Structure
 
 - `Package.nxscript`: intrinsic package metadata.
-- `external/tregexpr`: pinned Git submodule of
-  `https://github.com/andgineer/TRegExpr.git`.
+- `external/tregexpr`: pinned upstream Git submodule.
 - `external/tregexpr/src`: `regexpr.pas`, its compiler include and Unicode data.
 
-The initial pinned revision is
-`19389caeb6823cddfb110ed284f57d1088dd8ac2`.
-Upstream source and license notices are unchanged. The repository contains
-`LICENSE.txt` (MIT); `regexpr.pas` also retains its original alternative
-license notices. Refer to those upstream files for the terms.
+Upstream URL, pinned revision, import date, authors, and license indicators are
+maintained in the
+[central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#tregexpr).
+Original license texts and unit notices remain with the sources.
 
 From the Nexus root, add this unit search path:
 

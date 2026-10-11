@@ -19,23 +19,14 @@ path. From the Nexus repository root, this is:
 -Fupackages/nexus-packages-ext/mustache/external/dmustache
 ```
 
-The source retains its upstream MPL/GPL/LGPL licensing. All 13 files from the
-former fork are imported byte-for-byte, including its original documentation
-and `NEXUS_PATCHES.md`. Consumer paths and template behavior are unchanged.
+Upstream authors, revisions, import dates, SPDX license alternatives, and the
+preserved SynPDF include and NexusFPC corrections are maintained in the
+[central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#dmustache-and-synopse-include).
+Original source, include files, upstream documentation, and notices remain here.
+The former `NEXUS_PATCHES.md` prose is consolidated into that record.
 
-## Provenance and preserved fixes
-
-The source originated in `synopse/dmustache`. This import preserves revision
-`a178d4475657f1c6f5cae1a986740305c54d543d` from the former Nexus-maintained checkout.
-That revision is provenance; future maintenance belongs to this repository.
-
-- `f416f11`: added the missing `SynDoubleToText.inc` from `synopse/SynPDF`, with
-  its original license header.
-- `a178d44`: corrected `SynCommons.pas` and `Synopse.inc` for NexusFPC 3.3.
-  This commit was local to the former checkout and is included in full here.
-
-The original 13-file source archive, SHA-256 manifest and verified complete Git
-history bundle are retained at `C:\backup\DMustacheOwnership-20261010`.
+The original source archive, SHA-256 manifest, and complete Git history bundle
+are retained at `C:\backup\DMustacheOwnership-20261010`.
 
 ## Ownership-conversion validation
 

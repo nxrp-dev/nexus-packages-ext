@@ -216,26 +216,26 @@ procedure write_hybrid_profile; external
     {$L Win32\WavPack_unpack3_open.obj}
     {$L Win32\WavPack_unpack3_seek.obj}
   {$ELSEIF DEFINED(CPUX64)}
-    {$L Win64\WavPack_write_words.obj}
-    {$L Win64\WavPack_common_utils.obj}
-    {$L Win64\WavPack_decorr_utils.obj}
-    {$L Win64\WavPack_entropy_utils.obj}
-    {$L Win64\WavPack_extra1.obj}
-    {$L Win64\WavPack_extra2.obj}
-    {$L Win64\WavPack_open_legacy.obj}
-    {$L Win64\WavPack_open_raw.obj}
-    {$L Win64\WavPack_open_utils.obj}
-    {$L Win64\WavPack_read_words.obj}
-    {$L Win64\WavPack_tag_utils.obj}
-    {$L Win64\WavPack_tags.obj}
-    {$L Win64\WavPack_unpack.obj}
-    {$L Win64\WavPack_unpack_dsd.obj}
-    {$L Win64\WavPack_unpack_floats.obj}
-    {$L Win64\WavPack_unpack_seek.obj}
-    {$L Win64\WavPack_unpack_utils.obj}
-    {$L Win64\WavPack_unpack3.obj}
-    {$L Win64\WavPack_unpack3_open.obj}
-    {$L Win64\WavPack_unpack3_seek.obj}
+    {$L Win64\write_words.o}
+    {$L Win64\common_utils.o}
+    {$L Win64\decorr_utils.o}
+    {$L Win64\entropy_utils.o}
+    {$L Win64\extra1.o}
+    {$L Win64\extra2.o}
+    {$L Win64\open_legacy.o}
+    {$L Win64\open_raw.o}
+    {$L Win64\open_utils.o}
+    {$L Win64\read_words.o}
+    {$L Win64\tag_utils.o}
+    {$L Win64\tags.o}
+    {$L Win64\unpack.o}
+    {$L Win64\unpack_dsd.o}
+    {$L Win64\unpack_floats.o}
+    {$L Win64\unpack_seek.o}
+    {$L Win64\unpack_utils.o}
+    {$L Win64\unpack3.o}
+    {$L Win64\unpack3_open.o}
+    {$L Win64\unpack3_seek.o}
   {$IFEND}
 {$ENDIF}
 

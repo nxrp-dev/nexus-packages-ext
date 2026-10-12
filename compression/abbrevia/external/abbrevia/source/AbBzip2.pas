@@ -223,11 +223,11 @@ const
     {$L Win32\decompress.obj}
     {$L Win32\bzlib.obj}
   {$ELSEIF DEFINED(CPUX64)}
-    {$L Win64\blocksort.obj}
-    {$L Win64\huffman.obj}
-    {$L Win64\compress.obj}
-    {$L Win64\decompress.obj}
-    {$L Win64\bzlib.obj}
+    {$L Win64\blocksort.o}
+    {$L Win64\huffman.o}
+    {$L Win64\compress.o}
+    {$L Win64\decompress.o}
+    {$L Win64\bzlib.o}
   {$IFEND}
 {$ENDIF}
 

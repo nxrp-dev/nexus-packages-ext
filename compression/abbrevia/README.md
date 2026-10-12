@@ -3,110 +3,72 @@
 Package identity: `NXRP.Compression.Abbrevia`.
 
 `external/abbrevia` is maintained directly by `nexus-packages-ext`, including its
-NexusFPC corrections. It is an ordinary tracked directory, with no separate Git
-repository or fork required. Nexus consumes runtime units directly; the default
-FPC bzip2 configuration uses runtime DLL loading.
+NexusFPC corrections. It is an ordinary tracked directory; no separate fork is
+required. Nexus consumes runtime units directly. The default FPC bzip2
+configuration loads its library at runtime.
 
-Upstream revision, import history, authors, preserved corrections, and the separate
-SPDX indicators for Abbrevia and its bundled C codecs are maintained in the
-[central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#abbrevia).
-Original sources, resources, notices, test archives, and bundled objects remain here.
+Upstream history, authors, preserved corrections, and license indicators are in
+the [central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#abbrevia).
+Original notices, codec sources, bundled binaries, and archive fixtures remain
+with the imported material.
 
-## LLVM codec build
+## Forge build
 
-[Build-AbbreviaLLVM.ps1](scripts/Build-AbbreviaLLVM.ps1) preserves the successful
-Win64 build recipe recovered from the original temporary LLVM probe. It builds
-all 37 bundled C translation units: LZMA (7), PPMd (3), WavPack (20), bzip2 (7).
-It checks that every output is COFF x86-64, then creates a private Pascal source
-overlay with those objects under the names required by the existing `$L`
-directives. Original bundled binaries remain untouched.
+`Package.nxscript` owns the Win64 build through ordered children. Its first child,
+the `NativeCodecs` group, prepares `output/forge` and compiles all 37 bundled C
+sources with **one Clang invocation**: LZMA (7), PPMd (3), WavPack (20), bzip2 (7).
+There is no PowerShell build script or helper executable.
 
-Run from this package directory, choosing a new or empty output directory:
+The group copies Pascal sources and resources into `output/forge/source`,
+excluding prebuilt objects and compiled units. Clang writes its objects directly
+to `output/forge/source/Win64`. Win64 Pascal linker directives use these generated
+`.o` filenames, without a WavPack prefix or a renaming step. Imported C sources
+and bundled binaries are not overwritten.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\Build-AbbreviaLLVM.ps1 -OutputRoot C:\build\abbrevia-llvm -FPCSourceRoot C:\gitdev\tools\nexus-fpc
+Subsequent children stage the four SDK/CRT import libraries, compile the existing
+Pascal runtime probe, and run it. `Outputs.Objects` exports the actual object
+directory. `Outputs.RuntimeCheck` identifies the probe executable; UnitPaths,
+IncludePaths, and LibraryPaths expose the corresponding build directories.
+
+From the Nexus root, after building Forge and the native NexusFPC bootstrap:
+
+```text
+output/NexusForge/x86_64-win64/nxforge.exe /input=packages/nexus-packages-ext/compression/abbrevia/Package.nxscript
 ```
 
-The optional `FPCSourceRoot` must contain a matched native compiler and RTL build.
-It enables the combined Pascal link/startup probe using the LLVM LZMA, PPMd and
-WavPack objects, with the existing runtime-loaded bzip2 configuration. Omit that
-parameter to build and inspect only the C objects. When compiling applications
-with these generated objects, use the generated `source` overlay for `-Fu`,
-`-Fi` and `-Fo`, and the four SDK/CRT import libraries recorded in the build log.
-`objects.json` records source and object hashes; `logs/steps.json` records exact
-commands, versions and results.
+The compiler and RTL come from the sibling NexusFPC checkout's
+`build/forge-bootstrap/cycle3`. Required `rtl-objpas` and `rtl-generics` units
+compile from that checkout's package sources into this package's output tree.
+The recipe does not rely on binaries in `compiler` or `rtl/units`.
 
-The known toolchain is LLVM/Clang 23.1.2, MSVC headers/import libraries
-14.29.30133, and Windows SDK 10.0.19041.0. Override `LLVMRoot`, `VCToolsRoot`,
-`WindowsSDKRoot`, and `WindowsSDKVersion` for a different installation. Clang's
-resource headers must precede the MSVC headers. The script locates that resource
-directory through Clang, sets the Win64 target explicitly, uses `BZ_NO_STDIO` for
-bzip2, and supplies `kernel32.lib`, `ucrt.lib`, `vcruntime.lib` and `msvcrt.lib`
-for the Pascal link. MSBuild and `cl.exe` are not used.
+The recipe explicitly names the installed LLVM 23 resource headers, MSVC
+14.29.30133 headers/import libraries, and Windows SDK 10.0.19041.0. Adjust those
+paths in the descriptor for another installation. Clang's intrinsic headers
+precede the MSVC headers. The resource-header directory is now an explicit
+setting; the retired script queried Clang for that path. The build uses the
+Win64 MSVC target, optimization level 2, disabled stack protection, and
+`BZ_NO_STDIO`. The latter is only
+inspected by the bzip2 sources. Pascal linkage includes `kernel32.lib`,
+`ucrt.lib`, `vcruntime.lib`, and `msvcrt.lib`.
 
-`Package.nxscript` now owns the complete preserved Win64 build sequence. Its
-Package contract exports Outputs, UnitPaths, IncludePaths, and LibraryPaths.
-Ordered children clean only `output/forge`, invoke the unchanged LLVM codec
-builder, stage CRT libraries, explicitly compile the Pascal runtime probe with
-FPC, and run that probe. The LLVM builder still creates an isolated source overlay;
-none of the imported source or prebuilt objects is replaced.
+An importing consumer can inspect the contract without building. An explicit
+composed Package child executes the ordered build at that position.
 
-From the Nexus root:
+## Validation and limits
 
-```powershell
-output/NexusForge-next/x86_64-win64/nxforge.exe /input=packages/nexus-packages-ext/compression/abbrevia/Package.nxscript
-```
+The direct Forge recipe was verified on 2026-10-12 using the existing isolated
+Forge-built NexusFPC compiler and matching RTL. Its single Clang command selected
+all 37 sources; all 37 outputs were inspected as COFF x86-64. The Pascal runtime
+probe compiled, linked, and ran successfully. No PowerShell command was launched
+by the package. The former PowerShell recovery recipe has been removed.
 
-This recipe uses the matched NexusFPC compiler/RTL/packages in the sibling
-`tools/nexus-fpc` checkout and the same installed LLVM/SDK/CRT versions as the
-preserved script. It requires that compiler distribution to have already been
-built. Consumers can import the descriptor to inspect its contract without
-running it; an explicit composed Package child schedules the build.
+The Pascal probe verifies linkage/startup of the core runtime with LLVM LZMA,
+PPMd and WavPack objects. It does not exercise every codec or archive operation.
+Bzip2 still uses runtime DLL loading; this object build does not create that DLL.
+The separately retained C/C++ bzip2 round-trip project is
+`projects/forge/examples/AbbreviaLLVM.Forge.nxscript` in the Nexus repository.
 
-The independent C/C++ round-trip Project remains in the main Nexus repository:
-
-- `projects/forge/examples/AbbreviaLLVM.Forge.nxscript`
-- `projects/forge/examples/Clang.mustache` and `LLVMAr.mustache`
-- `projects/forge/test/fixtures/llvm/AbbreviaRoundTrip.cpp`
-
-From the Nexus root, the established commands build the seven bzip2 objects,
-create their COFF library, link the C++ fixture with LLD, and verify restored bytes:
-
-```powershell
-output/NexusForge-next/x86_64-win64/nxforge.exe /input=projects/forge/examples/AbbreviaLLVM.Forge.nxscript
-```
-
-The Project's final Run child now verifies the executable in the same invocation.
-
-## Validation and retained limits
-
-The ownership migration preserves all original source and object hashes. The
-37-source C rebuild, COFF-header inspection, combined Pascal runtime link/startup,
-and existing Forge round trip have passed. The Pascal check used the matched
-NexusFPC 3.3.1 bootstrap in `C:\gitdev\npuid`, including the Nexus artifact identity
-change. The Forge round trip compresses 4096 bytes to 100 and restores all 4096
-bytes identically.
-
-A checkout recreated from the Git index reproduced the same complete build and
-Pascal startup test without the former submodule or temporary probe. All 627
-imported files matched their pre-conversion bytes exactly in both the working
-directory and that checkout. The successful recipe recorded 41 build/check steps.
-
-The recovered probe notes describe a successful combined Pascal link/startup
-test with runtime-loaded bzip2, not a complete codec or archive regression suite.
-A new static-bzip2 Pascal check with the current compiler reaches LLD but lacks
-`bz_internal_error`, `BZ2_rNums`, and `BZ2_crc32Table`. That integration path is
-not changed here. The original probe also stopped the full Delphi runtime unit
-list at `AbCabTyp`'s missing `AnsiStrings`; the complete Delphi/IDE package is
-outside the preserved core-runtime build.
-
-The pre-conversion sources, Git history, fixes, original LLVM objects, scripts,
-and logs were backed up under
-`C:\gitdev\nexus\output\AbbreviaOwnership-20261010`. This local backup supplements
-the directly tracked sources and reproducible recipe; commit and push this
-repository before relying on a new-machine checkout.
-
-`abbrevia-ready-to-commit.zip` in that backup directory is a complete export of
-the staged Abbrevia package, including C sources, object files and archive test
-fixtures. `originals.zip` preserves the pre-conversion working tree and temporary
-LLVM work; `abbrevia-history.bundle` preserves the original Git history.
+The previously identified static-bzip2 Pascal linkage gap remains: that path
+lacks `bz_internal_error`, `BZ2_rNums`, and `BZ2_crc32Table`. The full Delphi/IDE
+unit list also previously stopped at `AbCabTyp`'s missing `AnsiStrings` unit.
+Neither path is part of this build migration. The recipe currently targets Win64.

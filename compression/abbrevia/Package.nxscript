@@ -16,17 +16,43 @@ Package Abbrevia {
     Author: "TurboPower, TurboPack and contributors";
     Description: "Abbrevia archive and compression runtime units.";
     License: "MPL-1.1";
-    Outputs: [RuntimeCheck: "output/forge/AbbreviaLLVMRuntime.exe", Objects: "output/forge/objects.json"];
+    Outputs: [RuntimeCheck: "output/forge/AbbreviaLLVMRuntime.exe", Objects: "output/forge/source/Win64"];
     UnitPaths: ["output/forge/units"];
     IncludePaths: ["output/forge/source"];
     LibraryPaths: ["output/forge/source/Win64", "output/forge/runtime-libs"];
 
-    // Reuse the verified codec builder. Pascal compilation is a distinct child.
-    DeletePath Clean { Path: "output/forge"; Recursive: True; }
-    PowerShell NativeCodecs {
-        Template: "../../../../projects/forge/examples/PowerShell.mustache";
-        EntryPoint: "scripts/Build-AbbreviaLLVM.ps1";
-        Arguments: ["-OutputRoot", "output/forge"];
+    Group NativeCodecs {
+        DeletePath Clean { Path: "output/forge"; Recursive: True; }
+        CopyFile PascalSources {
+            Source: "external/abbrevia/source";
+            Destination: "output/forge/source";
+            Recursive: True;
+            IncludeMasks: ["*.pas", "*.inc", "*.res", "*.dfm", "*.lfm"];
+        }
+        CreateDirectory Objects { Path: @Abbrevia.Outputs.Objects; }
+        Clang Compile {
+            Template: "../../../../projects/forge/examples/Clang.mustache";
+            Executable: "C:/Program Files/LLVM/bin/clang.exe";
+            Source: [
+                "external/abbrevia/thirdparty/lzma/*.c",
+                "external/abbrevia/thirdparty/ppmd/*.c",
+                "external/abbrevia/thirdparty/wavpack/*.c",
+                "external/abbrevia/thirdparty/bzip2/*.c"
+            ];
+            CompileOnly: True;
+            Target: "x86_64-pc-windows-msvc";
+            OptimizationLevel: 2;
+            DisableStackProtector: True;
+            Defines: [BZ_NO_STDIO];
+            SystemIncludePaths: [
+                "C:/Program Files/LLVM/lib/clang/23/include",
+                "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.29.30133/include",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/ucrt",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/shared",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.19041.0/um"
+            ];
+            WorkingDirectory: @Abbrevia.Outputs.Objects;
+        }
     }
     CreateDirectory Units { Path: "output/forge/units"; }
     CreateDirectory RuntimeLibraries { Path: "output/forge/runtime-libs"; }
@@ -48,18 +74,22 @@ Package Abbrevia {
     }
     FPC CompileRuntime {
         Template: "../../../../projects/forge/examples/FPC.mustache";
-        Compiler: "../../../../../tools/nexus-fpc/compiler/ppcx64.exe";
+        Compiler: "../../../../../tools/nexus-fpc/build/forge-bootstrap/cycle3/ppcx64.exe";
         Source: ["test/AbbreviaLLVMRuntime.pas"];
         EntryPoint: "test/AbbreviaLLVMRuntime.pas";
         Output: @Abbrevia.Outputs.RuntimeCheck;
         UnitOutput: "output/forge/units";
         UnitPaths: [
-            "../../../../../tools/nexus-fpc/rtl/units/x86_64-win64",
-            "../../../../../tools/nexus-fpc/packages/rtl-objpas/units/x86_64-win64",
-            "../../../../../tools/nexus-fpc/packages/rtl-generics/units/x86_64-win64",
+            "../../../../../tools/nexus-fpc/build/forge-bootstrap/cycle3/rtl64",
+            "../../../../../tools/nexus-fpc/packages/rtl-objpas/src/inc",
+            "../../../../../tools/nexus-fpc/packages/rtl-generics/src",
             "output/forge/source"
         ];
-        IncludePaths: @Abbrevia.IncludePaths;
+        IncludePaths: [
+            "output/forge/source",
+            "../../../../../tools/nexus-fpc/packages/rtl-objpas/src/win",
+            "../../../../../tools/nexus-fpc/packages/rtl-objpas/src/x86_64"
+        ];
         ObjectPaths: ["output/forge/source"];
         CompilerUtilitiesPath: "C:/Program Files/LLVM/bin";
         DisableDefaultConfigFiles: True;

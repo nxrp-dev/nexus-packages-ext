@@ -142,148 +142,148 @@
         <PackageImport Include="rtl.bpi">
             <BuildOrder>1</BuildOrder>
         </PackageImport>
-        <DelphiCompile Include="..\..\..\source\AbArcTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Archive.Types.pas">
             <BuildOrder>7</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBase.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Base.pas">
             <BuildOrder>49</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBitBkt.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.BitBucket.pas">
             <BuildOrder>9</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBrowse.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Browser.pas">
             <BuildOrder>49</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBytes.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Bytes.pas">
             <BuildOrder>50</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBzip2.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.BZip2.pas">
             <BuildOrder>11</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbBzip2Typ.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.BZip2.Types.pas">
             <BuildOrder>12</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCabExt.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.Extractor.pas">
             <BuildOrder>16</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCabKit.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.Kit.pas">
             <BuildOrder>13</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCabMak.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.Builder.pas">
             <BuildOrder>14</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCabTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.Types.pas">
             <BuildOrder>15</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCBrows.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.Browser.pas">
             <BuildOrder>17</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCharset.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Charset.pas">
             <BuildOrder>16</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbConst.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Constants.pas">
             <BuildOrder>13</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbCrtl.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.CRuntime.pas">
             <BuildOrder>45</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfBase.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.Base.pas">
             <BuildOrder>26</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfCryS.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.CryptoStream.pas">
             <BuildOrder>27</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfDec.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.Decoder.pas">
             <BuildOrder>18</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfEnc.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.Encoder.pas">
             <BuildOrder>19</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfHufD.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.HuffmanDecoder.pas">
             <BuildOrder>20</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfInW.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.InputWindow.pas">
             <BuildOrder>21</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfOutW.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.OutputWindow.pas">
             <BuildOrder>22</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfPkMg.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.PackageMerge.pas">
             <BuildOrder>23</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfStrm.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.Stream.pas">
             <BuildOrder>24</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbDfXlat.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Deflate.Translation.pas">
             <BuildOrder>25</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbExcept.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Exceptions.pas">
             <BuildOrder>24</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbFciFdi.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Cabinet.API.pas">
             <BuildOrder>28</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbGzTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.GZip.Types.pas">
             <BuildOrder>29</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbLZMA.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.LZMA.pas">
             <BuildOrder>47</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbPPMd.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.PPMd.pas">
             <BuildOrder>48</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbResString.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.ResourceStrings.pas">
             <BuildOrder>27</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbSelfEx.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.SelfExtractor.pas">
             <BuildOrder>36</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbSpanSt.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.SpanningStream.pas">
             <BuildOrder>30</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbSWStm.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.SlidingWindowStream.pas">
             <BuildOrder>31</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbTarTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Tar.Types.pas">
             <BuildOrder>32</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbUnzOutStm.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Unzip.OutputStream.pas">
             <BuildOrder>33</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbUnzper.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Unzipper.pas">
             <BuildOrder>34</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbUnzPrc.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Unzip.Procedures.pas">
             <BuildOrder>35</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbUtils.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Utilities.pas">
             <BuildOrder>35</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbVMStrm.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VirtualMemoryStream.pas">
             <BuildOrder>37</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbWavPack.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.WavPack.pas">
             <BuildOrder>50</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZBrows.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zip.Browser.pas">
             <BuildOrder>38</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZipExt.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zip.Extractor.pas">
             <BuildOrder>39</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZipKit.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zip.Kit.pas">
             <BuildOrder>40</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZipper.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zipper.pas">
             <BuildOrder>41</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZipPrc.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zip.Procedures.pas">
             <BuildOrder>42</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZipTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Zip.Types.pas">
             <BuildOrder>43</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\AbZLTyp.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.ZLib.Types.pas">
             <BuildOrder>44</BuildOrder>
         </DelphiCompile>
         <BuildConfiguration Include="Release">

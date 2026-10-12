@@ -28,7 +28,7 @@ unit AbCabExtTests;
 interface
 
 uses
-  AbTestFramework, AbCabExt;
+  AbTestFramework, Abbrevia.Cabinet.Extractor;
 
 type
   TAbCabExtTests = class(TAbCompTestCase)

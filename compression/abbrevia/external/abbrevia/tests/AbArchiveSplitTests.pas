@@ -53,7 +53,7 @@ type
 implementation
 
 uses
-  SysUtils, TestFrameWork, AbExcept, AbUnzper, AbZipTyp, AbZipper;
+  SysUtils, TestFrameWork, Abbrevia.Exceptions, Abbrevia.Unzipper, Abbrevia.Zip.Types, Abbrevia.Zipper;
 
 { TAbArchiveSplitTests }
 

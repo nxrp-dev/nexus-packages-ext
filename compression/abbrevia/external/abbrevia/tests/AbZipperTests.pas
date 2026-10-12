@@ -29,7 +29,7 @@ unit AbZipperTests;
 interface
 
 uses
-  AbTestFrameWork, AbZipper;
+  AbTestFrameWork, Abbrevia.Zipper;
 
 type
   TAbZipperTests = class(TAbCompTestCase)
@@ -70,7 +70,7 @@ uses
   {$ENDIF}
   Classes, SysUtils,
   TestFrameWork,
-  AbArcTyp, AbUtils, AbUnZper, AbZipTyp;
+  Abbrevia.Archive.Types, Abbrevia.Utilities, Abbrevia.Unzipper, Abbrevia.Zip.Types;
 
 { TAbZipperTests }
 

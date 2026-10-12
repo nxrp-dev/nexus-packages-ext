@@ -33,7 +33,7 @@
 interface
 
 uses
-  Classes, TestFrameWork, AbTestFrameWork, AbArcTyp, AbCharset, AbUtils;
+  Classes, TestFrameWork, AbTestFrameWork, Abbrevia.Archive.Types, Abbrevia.Charset, Abbrevia.Utilities;
 
 type
   TAbArchiveListTests = class(TAbTestCase)
@@ -135,7 +135,7 @@ uses
   {$IFDEF MSWINDOWS}
   Windows,
   {$ENDIF}
-  SysUtils, AbConst;
+  SysUtils, Abbrevia.Constants;
 
 {----------------------------------------------------------------------------}
 { TAbArchiveListTests }

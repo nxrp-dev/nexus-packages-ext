@@ -28,7 +28,7 @@ unit AbMeterTests;
 interface
 
 uses
-  AbMeter, AbVisualTestBase;
+  Abbrevia.Meter, AbVisualTestBase;
 
 type
 

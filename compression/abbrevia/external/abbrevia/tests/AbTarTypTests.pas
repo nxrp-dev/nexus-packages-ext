@@ -30,7 +30,7 @@
 interface
 
 uses
-  Classes, TestFramework, AbArcTypTests, AbTestFrameWork, AbUtils;
+  Classes, TestFramework, AbArcTypTests, AbTestFrameWork, Abbrevia.Utilities;
 
 type
   TAbTarArchiveTests = class(TAbArchiveMultiFileTests)
@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  SysUtils, AbTarTyp;
+  SysUtils, Abbrevia.Tar.Types;
 
 {----------------------------------------------------------------------------}
 { TAbTarArchiveTests }

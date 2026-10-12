@@ -28,7 +28,7 @@ unit AbCabMakTests;
 interface
 
 uses
-  AbTestFrameWork, AbCabMak;
+  AbTestFrameWork, Abbrevia.Cabinet.Builder;
 
 type
   TAbCabMakTests = class(TabCompTestCase)

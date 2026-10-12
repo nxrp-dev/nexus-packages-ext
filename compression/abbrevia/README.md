@@ -12,6 +12,96 @@ the [central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATT
 Original notices, codec sources, bundled binaries, and archive fixtures remain
 with the imported material.
 
+## Unit names
+
+Pascal units use descriptive dotted names beginning with `Abbrevia.`. Unit
+declarations, filenames, uses clauses, qualified references, package manifests,
+examples, tests, localization alternatives, and companion resources use the same
+names. Classes and other public identifiers retain their upstream names.
+Consumers must update their uses clauses; no legacy alias units are supplied.
+
+| Previous unit | Current unit |
+| --- | --- |
+| `AbArcTyp` | `Abbrevia.Archive.Types` |
+| `AbBase` | `Abbrevia.Base` |
+| `AbBitBkt` | `Abbrevia.BitBucket` |
+| `AbBrowse` | `Abbrevia.Browser` |
+| `AbBseCLX` | `Abbrevia.CLX.Base` |
+| `AbBseVCL` | `Abbrevia.VCL.Base` |
+| `AbBytes` | `Abbrevia.Bytes` |
+| `AbBzip2` | `Abbrevia.BZip2` |
+| `AbBzip2Typ` | `Abbrevia.BZip2.Types` |
+| `AbCBrows` | `Abbrevia.Cabinet.Browser` |
+| `AbCView` | `Abbrevia.Cabinet.View` |
+| `AbCabExt` | `Abbrevia.Cabinet.Extractor` |
+| `AbCabKit` | `Abbrevia.Cabinet.Kit` |
+| `AbCabMak` | `Abbrevia.Cabinet.Builder` |
+| `AbCabTyp` | `Abbrevia.Cabinet.Types` |
+| `AbCharset` | `Abbrevia.Charset` |
+| `AbComCtrls` | `Abbrevia.CommonControls` |
+| `AbCompnd` | `Abbrevia.CompoundFile` |
+| `AbConst` | `Abbrevia.Constants` |
+| `AbCrtl` | `Abbrevia.CRuntime` |
+| `AbDfBase` | `Abbrevia.Deflate.Base` |
+| `AbDfCryS` | `Abbrevia.Deflate.CryptoStream` |
+| `AbDfDec` | `Abbrevia.Deflate.Decoder` |
+| `AbDfEnc` | `Abbrevia.Deflate.Encoder` |
+| `AbDfHufD` | `Abbrevia.Deflate.HuffmanDecoder` |
+| `AbDfInW` | `Abbrevia.Deflate.InputWindow` |
+| `AbDfOutW` | `Abbrevia.Deflate.OutputWindow` |
+| `AbDfPkMg` | `Abbrevia.Deflate.PackageMerge` |
+| `AbDfStrm` | `Abbrevia.Deflate.Stream` |
+| `AbDfXlat` | `Abbrevia.Deflate.Translation` |
+| `AbDlgDir` | `Abbrevia.Dialogs.Directory` |
+| `AbExcept` | `Abbrevia.Exceptions` |
+| `AbFciFdi` | `Abbrevia.Cabinet.API` |
+| `AbGzTyp` | `Abbrevia.GZip.Types` |
+| `AbHexVw` | `Abbrevia.HexView` |
+| `AbLZMA` | `Abbrevia.LZMA` |
+| `AbLZMAStream` | `Abbrevia.LZMA.Stream` |
+| `AbMeter` | `Abbrevia.Meter` |
+| `AbPPMd` | `Abbrevia.PPMd` |
+| `AbPeCol` | `Abbrevia.Editors.Collection` |
+| `AbReg` | `Abbrevia.Registration` |
+| `AbResString` | `Abbrevia.ResourceStrings` |
+| `AbSWStm` | `Abbrevia.SlidingWindowStream` |
+| `AbSelfEx` | `Abbrevia.SelfExtractor` |
+| `AbSpanSt` | `Abbrevia.SpanningStream` |
+| `AbTarTyp` | `Abbrevia.Tar.Types` |
+| `AbUnzOutStm` | `Abbrevia.Unzip.OutputStream` |
+| `AbUnzPrc` | `Abbrevia.Unzip.Procedures` |
+| `AbUnzper` | `Abbrevia.Unzipper` |
+| `AbUtils` | `Abbrevia.Utilities` |
+| `AbVMStrm` | `Abbrevia.VirtualMemoryStream` |
+| `AbView` | `Abbrevia.View` |
+| `AbWavPack` | `Abbrevia.WavPack` |
+| `AbZBrows` | `Abbrevia.Zip.Browser` |
+| `AbZLTyp` | `Abbrevia.ZLib.Types` |
+| `AbZView` | `Abbrevia.Zip.View` |
+| `AbZipExt` | `Abbrevia.Zip.Extractor` |
+| `AbZipKit` | `Abbrevia.Zip.Kit` |
+| `AbZipOut` | `Abbrevia.Zip.Output` |
+| `AbZipPrc` | `Abbrevia.Zip.Procedures` |
+| `AbZipTyp` | `Abbrevia.Zip.Types` |
+| `AbZipper` | `Abbrevia.Zipper` |
+| `Abbrevia_TLB` | `Abbrevia.COM.TypeLibrary` |
+| `FMX.AbDlgPwd` | `Abbrevia.FMX.Dialogs.Password` |
+| `FMX.AbPeDir` | `Abbrevia.FMX.Editors.Directory` |
+| `FMX.AbPeFn` | `Abbrevia.FMX.Editors.FileName` |
+| `FMX.AbPePass` | `Abbrevia.FMX.Editors.Password` |
+| `FMX.AbPeVer` | `Abbrevia.FMX.Editors.Version` |
+| `FMX.AbReg` | `Abbrevia.FMX.Registration` |
+| `Vcl.AbDlgPwd` | `Abbrevia.VCL.Dialogs.Password` |
+| `Vcl.AbPeDir` | `Abbrevia.VCL.Editors.Directory` |
+| `Vcl.AbPeFn` | `Abbrevia.VCL.Editors.FileName` |
+| `Vcl.AbPePass` | `Abbrevia.VCL.Editors.Password` |
+| `Vcl.AbPeVer` | `Abbrevia.VCL.Editors.Version` |
+| `Vcl.AbReg` | `Abbrevia.VCL.Registration` |
+| `_GZipItem` | `Abbrevia.COM.GZipItem` |
+| `_TarItem` | `Abbrevia.COM.TarItem` |
+| `_ZipItem` | `Abbrevia.COM.ZipItem` |
+| `_ZipKit` | `Abbrevia.COM.ZipKit` |
+
 ## Forge build
 
 `Package.nxscript` owns the Win64 build through ordered children. Its first child,
@@ -70,5 +160,5 @@ The separately retained C/C++ bzip2 round-trip project is
 
 The previously identified static-bzip2 Pascal linkage gap remains: that path
 lacks `bz_internal_error`, `BZ2_rNums`, and `BZ2_crc32Table`. The full Delphi/IDE
-unit list also previously stopped at `AbCabTyp`'s missing `AnsiStrings` unit.
+unit list also previously stopped at `Abbrevia.Cabinet.Types`'s missing `AnsiStrings` unit.
 Neither path is part of this build migration. The recipe currently targets Win64.

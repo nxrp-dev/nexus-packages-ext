@@ -139,16 +139,16 @@
         <DCCReference Include="AbbreviaD.dcp"/>
         <DCCReference Include="designide.dcp"/>
         <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="..\..\..\source\FMX.AbPeFn.pas"/>
-        <DCCReference Include="..\..\..\source\FMX.AbReg.pas"/>
-        <DCCReference Include="..\..\..\source\FMX.AbPeDir.pas"/>
-        <DCCReference Include="..\..\..\source\FMX.AbPeVer.pas">
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Editors.FileName.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Registration.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Editors.Directory.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Editors.Version.pas">
             <Form>AbAboutBox</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\source\FMX.AbDlgPwd.pas">
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Dialogs.Password.pas">
             <Form>PassWordDlg</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\source\FMX.AbPePass.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.FMX.Editors.Password.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

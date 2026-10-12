@@ -30,7 +30,7 @@ unit AbCabViewTests;
 interface
 
 uses
-  AbCView, AbVisualTestBase;
+  Abbrevia.Cabinet.View, AbVisualTestBase;
 
 type
 
@@ -48,7 +48,7 @@ type
 implementation
 
 uses
-  Menus, TestFrameWork, AbCBrows, AbTestFrameWork;
+  Menus, TestFrameWork, Abbrevia.Cabinet.Browser, AbTestFrameWork;
 
 { TAbCabViewTests }
 

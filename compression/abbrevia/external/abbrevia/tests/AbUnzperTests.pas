@@ -30,7 +30,7 @@ unit AbUnzperTests;
 interface
 
 uses
-  AbTestFrameWork, AbUnzper;
+  AbTestFrameWork, Abbrevia.Unzipper;
 
 type
 
@@ -75,7 +75,7 @@ uses
   Windows,
   {$ENDIF}
   SysUtils, Classes, TestFrameWork,
-  AbArcTyp, AbDfBase, AbExcept, AbUtils, AbZipTyp;
+  Abbrevia.Archive.Types, Abbrevia.Deflate.Base, Abbrevia.Exceptions, Abbrevia.Utilities, Abbrevia.Zip.Types;
 
 { TAbUnZipperTests }
 

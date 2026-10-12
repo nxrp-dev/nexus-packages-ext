@@ -27,11 +27,11 @@ library Abbrevia;
 
 uses
   ComServ,
-  _ZipKit in '_ZipKit.pas',
-  _ZipItem in '_ZipItem.pas',
-  _GZipItem in '_GZipItem.pas',
-  _TarItem in '_TarItem.pas',
-  Abbrevia_TLB in 'Abbrevia_TLB.pas';
+  Abbrevia.COM.ZipKit in 'Abbrevia.COM.ZipKit.pas',
+  Abbrevia.COM.ZipItem in 'Abbrevia.COM.ZipItem.pas',
+  Abbrevia.COM.GZipItem in 'Abbrevia.COM.GZipItem.pas',
+  Abbrevia.COM.TarItem in 'Abbrevia.COM.TarItem.pas',
+  Abbrevia.COM.TypeLibrary in 'Abbrevia.COM.TypeLibrary.pas';
 
 exports
   DllGetClassObject,

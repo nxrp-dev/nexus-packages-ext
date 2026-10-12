@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  SysUtils, TestFrameWork, AbVMStrm, AbUtils;
+  SysUtils, TestFrameWork, Abbrevia.VirtualMemoryStream, Abbrevia.Utilities;
 
 { TAbVMStrmTests }
 

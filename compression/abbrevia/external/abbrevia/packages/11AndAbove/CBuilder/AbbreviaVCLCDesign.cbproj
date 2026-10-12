@@ -140,29 +140,29 @@
         <PackageImport Include="xmlrtl.bpi">
             <BuildOrder>21</BuildOrder>
         </PackageImport>
-        <DelphiCompile Include="..\..\..\source\AbPeCol.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.Editors.Collection.pas">
             <BuildOrder>11</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbDlgPwd.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Dialogs.Password.pas">
             <Form>PassWordDlg</Form>
             <FormType>dfm</FormType>
             <BuildOrder>14</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbPeDir.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Editors.Directory.pas">
             <BuildOrder>15</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbPeFn.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Editors.FileName.pas">
             <BuildOrder>16</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbPePass.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Editors.Password.pas">
             <BuildOrder>17</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbPeVer.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Editors.Version.pas">
             <Form>AbAboutBox</Form>
             <FormType>dfm</FormType>
             <BuildOrder>18</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\Vcl.AbReg.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.VCL.Registration.pas">
             <BuildOrder>19</BuildOrder>
         </DelphiCompile>
         <BuildConfiguration Include="Base">

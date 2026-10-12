@@ -30,7 +30,7 @@
 interface
 
 uses
-  Classes, TestFrameWork, AbTestFrameWork, AbArcTypTests, AbArcTyp, AbUtils, AbZipTyp;
+  Classes, TestFrameWork, AbTestFrameWork, AbArcTypTests, Abbrevia.Archive.Types, Abbrevia.Utilities, Abbrevia.Zip.Types;
 
 type
   TAbZipArchiveTests = class(TAbArchiveMultiFileTests)
@@ -87,14 +87,14 @@ type
 implementation
 
 uses
-  SysUtils, AbBitBkt, AbConst, AbExcept, AbUnzPrc, AbZipPrc;
+  SysUtils, Abbrevia.BitBucket, Abbrevia.Constants, Abbrevia.Exceptions, Abbrevia.Unzip.Procedures, Abbrevia.Zip.Procedures;
 
 {----------------------------------------------------------------------------}
 { TAbZipArchive with Extract/Insert helpers }
 {----------------------------------------------------------------------------}
 
 type
-  TAbZipArchive = class(AbZipTyp.TAbZipArchive)
+  TAbZipArchive = class(Abbrevia.Zip.Types.TAbZipArchive)
   private
     procedure DoExtractHelper(Sender : TObject; Item : TAbArchiveItem;
       const NewName : string);

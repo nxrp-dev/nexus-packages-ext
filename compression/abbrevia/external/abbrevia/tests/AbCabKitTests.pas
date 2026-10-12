@@ -28,7 +28,7 @@ unit AbCabKitTests;
 interface
 
 uses
-  AbTestFrameWork, AbCabKit;
+  AbTestFrameWork, Abbrevia.Cabinet.Kit;
 
 type
 

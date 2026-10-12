@@ -30,7 +30,7 @@ unit AbZipViewTests;
 interface
 
 uses
-  AbZView, AbVisualTestBase;
+  Abbrevia.Zip.View, AbVisualTestBase;
 
 type
 
@@ -49,7 +49,7 @@ implementation
 
 uses
   {$IFDEF LINUX}QMenus{$ELSE}Menus{$ENDIF},
-  TestFrameWork, AbTestFramework, AbZBrows;
+  TestFrameWork, AbTestFramework, Abbrevia.Zip.Browser;
 
 { TAbZipViewTests }
 

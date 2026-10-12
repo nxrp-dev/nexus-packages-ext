@@ -30,7 +30,7 @@ unit AbZipOutTests;
 interface
 
 uses
-  AbZipOut, AbVisualTestBase;
+  Abbrevia.Zip.Output, AbVisualTestBase;
 
 type
   TAbZipOutlineTests = class(TAbVisualTestCase)

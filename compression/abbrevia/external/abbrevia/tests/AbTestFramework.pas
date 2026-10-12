@@ -42,7 +42,7 @@ uses
   Windows,
 {$ENDIF}
   Classes, TypInfo,
-  AbBrowse;
+  Abbrevia.Browser;
 
 type
   TAbDirEntry = record
@@ -113,7 +113,7 @@ uses
   Posix.SysStat,
 {$ENDIF}
   Math, SysUtils, IOUtils, Variants,
-  AbUtils;
+  Abbrevia.Utilities;
 
 var
   ExePath : string;

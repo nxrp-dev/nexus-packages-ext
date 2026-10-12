@@ -41,7 +41,7 @@ interface
 uses
 // Note: The Floppy Span tests are designed to be platform specific
   Windows,
-  AbArcTyp, AbUtils,
+  Abbrevia.Archive.Types, Abbrevia.Utilities,
   AbTestFramework;
 
 type
@@ -84,7 +84,7 @@ implementation
 uses
   Classes, Controls, Dialogs, SysUtils,
   TestFrameWork,
-  AbUnzper, AbZipper;
+  Abbrevia.Unzipper, Abbrevia.Zipper;
 
 var
   ADriveType: Integer = -1;

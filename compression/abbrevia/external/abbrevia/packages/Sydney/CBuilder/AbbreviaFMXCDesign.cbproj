@@ -161,30 +161,30 @@
         <PackageImport Include="xmlrtl.bpi">
             <BuildOrder>12</BuildOrder>
         </PackageImport>
-        <DelphiCompile Include="..\..\..\source\FMX.AbDlgPwd.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Dialogs.Password.pas">
             <Form>PassWordDlg</Form>
             <FormType>fmx</FormType>
             <BuildOrder>4</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\FMX.AbPeDir.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Editors.Directory.pas">
             <BuildOrder>5</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\FMX.AbPeFn.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Editors.FileName.pas">
             <BuildOrder>6</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\FMX.AbPePass.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Editors.Password.pas">
             <BuildOrder>7</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\FMX.AbPeVer.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Editors.Version.pas">
             <Form>AbAboutBox</Form>
             <FormType>fmx</FormType>
             <BuildOrder>8</BuildOrder>
         </DelphiCompile>
-        <DelphiCompile Include="..\..\..\source\FMX.AbReg.pas">
+        <DelphiCompile Include="..\..\..\source\Abbrevia.FMX.Registration.pas">
             <BuildOrder>9</BuildOrder>
         </DelphiCompile>
-        <FormResources Include="..\..\..\source\FMX.AbDlgPwd.fmx"/>
-        <FormResources Include="..\..\..\source\FMX.AbPeVer.fmx"/>
+        <FormResources Include="..\..\..\source\Abbrevia.FMX.Dialogs.Password.fmx"/>
+        <FormResources Include="..\..\..\source\Abbrevia.FMX.Editors.Version.fmx"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -50,8 +50,8 @@ type
 implementation
 
 uses
-  Classes, SysUtils, TestFrameWork, AbUtils,
-  {$IFDEF HasAdvancedRecords}AbLZMAStream,{$ENDIF} AbLZMA;
+  Classes, SysUtils, TestFrameWork, Abbrevia.Utilities,
+  {$IFDEF HasAdvancedRecords}Abbrevia.LZMA.Stream,{$ENDIF} Abbrevia.LZMA;
 
 { TAbLZMATests }
 

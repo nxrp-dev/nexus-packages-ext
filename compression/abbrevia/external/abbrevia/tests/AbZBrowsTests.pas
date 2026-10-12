@@ -28,7 +28,7 @@ unit AbZBrowsTests;
 interface
 
 uses
-  AbTestFrameWork, AbZBrows;
+  AbTestFrameWork, Abbrevia.Zip.Browser;
 
 type
 

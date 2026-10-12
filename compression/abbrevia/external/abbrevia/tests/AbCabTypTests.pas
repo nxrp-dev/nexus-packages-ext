@@ -30,7 +30,7 @@
 interface
 
 uses
-  Classes, TestFrameWork, AbArcTyp, AbUtils, AbArcTypTests, AbTestFrameWork;
+  Classes, TestFrameWork, Abbrevia.Archive.Types, Abbrevia.Utilities, AbArcTypTests, AbTestFrameWork;
 
 type
   TAbCabArchiveTests = class(TAbArchiveMultiFileTests)
@@ -56,7 +56,7 @@ type
 implementation
 
 uses
-  SysUtils, AbCabTyp, AbFciFdi;
+  SysUtils, Abbrevia.Cabinet.Types, Abbrevia.Cabinet.API;
 
 {----------------------------------------------------------------------------}
 { TAbCabArchiveTests }
@@ -123,7 +123,7 @@ var
   Arc: TAbCabArchive;
 begin
   // Check that creating a single cabinet archive doesn't flag the cab as having
-  // a second volume (issue with D2007->D2009 conversion and Boolean vs BOOL in AbFciFdi)
+  // a second volume (issue with D2007->D2009 conversion and Boolean vs BOOL in Abbrevia.Cabinet.API)
   Arc := TAbCabArchive.Create(TestTempDir + 'test.cab', fmCreate);
   try
     Arc.Load;

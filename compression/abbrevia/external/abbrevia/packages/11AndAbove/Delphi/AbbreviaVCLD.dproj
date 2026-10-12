@@ -179,15 +179,15 @@
         <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="vclx.dcp"/>
         <DCCReference Include="AbbreviaD.dcp"/>
-        <DCCReference Include="..\..\..\source\AbBseVCL.pas"/>
-        <DCCReference Include="..\..\..\source\AbMeter.pas"/>
-        <DCCReference Include="..\..\..\source\AbView.pas"/>
-        <DCCReference Include="..\..\..\source\AbZipOut.pas"/>
-        <DCCReference Include="..\..\..\source\AbCView.pas"/>
-        <DCCReference Include="..\..\..\source\AbZView.pas"/>
-        <DCCReference Include="..\..\..\source\AbCompnd.pas"/>
-        <DCCReference Include="..\..\..\source\AbHexVw.pas"/>
-        <DCCReference Include="..\..\..\source\AbComCtrls.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Base.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.Meter.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.View.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.Zip.Output.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.Cabinet.View.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.Zip.View.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.CompoundFile.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.HexView.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.CommonControls.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -4,8 +4,8 @@ program AbbreviaLLVMRuntime;
 {$mode delphi}
 
 uses
-  SysUtils, AbTarTyp, AbZipTyp, AbGzTyp, AbZipPrc, AbUnzPrc,
-  AbLzma, AbPPMd, AbWavPack, AbBzip2;
+  SysUtils, Abbrevia.Tar.Types, Abbrevia.Zip.Types, Abbrevia.GZip.Types, Abbrevia.Zip.Procedures, Abbrevia.Unzip.Procedures,
+  Abbrevia.LZMA, Abbrevia.PPMd, Abbrevia.WavPack, Abbrevia.BZip2;
 
 begin
   { This preserves the original combined link/startup probe. Codec behavior is

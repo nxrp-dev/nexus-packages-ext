@@ -60,13 +60,13 @@ requires
   AbbreviaVCLD;
 
 contains
-  AbPeCol in '..\..\..\source\AbPeCol.pas',
-  AbDlgDir in '..\..\..\source\AbDlgDir.pas' {DirDlg},
-  Vcl.AbPeFn in '..\..\..\source\Vcl.AbPeFn.pas',
-  Vcl.AbReg in '..\..\..\source\Vcl.AbReg.pas',
-  Vcl.AbPeDir in '..\..\..\source\Vcl.AbPeDir.pas',
-  Vcl.AbPeVer in '..\..\..\source\Vcl.AbPeVer.pas' {AbAboutBox},
-  Vcl.AbDlgPwd in '..\..\..\source\Vcl.AbDlgPwd.pas' {PassWordDlg},
-  Vcl.AbPePass in '..\..\..\source\Vcl.AbPePass.pas';
+  Abbrevia.Editors.Collection in '..\..\..\source\Abbrevia.Editors.Collection.pas',
+  Abbrevia.Dialogs.Directory in '..\..\..\source\Abbrevia.Dialogs.Directory.pas' {DirDlg},
+  Abbrevia.VCL.Editors.FileName in '..\..\..\source\Abbrevia.VCL.Editors.FileName.pas',
+  Abbrevia.VCL.Registration in '..\..\..\source\Abbrevia.VCL.Registration.pas',
+  Abbrevia.VCL.Editors.Directory in '..\..\..\source\Abbrevia.VCL.Editors.Directory.pas',
+  Abbrevia.VCL.Editors.Version in '..\..\..\source\Abbrevia.VCL.Editors.Version.pas' {AbAboutBox},
+  Abbrevia.VCL.Dialogs.Password in '..\..\..\source\Abbrevia.VCL.Dialogs.Password.pas' {PassWordDlg},
+  Abbrevia.VCL.Editors.Password in '..\..\..\source\Abbrevia.VCL.Editors.Password.pas';
 
 end.

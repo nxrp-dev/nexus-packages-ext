@@ -30,7 +30,7 @@ unit AbCBrowsTests;
 interface
 
 uses
-  AbTestFrameWork, AbCBrows;
+  AbTestFrameWork, Abbrevia.Cabinet.Browser;
 
 type
   TAbCabBrowserTests = class(TAbCompTestCase)

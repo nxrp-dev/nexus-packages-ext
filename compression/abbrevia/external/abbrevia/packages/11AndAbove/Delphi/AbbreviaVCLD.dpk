@@ -62,14 +62,14 @@ requires
   AbbreviaD;
 
 contains
-  AbBseVCL in '..\..\..\source\AbBseVCL.pas',
-  AbMeter in '..\..\..\source\AbMeter.pas',
-  AbView in '..\..\..\source\AbView.pas',
-  AbZipOut in '..\..\..\source\AbZipOut.pas',
-  AbCView in '..\..\..\source\AbCView.pas',
-  AbZView in '..\..\..\source\AbZView.pas',
-  AbCompnd in '..\..\..\source\AbCompnd.pas',
-  AbHexVw in '..\..\..\source\AbHexVw.pas',
-  AbComCtrls in '..\..\..\source\AbComCtrls.pas';
+  Abbrevia.VCL.Base in '..\..\..\source\Abbrevia.VCL.Base.pas',
+  Abbrevia.Meter in '..\..\..\source\Abbrevia.Meter.pas',
+  Abbrevia.View in '..\..\..\source\Abbrevia.View.pas',
+  Abbrevia.Zip.Output in '..\..\..\source\Abbrevia.Zip.Output.pas',
+  Abbrevia.Cabinet.View in '..\..\..\source\Abbrevia.Cabinet.View.pas',
+  Abbrevia.Zip.View in '..\..\..\source\Abbrevia.Zip.View.pas',
+  Abbrevia.CompoundFile in '..\..\..\source\Abbrevia.CompoundFile.pas',
+  Abbrevia.HexView in '..\..\..\source\Abbrevia.HexView.pas',
+  Abbrevia.CommonControls in '..\..\..\source\Abbrevia.CommonControls.pas';
 
 end.

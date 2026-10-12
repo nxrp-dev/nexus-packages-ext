@@ -28,7 +28,7 @@ unit AbSelfExTests;
 interface
 
 uses
-  AbSelfEx, AbTestFrameWork;
+  Abbrevia.SelfExtractor, AbTestFrameWork;
 
 type
 

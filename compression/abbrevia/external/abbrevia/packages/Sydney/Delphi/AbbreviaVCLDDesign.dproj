@@ -102,22 +102,22 @@
         </DelphiCompile>
         <DCCReference Include="designide.dcp"/>
         <DCCReference Include="AbbreviaVCLD.dcp"/>
-        <DCCReference Include="..\..\..\source\AbPeCol.pas"/>
-        <DCCReference Include="..\..\..\source\AbDlgDir.pas">
+        <DCCReference Include="..\..\..\source\Abbrevia.Editors.Collection.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.Dialogs.Directory.pas">
             <Form>DirDlg</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\source\Vcl.AbPeFn.pas"/>
-        <DCCReference Include="..\..\..\source\Vcl.AbReg.pas"/>
-        <DCCReference Include="..\..\..\source\Vcl.AbPeDir.pas"/>
-        <DCCReference Include="..\..\..\source\Vcl.AbPeVer.pas">
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Editors.FileName.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Registration.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Editors.Directory.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Editors.Version.pas">
             <Form>AbAboutBox</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\..\source\Vcl.AbDlgPwd.pas">
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Dialogs.Password.pas">
             <Form>PassWordDlg</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\..\source\Vcl.AbPePass.pas"/>
+        <DCCReference Include="..\..\..\source\Abbrevia.VCL.Editors.Password.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

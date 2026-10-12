@@ -9,11 +9,69 @@
 //
 // SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
 
-dialect "nxpackage.Language.nxscript";
+dialect "../../../../projects/forge/language/Forge.nxscript";
 
 Package Abbrevia {
     Id: "NXRP.Compression.Abbrevia";
     Author: "TurboPower, TurboPack and contributors";
     Description: "Abbrevia archive and compression runtime units.";
     License: "MPL-1.1";
+    Outputs: [RuntimeCheck: "output/forge/AbbreviaLLVMRuntime.exe", Objects: "output/forge/objects.json"];
+    UnitPaths: ["output/forge/units"];
+    IncludePaths: ["output/forge/source"];
+    LibraryPaths: ["output/forge/source/Win64", "output/forge/runtime-libs"];
+
+    // Reuse the verified codec builder. Pascal compilation is a distinct child.
+    DeletePath Clean { Path: "output/forge"; Recursive: True; }
+    PowerShell NativeCodecs {
+        Template: "../../../../projects/forge/examples/PowerShell.mustache";
+        EntryPoint: "scripts/Build-AbbreviaLLVM.ps1";
+        Arguments: ["-OutputRoot", "output/forge"];
+    }
+    CreateDirectory Units { Path: "output/forge/units"; }
+    CreateDirectory RuntimeLibraries { Path: "output/forge/runtime-libs"; }
+    CopyFile Kernel {
+        Source: "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/um/x64/kernel32.lib";
+        Destination: "output/forge/runtime-libs/kernel32.lib";
+    }
+    CopyFile UniversalCRT {
+        Source: "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64/ucrt.lib";
+        Destination: "output/forge/runtime-libs/ucrt.lib";
+    }
+    CopyFile VCRuntime {
+        Source: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.29.30133/lib/x64/vcruntime.lib";
+        Destination: "output/forge/runtime-libs/vcruntime.lib";
+    }
+    CopyFile MSVCRT {
+        Source: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.29.30133/lib/x64/msvcrt.lib";
+        Destination: "output/forge/runtime-libs/msvcrt.lib";
+    }
+    FPC CompileRuntime {
+        Template: "../../../../projects/forge/examples/FPC.mustache";
+        Compiler: "../../../../../tools/nexus-fpc/compiler/ppcx64.exe";
+        Source: ["test/AbbreviaLLVMRuntime.pas"];
+        EntryPoint: "test/AbbreviaLLVMRuntime.pas";
+        Output: @Abbrevia.Outputs.RuntimeCheck;
+        UnitOutput: "output/forge/units";
+        UnitPaths: [
+            "../../../../../tools/nexus-fpc/rtl/units/x86_64-win64",
+            "../../../../../tools/nexus-fpc/packages/rtl-objpas/units/x86_64-win64",
+            "../../../../../tools/nexus-fpc/packages/rtl-generics/units/x86_64-win64",
+            "output/forge/source"
+        ];
+        IncludePaths: @Abbrevia.IncludePaths;
+        ObjectPaths: ["output/forge/source"];
+        CompilerUtilitiesPath: "C:/Program Files/LLVM/bin";
+        DisableDefaultConfigFiles: True;
+        Mode: delphi;
+        Rebuild: True;
+        LinkerOptions: [
+            "output/forge/runtime-libs/kernel32.lib", "output/forge/runtime-libs/ucrt.lib",
+            "output/forge/runtime-libs/vcruntime.lib", "output/forge/runtime-libs/msvcrt.lib"
+        ];
+    }
+    Run VerifyRuntime {
+        Template: "../../../../projects/forge/examples/Run.mustache";
+        Executable: @Abbrevia.Outputs.RuntimeCheck;
+    }
 }

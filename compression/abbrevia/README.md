@@ -44,7 +44,26 @@ directory through Clang, sets the Win64 target explicitly, uses `BZ_NO_STDIO` fo
 bzip2, and supplies `kernel32.lib`, `ucrt.lib`, `vcruntime.lib` and `msvcrt.lib`
 for the Pascal link. MSBuild and `cl.exe` are not used.
 
-The existing Forge integration remains owned by the main Nexus repository:
+`Package.nxscript` now owns the complete preserved Win64 build sequence. Its
+Package contract exports Outputs, UnitPaths, IncludePaths, and LibraryPaths.
+Ordered children clean only `output/forge`, invoke the unchanged LLVM codec
+builder, stage CRT libraries, explicitly compile the Pascal runtime probe with
+FPC, and run that probe. The LLVM builder still creates an isolated source overlay;
+none of the imported source or prebuilt objects is replaced.
+
+From the Nexus root:
+
+```powershell
+output/NexusForge-next/x86_64-win64/nxforge.exe /input=packages/nexus-packages-ext/compression/abbrevia/Package.nxscript
+```
+
+This recipe uses the matched NexusFPC compiler/RTL/packages in the sibling
+`tools/nexus-fpc` checkout and the same installed LLVM/SDK/CRT versions as the
+preserved script. It requires that compiler distribution to have already been
+built. Consumers can import the descriptor to inspect its contract without
+running it; an explicit composed Package child schedules the build.
+
+The independent C/C++ round-trip Project remains in the main Nexus repository:
 
 - `projects/forge/examples/AbbreviaLLVM.Forge.nxscript`
 - `projects/forge/examples/Clang.mustache` and `LLVMAr.mustache`
@@ -55,8 +74,9 @@ create their COFF library, link the C++ fixture with LLD, and verify restored by
 
 ```powershell
 output/NexusForge-next/x86_64-win64/nxforge.exe /input=projects/forge/examples/AbbreviaLLVM.Forge.nxscript
-output/AbbreviaLLVM-roundtrip.exe
 ```
+
+The Project's final Run child now verifies the executable in the same invocation.
 
 ## Validation and retained limits
 

@@ -30,7 +30,7 @@ unit AbGzTypTests;
 interface
 
 uses
-  Classes, AbArcTypTests, AbTestFrameWork, Abbrevia.Archive.Types, Abbrevia.GZip.Types, Abbrevia.Utilities;
+  Classes, AbArcTypTests, AbTestFrameWork, Abbrevia.Archive, Abbrevia.GZip, Abbrevia.Utilities;
 
 type
   TAbGzipExtraFieldTests = class(TAbTestCase)

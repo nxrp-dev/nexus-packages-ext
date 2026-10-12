@@ -30,7 +30,7 @@ unit AbBzip2TypTests;
 interface
 
 uses
-  Classes, AbArcTypTests, Abbrevia.Archive.Types, Abbrevia.Utilities;
+  Classes, AbArcTypTests, Abbrevia.Archive, Abbrevia.Utilities;
 
 type
   TAbBzip2ArchiveTests = class(TAbArchiveTests)
@@ -56,7 +56,7 @@ type
 implementation
 
 uses
-  SysUtils, TestFrameWork, Abbrevia.BZip2.Types;
+  SysUtils, TestFrameWork, Abbrevia.BZip2Archive;
 
 {----------------------------------------------------------------------------}
 { TAbBzip2ArchiveTests }

@@ -102,7 +102,6 @@ initialization
 
   TestFramework.RegisterTest('Abbrevia.Utility Classes',
     TAbVMStrmTests.Suite);
- 
+
 end.
 
- 

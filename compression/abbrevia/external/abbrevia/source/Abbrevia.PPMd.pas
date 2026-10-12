@@ -58,9 +58,9 @@ uses
 
 // Don't re-order these;  it will cause linker errors
 {$IF DEFINED(CPU386)}
-  {$L Win32\Ppmd8Enc.obj}
-  {$L Win32\Ppmd8.obj}
-  {$L Win32\Ppmd8Dec.obj}
+  {$L Win32\Ppmd8Enc.o}
+  {$L Win32\Ppmd8.o}
+  {$L Win32\Ppmd8Dec.o}
 {$ELSEIF DEFINED(CPUX64)}
   {$L Win64\Ppmd8Enc.o}
   {$L Win64\Ppmd8.o}
@@ -74,6 +74,12 @@ uses
 
 
 { 7zTypes.h ================================================================== }
+
+{ These imported records use C alignment; AbDefine.inc selects four-byte alignment. }
+
+{$PUSH}
+{$PACKRECORDS C}
+
 
 type
   BoolInt = LongBool;
@@ -107,20 +113,21 @@ const
 
 (* SEE-contexts for PPM-contexts with masked symbols *)
 type
-  CPpmd_See = record
+  CPpmd_See = packed record
     Summ: UInt16; (* Freq *)
     Shift: Byte;  (* Speed of Freq change; low Shift is for fast change *)
     Count: Byte;  (* Count to next change of Shift *)
   end;
 
 type
-  CPpmd_Void_Ref = Pointer;
+  { PPMd stores 32-bit references: pointers on Win32, offsets on Win64. }
+  CPpmd_Void_Ref = UInt32;
 
 
 { Ppmd8.h ================================================================== }
 
 type
-  CPpmd_State = record
+  CPpmd_State = packed record
     Symbol: Byte;
     Freq: Byte;
     Successor_0: UInt16;
@@ -163,6 +170,10 @@ type
   end;
   PPpmd8 = ^CPpmd8;
 
+
+{$POP}
+
+
 procedure Ppmd8_Construct(p: PPpmd8); cdecl; external
   {$IFDEF USE_LIBPPMD}libppmd{$ENDIF} name 'Ppmd8_Construct';
 function Ppmd8_Alloc(p: PPpmd8; size: UInt32; alloc: ISzAllocPtr): BoolInt; cdecl;
@@ -195,7 +206,7 @@ begin
 end;
 
 var
-  DelphiMMInterface: ISzAlloc = (Alloc: SzAlloc; Free: SzFree);
+  PascalMMInterface: ISzAlloc = (Alloc: SzAlloc; Free: SzFree);
 
 
 { Ppmd.c::CharReader ======================================================= }
@@ -268,12 +279,12 @@ begin
       ppmd.Stream.In_ := @Src.streamIn;
 
       Ppmd8_Construct(@ppmd);
-      if not Ppmd8_Alloc(@ppmd, memMb shl 20, @DelphiMMInterface) then
+      if not Ppmd8_Alloc(@ppmd, memMb shl 20, @PascalMMInterface) then
         Exit;
       try
         if not Ppmd8_Init_RangeDec(@ppmd) then
         begin
-          Ppmd8_Free(@ppmd, @DelphiMMInterface);
+          Ppmd8_Free(@ppmd, @PascalMMInterface);
           Exit;
         end;
         Ppmd8_Init(@ppmd, modelOrder, restoreMethod);
@@ -298,7 +309,7 @@ begin
         if not finishedOK then
           raise EAbException.Create('Decompression failed');
       finally
-        Ppmd8_Free(@ppmd, @DelphiMMInterface);
+        Ppmd8_Free(@ppmd, @PascalMMInterface);
       end;
     finally
       FreeMem(OutBuf);

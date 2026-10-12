@@ -40,7 +40,6 @@
 {$A+ Force alignment on word/dword boundaries}
 {$S- No stack checking}
 
-{---Global compiler defines for 32-bit OS's---}
 {====Global fixed compiler options (do NOT change)====}
 
 {$B- Incomplete boolean evaluation}
@@ -53,34 +52,10 @@
 {$X+ Extended syntax}
 {$Z1 Enumerations are byte sized}
 
-{====Platform defines================================================}
-
-{$IFDEF UNIX}
-  {$DEFINE PosixAPI}
-{$ENDIF}
-
-{====General defines=================================================}
-
-{Activate the following define to include extra code to get rid of all
- hints and warnings. Parts of ABBREVIA are written in such a way
- that the hint/warning algorithms of the Delphi compilers are
- fooled and report things like variables being used before
- initialisation and so on when in reality the problem does not exist.}
-{$DEFINE DefeatWarnings}
-
-{ Disable warnings for explicit string casts }
-{$WARN EXPLICIT_STRING_CAST OFF}
-{$WARN EXPLICIT_STRING_CAST_LOSS OFF}
-
-{ Disable hints on Delphi XE2/Mac to prevent unexpanded inline messages }
-{$IFDEF POSIX}
-  {$HINTS OFF}
-{$ENDIF}
-
 {====Bzip2 defines===================================================}
 
-{Activate this define to statically link bzip2 .obj files into the application.
- Curerntly only supported by Delphi/Win32.}
+{Activate this define to statically link bzip2 object files into the application.
+ This path still needs the missing bzip2 C symbols described in the package README.}
 {.$DEFINE Bzip2Static}
 
 {Activate this define to dynamically link to a libbz2.dll/libbbz2.so.1}
@@ -89,17 +64,11 @@
 {Activate this define to load libbz2.dll/libbz2.so.1 at runtime using LoadLibrary}
 {.$DEFINE Bzip2Runtime}
 
-{Pick an appropriate linking method if none of the above are activate}
+{Use runtime loading unless a linking method is selected explicitly.}
 {$IF NOT DEFINED(Bzip2Static) AND NOT DEFINED(Bzip2Dynamic) AND NOT DEFINED(Bzip2Runtime)}
-  {$IFDEF FPC}
-    {$DEFINE Bzip2Runtime}
-  {$ELSE}
-  {$IFDEF MSWINDOWS}
-    {$DEFINE Bzip2Static}
-  {$ELSE}
-    {$DEFINE Bzip2Dynamic}
-  {$ENDIF}
-  {$ENDIF}
+
+  {$DEFINE Bzip2Runtime}
+
 {$IFEND}
 
 {Activate this define if you do not want to work with Bzip2}
@@ -115,20 +84,13 @@
   {$DEFINE NoBZip2}
 {$ENDIF}
 
-{$IF DEFINED(BCB) AND DEFINED(MACOS)}
-  {$DEFINE NoBZip2}
-{$ENDIF}
+
 
 {$IFDEF MACOS64}
   {$DEFINE NoBZip2}
 {$ENDIF}
 
 {====Zip defines=====================================================}
-
-{Activate the following define when you don't want Visual parts of
-the VCL library included for a program using a TAbArchive or
-TAbZipArchive}
-{.$DEFINE BuildingStub}
 
 {Activate the following define to include support for extracting files
 using PKzip compatible unShrink.}
@@ -196,18 +158,6 @@ all newer (zipx) compatible methods (Bzip2, Lzma, PPMd, WavPack)}
 
 {.$DEFINE STRICTGZIP}
 
-{ The following define is ONLY used for Abbrevia Unit Tests.
-  It has no effect on the Abbrevia Library.
-
-  If defined it uses Winzip to create and test archives for compatability.
-  The winzip tests require Systools stSpawn.pas
-  It can be downloaded at http://sf.net/projects/tpsystools }
-
-{$IFDEF MSWINDOWS}
-  {.$DEFINE WINZIPTESTS}
-{$ENDIF}
-
-
 {-------- !! DO NOT CHANGE DEFINES BELOW THIS LINE !! --------}
 
 {$IFDEF UnzipBackwardSupport}
@@ -223,7 +173,7 @@ all newer (zipx) compatible methods (Bzip2, Lzma, PPMd, WavPack)}
   {$DEFINE UnzipWavPackSupport}
 {$ENDIF}
 
-{ Linking .obj files isn't currently supported in Kylix or FPC }
+{ Native codec bindings currently link Windows objects. }
 {$IF NOT DEFINED(MSWINDOWS)}
   {$UNDEF UnzipLzmaSupport}
   {$UNDEF UnzipPPMdSupport}

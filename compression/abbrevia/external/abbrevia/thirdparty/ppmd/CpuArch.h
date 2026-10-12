@@ -327,9 +327,6 @@ MY_CPU_64BIT means that processor can work with 64-bit registers.
   #ifdef __xlC__
     #define MY_CPU_pragma_pack_push_1   _Pragma("pack(1)")
     #define MY_CPU_pragma_pop           _Pragma("pack()")
-  #elif (defined(__BORLANDC__) && !defined(__clang__))  
-    #define MY_CPU_pragma_pack_push_1
-    #define MY_CPU_pragma_pop
   #else
     #define MY_CPU_pragma_pack_push_1   _Pragma("pack(push, 1)")
     #define MY_CPU_pragma_pop           _Pragma("pack(pop)")

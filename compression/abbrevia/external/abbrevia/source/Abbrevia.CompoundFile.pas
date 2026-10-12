@@ -27,7 +27,6 @@
 {* ABBREVIA: Abbrevia.CompoundFile.pas                                *}
 {*********************************************************}
 {* ABBREVIA: Compound File classes and component         *}
-{*   Use AbQCmpnd.pas for CLX                            *}
 {*********************************************************}
 
 unit Abbrevia.CompoundFile;
@@ -37,7 +36,7 @@ unit Abbrevia.CompoundFile;
 interface
 
 uses
-  Classes, SysUtils, ComCtrls, Abbrevia.Base, Abbrevia.ResourceStrings, Abbrevia.Deflate.Decoder, Abbrevia.Deflate.Encoder, Abbrevia.Deflate.Base,
+  Classes, SysUtils, Abbrevia.Base, Abbrevia.ResourceStrings, Abbrevia.DeflateDecoder, Abbrevia.DeflateEncoder, Abbrevia.DeflateBase,
   Abbrevia.Utilities;
 
 const
@@ -147,8 +146,6 @@ type
     procedure VisitSubNodesPre(Node : TMultiNode; Strm : TStream);
     procedure VisitNode(Node : TMultiNode; Strm : TStream);
     procedure ParseDirStr(const Key : AnsiString; Lst : TStringList);
-    procedure PopulateSubNodes(ParentNode : TMultiNode;
-                               TreeView : TTreeView; TreeNode : TTreeNode);
     procedure TraversePost(ID : Integer);
     procedure TraversePre(Strm : TStream);
 
@@ -159,7 +156,6 @@ type
     function GetNode(const Key : AnsiString) : TMultiNode;
     function DeleteNode(const Key : AnsiString) : Boolean;
     procedure ChangeDir(const Key : AnsiString);
-    function PopulateTreeView(TreeView : TTreeView) : Integer;
     property Root : TMultiNode read FRoot;
     property Count : Integer read FCount;
     property CurrentNode : TMultiNode read FCurrentNode;
@@ -228,7 +224,7 @@ type
   end;
 
 
-  TAbRootDir = class(TMultiTree)
+  TAbRootDirectory = class(TMultiTree)
     fAllocSize : Integer;
   protected {private}
     function AddFolder(FolderName : AnsiString) : TAbDirectoryEntry;
@@ -243,7 +239,7 @@ type
   end;
 
 
-  TAbFATTable = class(TObject)
+  TAbFileAllocationTable = class(TObject)
   protected {private}
     fFATArray  : Array of Integer;       {dynamic array for the FAT}
     fAllocSize : Integer;
@@ -275,8 +271,8 @@ type
   TAbCompoundFile = class(TObject)
   protected {private}
     FSystemBlock : TAbSystemBlock;      {system block}
-    FFATTable    : TAbFATTable;         {FAT table}
-    FRootDir     : TAbRootDir;          {root directory}
+    FFATTable    : TAbFileAllocationTable;         {FAT table}
+    FRootDir     : TAbRootDirectory;          {root directory}
     FDiskFile    : string;              {compound file name}
     FSizeOnDisk  : Integer;             {sum total of compressed sizes +
                                          uncompressed Sys, RootDir, & FAT blks}
@@ -320,9 +316,6 @@ type
     procedure Open(const FName : string); overload;
     procedure Open(const FName : string; const Signature: AnsiString); overload;
     function OpenFile(FileName : AnsiString; var Strm : TStream) : Int64;
-    function PopulateTreeView(TreeView : TTreeView) : Integer;
-    procedure PopulateSubNodes(ParentNode : TMultiNode;
-                     TreeView : TTreeView; TreeNode : TTreeNode);
     procedure RenameFile(OrigName, NewName : AnsiString);
     procedure RenameFolder(OrigName, NewName : AnsiString);
     procedure SetCurrentDirectory(val : AnsiString);
@@ -357,7 +350,7 @@ type
 implementation
 
 uses
-  StrUtils, AnsiStrings;
+  StrUtils;
 
 {-----------------------------------------------------------------------------}
 {-----------------------------------------------------------------------------}
@@ -629,41 +622,6 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TMultiTree.PopulateSubNodes(ParentNode : TMultiNode;
-                     TreeView : TTreeView; TreeNode : TTreeNode);
-  {- Visits sub-nodes recursively - pre order}
-var
-  Curr : TMultiNode;
-  i    : Integer;
-  Node : TTreeNode;
-begin
-  Node := TreeView.Items.AddChild(TreeNode, string(ParentNode.Key));
-  Curr := ParentNode;
-  if Curr <> nil then begin
-    if Curr.HasChildren then begin
-      for i := 0 to Curr.ChildCount -1 do
-        PopulateSubNodes(Curr.Children[i], TreeView, Node);
-    end;
-  end;
-end;
-{-----------------------------------------------------------------------------}
-function TMultiTree.PopulateTreeView(TreeView : TTreeView) : Integer;
-{- Populates a user-supplied TTreeView with multiway tree nodes}
-var
-  i        : Integer;
-  TreeNode : TTreeNode;
-begin
-  TreeView.Items.Clear;
-  if Root <> nil then begin
-    TreeNode := TreeView.Items.Add(nil, string(Root.Key));
-    if Root.HasChildren then begin
-      for i := 0 to Root.ChildCount - 1 do
-        PopulateSubNodes(Root.Children[i], TreeView, TreeNode);
-    end;
-  end;
-  Result := TreeView.Items.Count
-end;
-{-----------------------------------------------------------------------------}
 procedure TMultiTree.TraversePost(ID : Integer);
   {- Traverses tree post-order - CurrentNode after traversal will be the node
      whose EntryID = ID}
@@ -783,15 +741,15 @@ var
   Updt      : Byte;
 begin
   FillChar(Sig, sbSignatureSize, #0);
-  AnsiStrings.StrPCopy(Sig, FSignature);
+  StrPCopy(Sig, FSignature);
 
   FillChar(VolLabel[0], sbVolumeLabelSize, #0);
-  AnsiStrings.StrPCopy(VolLabel, FVolumeLabel);
+  StrPCopy(VolLabel, FVolumeLabel);
 
   AllocSize := FAllocationSize;
 
   FillChar(Version[0], sbVersionSize, #0);
-  AnsiStrings.StrPCopy(Version, FVersion);
+  StrPCopy(Version, FVersion);
 
   if FUpdating then
     Updt := $01
@@ -817,9 +775,7 @@ begin
   FParentFolder   := rdUnused;
   if AsFile then begin
     FEntryType     := etFile;
-    {$WARN SYMBOL_PLATFORM OFF}
     FAttributes     := faArchive;
-    {$WARN SYMBOL_PLATFORM ON}
   end else begin
     FEntryType     := etFolder;
     FAttributes     := faDirectory;
@@ -839,9 +795,7 @@ end;
 function TAbDirectoryEntry.IsArchive : Boolean;
   {- returns true if the entry is an archive}
 begin
-{$WARN SYMBOL_PLATFORM OFF}
   Result := ((FAttributes and faArchive) > 0);
-{$WARN SYMBOL_PLATFORM ON}
 end;
 {-----------------------------------------------------------------------------}
 function TAbDirectoryEntry.IsDirectory : Boolean;
@@ -853,34 +807,26 @@ end;
 function TAbDirectoryEntry.IsHidden : Boolean;
   {- returns true if the entry is hidden}
 begin
-{$WARN SYMBOL_PLATFORM OFF}
   Result := ((FAttributes and faHidden) > 0);
-{$WARN SYMBOL_PLATFORM ON}
 end;
 {-----------------------------------------------------------------------------}
 function TAbDirectoryEntry.IsReadOnly : Boolean;
   {- returns true if the entry is read-only}
 begin
-{$WARN SYMBOL_PLATFORM OFF}
   Result := ((FAttributes and faReadOnly) > 0);
-{$WARN SYMBOL_PLATFORM ON}
 end;
 {-----------------------------------------------------------------------------}
 function TAbDirectoryEntry.IsSysFile : Boolean;
   {- returns true if the entry is a system file}
 begin
-{$WARN SYMBOL_PLATFORM OFF}
   Result := ((FAttributes and faSysFile) > 0);
-{$WARN SYMBOL_PLATFORM ON}
 end;
 {-----------------------------------------------------------------------------}
 function TAbDirectoryEntry.IsVolumeID : Boolean;
   {- returns true if the entry is a volume ID}
 begin
 {$WARN SYMBOL_DEPRECATED OFF}
-{$WARN SYMBOL_PLATFORM OFF}
   Result := ((FAttributes and faVolumeID) > 0);
-{$WARN SYMBOL_PLATFORM ON}
 {$WARN SYMBOL_DEPRECATED ON}
 end;
 {-----------------------------------------------------------------------------}
@@ -891,7 +837,7 @@ var
   FType     : Integer;
 begin
   FillChar(EntryName, rdEntryNameSize - 1, #0);
-  AnsiStrings.StrPCopy(EntryName, FName);
+  StrPCopy(EntryName, FName);
 
   Strm.Write(EntryName[0], rdEntryNameSize);
 
@@ -911,10 +857,10 @@ begin
 end;
 {-----------------------------------------------------------------------------}
 {-----------------------------------------------------------------------------}
-            {TAbRootDir}
+            {TAbRootDirectory}
 {-----------------------------------------------------------------------------}
 {-----------------------------------------------------------------------------}
-constructor TAbRootDir.Create(VolLabel : AnsiString; AllocSize : Integer);
+constructor TAbRootDirectory.Create(VolLabel : AnsiString; AllocSize : Integer);
   {- Creates a single-entry (vol-label) root directory structure}
 begin
   inherited Create;
@@ -923,13 +869,13 @@ begin
     AddFolder(VolLabel);
 end;
 {-----------------------------------------------------------------------------}
-destructor TAbRootDir.Destroy;
+destructor TAbRootDirectory.Destroy;
   {- Destroys the root dir.}
 begin
   inherited Destroy;
 end;
 {-----------------------------------------------------------------------------}
-function TAbRootDir.AddFile(FileName : AnsiString) : TAbDirectoryEntry;
+function TAbRootDirectory.AddFile(FileName : AnsiString) : TAbDirectoryEntry;
   {- Adds a file to the current directory of the compound file}
 var
   NewNode : TMultiNode;
@@ -941,9 +887,7 @@ begin
     NewData := TAbDirectoryEntry.Create(True);
     NewData.FName := FileName;
     NewData.ParentFolder := 1;
-{$WARN SYMBOL_PLATFORM OFF}
     NewData.Attributes := faArchive;
-{$WARN SYMBOL_PLATFORM ON}
     NewData.StartBlock := 3;
     NewData.LastModified := Now;
     NewData.Size := 4;
@@ -954,7 +898,7 @@ begin
   Result := NewData;
 end;
 {-----------------------------------------------------------------------------}
-function TAbRootDir.AddFolder(FolderName : AnsiString) : TAbDirectoryEntry;
+function TAbRootDirectory.AddFolder(FolderName : AnsiString) : TAbDirectoryEntry;
   {- Adds a folder to the current directory of the compound file}
 var
   NewNode : TMultiNode;
@@ -977,13 +921,13 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbRootDir.DeleteFile(FileName : AnsiString);
+procedure TAbRootDirectory.DeleteFile(FileName : AnsiString);
   {- Deletes the specified file if found}
 begin
   DeleteNode(FileName);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbRootDir.DeleteFolder(FolderName : AnsiString);
+procedure TAbRootDirectory.DeleteFolder(FolderName : AnsiString);
   {- Deletes the specifed folder if found & empty}
 begin
   if not CurrentNode.Contains(FolderName) then
@@ -993,17 +937,17 @@ begin
   DeleteFolder(FolderName);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbRootDir.WriteToStream(Strm : TMemoryStream);
+procedure TAbRootDirectory.WriteToStream(Strm : TMemoryStream);
   {- Streams and writes the root directory entries to the stream parameter}
 begin
   TraversePre(Strm);
 end;
 {-----------------------------------------------------------------------------}
 {-----------------------------------------------------------------------------}
-            {TAbFATTable}
+            {TAbFileAllocationTable}
 {-----------------------------------------------------------------------------}
 {-----------------------------------------------------------------------------}
-constructor TAbFATTable.Create(AllocSize : Integer);
+constructor TAbFileAllocationTable.Create(AllocSize : Integer);
   {- Creates the FAT table structure}
 var
   i : NativeInt;
@@ -1017,13 +961,13 @@ begin
     fFATArray[i] := ftEndOfBlock;
 end;
 {-----------------------------------------------------------------------------}
-destructor TAbFATTable.Destroy;
+destructor TAbFileAllocationTable.Destroy;
   {- Destroys the FAT table}
 begin
   Finalize(fFATArray);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.ClearExistingChain(StartNdx : Integer);
+procedure TAbFileAllocationTable.ClearExistingChain(StartNdx : Integer);
   {- Sets all of the FAT entries pertaining to the sequence starting at StartNds
      to ftUnUsedBlock}
 var
@@ -1036,19 +980,19 @@ begin
     fFATArray[ChainArray[i]] := ftUnUsedBlock;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.ClearFATChain;
+procedure TAbFileAllocationTable.ClearFATChain;
   {- Sets the FAT entries pertaining to the FAT table to unused}
 begin
   ClearExistingChain(2);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.ClearRootDirChain;
+procedure TAbFileAllocationTable.ClearRootDirChain;
   {- Sets the FAT entries pertaining the the RootDir to unused}
 begin
   ClearExistingChain(1);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetExistingChain(StartNdx : Integer;
+procedure TAbFileAllocationTable.GetExistingChain(StartNdx : Integer;
                                        var ChainArray : TFATChainArray);
   {- Walks the FAT table starting at the index specified, and populates the
      chain array parameter with the results}
@@ -1089,14 +1033,14 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetFATChain(var ChainArray : TFATChainArray);
+procedure TAbFileAllocationTable.GetFATChain(var ChainArray : TFATChainArray);
   {- Returns the sequence of FAT blocks used by the FAT table in the
      ChainArray parameter}
 begin
   GetExistingChain(2, ChainArray);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetNewChain(NumBytes : Integer;
+procedure TAbFileAllocationTable.GetNewChain(NumBytes : Integer;
                                   var ChainArray : TFATChainArray);
   {- Finds sequence of free blocks required of a file of size NumBytes
      The new FAT chain is commited and passed back in the ChainArray parameter}
@@ -1151,7 +1095,7 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetNewFATChain(NumBytes : Integer;
+procedure TAbFileAllocationTable.GetNewFATChain(NumBytes : Integer;
                                      var ChainArray : TFATChainArray);
   {- Finds and commits a new chain starting at the 3rd block. The new chain is
      returned in the ChainArray parameter}
@@ -1206,7 +1150,7 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetNewRootDirChain(NumBytes : Integer;
+procedure TAbFileAllocationTable.GetNewRootDirChain(NumBytes : Integer;
                                          var ChainArray : TFATChainArray);
   {- Finds and commits a new chain starting at the 2nd block. The new chain is
      returned in the ChainArray parameter}
@@ -1261,7 +1205,7 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-function TAbFATTable.GetNextUnusedBlock : NativeInt;
+function TAbFileAllocationTable.GetNextUnusedBlock : NativeInt;
   {- Returns the index into the FAT table of the next block marked as unused}
 var
   i, j : NativeInt;
@@ -1290,14 +1234,14 @@ begin
   end;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.GetRootDirChain(var ChainArray : TFATChainArray);
+procedure TAbFileAllocationTable.GetRootDirChain(var ChainArray : TFATChainArray);
   {- Returns the sequence of FAT blocks used by the RootDir in the
      ChainArray parameter}
 begin
   GetExistingChain(1, ChainArray);
 end;
 {-----------------------------------------------------------------------------}
-function TAbFATTable.IsEndOfFile(Ndx : Integer) : Boolean;
+function TAbFileAllocationTable.IsEndOfFile(Ndx : Integer) : Boolean;
   {- Returns true if Ndx into FAT signifies end of file}
 begin
   if ((Ndx < 0) or (Ndx > High(fFATArray)) or
@@ -1307,7 +1251,7 @@ begin
     Result := (fFATArray[Ndx] = ftEndOfBlock);
 end;
 {-----------------------------------------------------------------------------}
-function TAbFATTable.IsUnUsed(Ndx : Integer) : Boolean;
+function TAbFileAllocationTable.IsUnUsed(Ndx : Integer) : Boolean;
   {- Returns true if Ndx into FAT signifies an unused block}
 begin
   if ((Ndx < 0) or (Ndx > High(fFATArray)) or
@@ -1317,7 +1261,7 @@ begin
     Result := (fFATArray[Ndx] = ftUnUsedBlock);
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbFATTable.WriteToStream(Strm : TMemoryStream);
+procedure TAbFileAllocationTable.WriteToStream(Strm : TMemoryStream);
   {- Streams and writes the FAT entries to the stream parameter}
 begin
   Strm.Write(fFATArray[0], Length(fFATArray) * SizeOf(Integer));
@@ -1335,8 +1279,8 @@ var
 begin
   inherited Create;
   FSystemBlock := TAbSystemBlock.Create(VolLabel, AllocSize);
-  FFATTable    := TAbFATTable.Create(AllocSize);
-  FRootDir     := TAbRootDir.Create(VolLabel, AllocSize);
+  FFATTable    := TAbFileAllocationTable.Create(AllocSize);
+  FRootDir     := TAbRootDirectory.Create(VolLabel, AllocSize);
   {create file}
 
   if FileName <> '' then begin
@@ -1366,9 +1310,9 @@ var
 begin
   inherited Create;
   FSystemBlock := TAbSystemBlock.Create(VolLabel, AllocSize);
-  FSystemBlock.Signature := AnsiStrings.LeftStr(Signature, sbSignatureSize);
-  FFATTable    := TAbFATTable.Create(AllocSize);
-  FRootDir     := TAbRootDir.Create(VolLabel, AllocSize);
+  FSystemBlock.Signature := Copy(Signature, 1, sbSignatureSize);
+  FFATTable    := TAbFileAllocationTable.Create(AllocSize);
+  FRootDir     := TAbRootDirectory.Create(VolLabel, AllocSize);
   {create file}
 
   if FileName <> '' then begin
@@ -1828,7 +1772,7 @@ begin
   Result := FSystemBlock.VolumeLabel;
 end;
 {-----------------------------------------------------------------------------}
-procedure TAbRootDir.GoToEntryID(ID : Integer);
+procedure TAbRootDirectory.GoToEntryID(ID : Integer);
   {- Traverses tree and sets the current node to the node whose EntryID = ID}
 begin
   TraversePost(ID);
@@ -1845,7 +1789,7 @@ begin
 
   {Ensure valid signature}
   FStream.Read(Sig[0], sbSignatureSize);
-  if Sig <> AnsiStrings.LeftStr(FSystemBlock.Signature, sbSignatureSize) then begin
+  if Sig <> Copy(FSystemBlock.Signature, 1, sbSignatureSize) then begin
     raise ECompoundFileError.Create(AbCmpndInvalidFile);
     exit;
   end;
@@ -1871,7 +1815,7 @@ begin
 
   {Ensure valid signature}
   FStream.Read(Sig[0], sbSignatureSize);
-  if Sig <> AnsiStrings.LeftStr(Signature, sbSignatureSize) then begin
+  if Sig <> Copy(Signature, 1, sbSignatureSize) then begin
     raise ECompoundFileError.Create(AbCmpndInvalidFile);
     exit;
   end;
@@ -2129,50 +2073,6 @@ end;
 
 
 
-function TAbCompoundFile.PopulateTreeView(TreeView : TTreeView) : Integer;
-  {- Populates the tree view parameter with all root directory entries}
-var
-  i        : Integer;
-  TreeNode : TTreeNode;
-begin
-  TreeView.Items.Clear;
-  if FRootDir.Root <> nil then begin
-    TreeNode := TreeView.Items.Add(nil, string(FRootDir.Root.Key));
-    TreeNode.ImageIndex := 0;
-    TreeNode.SelectedIndex := 0;
-    if FRootDir.Root.HasChildren then begin
-      for i := 0 to FRootDir.Root.ChildCount - 1 do
-        PopulateSubNodes(FRootDir.Root.Children[i], TreeView, TreeNode);
-    end;
-  end;
-  Result := TreeView.Items.Count;
-end;
-{-----------------------------------------------------------------------------}
-procedure TAbCompoundFile.PopulateSubNodes(ParentNode : TMultiNode;
-                     TreeView : TTreeView; TreeNode : TTreeNode);
-  {- Visits sub-nodes recursively - pre order}
-var
-  Curr : TMultiNode;
-  i    : Integer;
-  Node : TTreeNode;
-begin
-  Node := TreeView.Items.AddChild(TreeNode, string(ParentNode.Key));
-  if TAbDirectoryEntry(ParentNode.Data).EntryType = etFolder then begin
-    Node.ImageIndex := 0;
-    Node.SelectedIndex := 0;
-  end else begin
-    Node.ImageIndex := 1;
-    Node.SelectedIndex := 1;
-  end;
-  Curr := ParentNode;
-  if Curr <> nil then begin
-    if Curr.HasChildren then begin
-      for i := 0 to Curr.ChildCount -1 do
-        PopulateSubNodes(Curr.Children[i], TreeView, Node);
-    end;
-  end;
-end;
-{-----------------------------------------------------------------------------}
 procedure TAbCompoundFile.RenameFile(OrigName, NewName : AnsiString);
   {- Renames the file if file is found}
 var

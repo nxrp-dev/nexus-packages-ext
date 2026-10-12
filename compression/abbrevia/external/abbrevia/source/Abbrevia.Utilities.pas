@@ -39,16 +39,10 @@ uses
 {$IFDEF MSWINDOWS}
   Windows,
 {$ENDIF}
-{$IFDEF POSIX}
-  Posix.SysStatvfs,
-  Posix.SysStat,
-  Posix.Utime,
-  Posix.Base,
-  Posix.Unistd,
-  Posix.Fcntl,
-  Posix.SysTypes,
+{$IFDEF UNIX}
+  BaseUnix,
 {$ENDIF}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
   DateUtils,
 {$ENDIF}
   Types,
@@ -70,15 +64,15 @@ type
      ecFileOpenError, ecCabError, ecOther);
 
 const
-  AbPathDelim     = PathDelim; { Delphi/Linux constant }
-  AbPathSep       = PathSep;   { Delphi/Linux constant }
+  AbPathDelim     = PathDelim;
+  AbPathSep       = PathSep;
   AbDosPathDelim  = '\';
   AbUnixPathDelim = '/';
   AbDosPathSep    = ';';
   AbUnixPathSep   = ':';
   AbDosAnyFile    = '*.*';
   AbUnixAnyFile   = '*';
-  AbAnyFile       = {$IFDEF POSIX} AbUnixAnyFile; {$ELSE} AbDosAnyFile; {$ENDIF}
+  AbAnyFile       = {$IFDEF UNIX} AbUnixAnyFile; {$ELSE} AbDosAnyFile; {$ENDIF}
   AbThisDir       = '.';
   AbParentDir     = '..';
 
@@ -90,15 +84,10 @@ type
   PtrInt = NativeInt;
   PtrUInt = NativeUInt;
 
-{$IFDEF FPC}
+
   TBufferedFileStream = class(TFileStream)
   end;
-{$ELSE}
-{$IF COMPILERVERSION <= 35}
-  TBufferedFileStream = class(TFileStream)
-  end;
-{$IFEND}
-{$ENDIF}
+
 
 { System-encoded SBCS string (formerly AnsiString) }
 type
@@ -300,7 +289,7 @@ type
     Time: TDateTime;
     Size: Int64;
     Attr: Integer;
-    Mode: {$IFDEF POSIX}mode_t{$ELSE}Cardinal{$ENDIF};
+    Mode: {$IFDEF UNIX}mode_t{$ELSE}Cardinal{$ENDIF};
   end;
 
   function AbFileGetAttrEx(const aFileName: string; out aAttr: TAbAttrExRec) : Boolean;
@@ -367,28 +356,21 @@ implementation
 
 uses
   StrUtils,
-  {$IFNDEF FPC}IOUtils,{$ENDIF}
+
   Abbrevia.Constants,
   Abbrevia.Exceptions;
 
-{$IFNDEF LINUX}
-{$IFDEF POSIX}
-function mktemp(template: MarshaledAString): MarshaledAString; cdecl; external libc name _PU + 'mktemp';
-{$ENDIF}
-{$ENDIF}
 
 {===platform independent routines for platform dependent stuff=======}
 function ExtractShortName(const SR : TSearchRec) : string;
 begin
   {$IFDEF MSWINDOWS}
-  {$WARN SYMBOL_PLATFORM OFF}
   if SR.FindData.cAlternateFileName[0] <> #0 then
     Result := SR.FindData.cAlternateFileName
   else
     Result := SR.FindData.cFileName;
-  {$WARN SYMBOL_PLATFORM ON}
   {$ENDIF}
-  {$IFDEF POSIX}
+  {$IFDEF UNIX}
   Result := SR.Name;
   {$ENDIF}
 end;
@@ -397,12 +379,12 @@ end;
 
 { ========================================================================== }
 function AbCopyFile(const Source, Destination: string; FailIfExists: Boolean): Boolean;
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 var
   DesStream, SrcStream: TBufferedFileStream;
 {$ENDIF}
 begin
-{$IFDEF POSIX}
+{$IFDEF UNIX}
   Result := False;
   if not FailIfExists or not FileExists(Destination) then
     try
@@ -478,47 +460,26 @@ var
 {$IFDEF MSWINDOWS}
   FileNameZ : array [0..259] of char;
 {$ENDIF}
-{$IFNDEF LINUX64}
-{$IFDEF POSIX}
-  hFile: Integer;
-  FileName: AbSysString;
-  M: TMarshaller;
-{$ENDIF}
-{$ENDIF}
-{$IFDEF LINUX64}
-  function RandomName: string;
-  var
-    LRand: TGUID;
-  begin
-    LRand := TGUID.NewGuid;
-    Result := Format('File_%8x%4x%4x%16x_tmp', [LRand.D1, LRand.D2, LRand.D3, PInt64(@LRand.D4[0])^]);
-  end;
+{$IFDEF UNIX}
+  lHandle: THandle;
 {$ENDIF}
 begin
   if DirectoryExists(Dir) then
     TempPath := Dir
   else
-    TempPath := {$IFDEF FPC}GetTempDir{$ELSE}TPath.GetTempPath{$ENDIF};
+    TempPath := GetTempDir;
 {$IFDEF MSWINDOWS}
   GetTempFileName(PChar(TempPath), 'VMS', Word(not CreateIt), FileNameZ);
   Result := string(FileNameZ);
 {$ENDIF}
-{$IFDEF LINUX64}
-  repeat
-    Result := AbCombinePath(TempPath, RandomName);
-  until (not FileExists(Result, False));
-{$ELSE}
-{$IFDEF POSIX}
-  FileName := AbCombinePath({$IFDEF FPC}GetTempDir{$ELSE}TPath.GetTempPath{$ENDIF}, 'VMSXXXXXX');
-  mktemp(M.AsAnsi(FileName).ToPointer);
-  Result := FileName;
+{$IFDEF UNIX}
+  Result := SysUtils.GetTempFileName(TempPath, 'VMS');
   if CreateIt then begin
-    hFile := FileCreate(Result);
-    if hFile <> -1 then
-      FileClose(hFile);
+    lHandle := FileCreate(Result);
+    if lHandle <> THandle(-1) then
+      FileClose(lHandle);
   end;
 {$ENDIF}
-{$ENDIF LINUX}
 end;
 { -------------------------------------------------------------------------- }
 function AbDrive(const ArchiveName : string) : Char;
@@ -549,7 +510,7 @@ begin
   Path := IncludeTrailingPathDelimiter(ExtractFileDrive(Path));
   Result := GetDriveType(PChar(Path)) = DRIVE_REMOVABLE;
 {$ENDIF}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
   Result := False;
 {$ENDIF}
 end;
@@ -567,15 +528,9 @@ begin
   else
     Result := -1;
 {$ENDIF}
-{$IFDEF POSIX}
-//var
-//  FStats : _statvfs;
+{$IFDEF UNIX}
 begin
   Result := -1;
-//  if statvfs(PAnsiChar(AbSysString(ExtractFilePath(ArchiveName))), FStats) = 0 then
-//    Result := Int64(FStats.f_bavail) * Int64(FStats.f_bsize)
-//  else
-//    Result := -1;
 {$ENDIF}
 end;
 { -------------------------------------------------------------------------- }
@@ -697,9 +652,9 @@ begin
 {check for drive/unc info}
   if ( Pos( '\\', Value ) > 0 ) or ( Pos( ':', Value ) > 0 ) then
 {$ENDIF MSWINDOWS}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 { UNIX absolute paths start with a slash }
-  if (Value.Chars[0] = AbPathDelim) then
+  if ((Value <> '') and (Value[1] = AbPathDelim)) then
 {$ENDIF UNIX}
     Result := ptAbsolute
   else if ( Pos( AbPathDelim, Value ) > 0 ) or ( Pos( AB_ZIPPATHDELIM, Value ) > 0 ) then
@@ -707,7 +662,6 @@ begin
 end;
 { -------------------------------------------------------------------------- }
 {$IFDEF MSWINDOWS}
-{$WARN SYMBOL_PLATFORM OFF}
 function AbGetShortFileSpec(const LongFileSpec : string ) : string;
 var
   SR : TSearchRec;
@@ -751,7 +705,6 @@ begin
     SubPaths.Free;
   end;
 end;
-{$WARN SYMBOL_PLATFORM ON}
 {$ENDIF}
 { -------------------------------------------------------------------------- }
 procedure AbIncFilename( var Filename : string; Value : Word );
@@ -1005,7 +958,7 @@ begin
     Result := 0
   else Result := GetLastError;
 {$ENDIF MSWINDOWS}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 { Volume labels not supported on Unix }
   Result := 0;
 {$ENDIF UNIX}
@@ -1032,7 +985,7 @@ end;
 {$ENDIF}
 { -------------------------------------------------------------------------- }
 function AbUnixTimeToLocalDateTime(UnixTime : Int64) : TDateTime;
-{ convert UTC unix date to Delphi TDateTime in local timezone }
+{ convert UTC unix date to TDateTime in local timezone }
 {$IFDEF MSWINDOWS}
 var
   Hrs, Mins, Secs : Word;
@@ -1051,7 +1004,7 @@ begin
   else
     Result := 0;
 {$ENDIF}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 begin
   Result := FileDateToDateTime(UnixTime);
 {$ENDIF}
@@ -1059,7 +1012,7 @@ end;
 
 { -------------------------------------------------------------------------- }
 function AbLocalDateTimeToUnixTime(DateTime : TDateTime) : Int64;
-{ convert local Delphi TDateTime to UTC unix date }
+{ convert local TDateTime to UTC unix date }
 {$IFDEF MSWINDOWS}
 var
   Hrs, Mins, Secs, MSecs : Word;
@@ -1076,7 +1029,7 @@ begin
   Result := Result + (Hrs * SecondsInHour) + (Mins * SecondsInMinute) + Secs;
   Result := Result + AbOffsetFromUTC;
 {$ENDIF}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 begin
   Result := DateTimeToFileDate(DateTime);
 {$ENDIF}
@@ -1096,7 +1049,7 @@ begin
       Result := 0;
   end;
 {$ENDIF MSWINDOWS}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 var
   Yr, Mo, Dy : Word;
   Hr, Mn, S  : Word;
@@ -1127,7 +1080,7 @@ begin
     on E: EConvertError do
       Result := 0;
   end;
-{$ENDIF POSIX}
+{$ENDIF UNIX}
 end;
 
 function AbDateTimeToDosFileDate(Value : TDateTime) : Integer;
@@ -1135,7 +1088,7 @@ function AbDateTimeToDosFileDate(Value : TDateTime) : Integer;
 begin
   Result := DateTimeToFileDate(Value);
 {$ENDIF MSWINDOWS}
-{$IFDEF POSIX}
+{$IFDEF UNIX}
 var
   Yr, Mo, Dy : Word;
   Hr, Mn, S, MS: Word;
@@ -1147,7 +1100,7 @@ begin
 
   LongRec(Result).Lo := (S shr 1) or (Mn shl 5) or (Hr shl 11);
   LongRec(Result).Hi := Dy or (Mo shl 5) or (Word(Yr - 1980) shl 9);
-{$ENDIF POSIX}
+{$ENDIF UNIX}
 end;
 
 { -------------------------------------------------------------------------- }
@@ -1165,7 +1118,7 @@ begin
   {$IFDEF MSWINDOWS}
   Result := FileSetDate(aFileName, AbDateTimeToDosFileDate(aValue)) = 0;
   {$ENDIF}
-  {$IFDEF POSIX}
+  {$IFDEF UNIX}
   Result := FileSetDate(aFileName, AbLocalDateTimeToUnixTime(aValue)) = 0;
   {$ENDIF}
 end;
@@ -1184,7 +1137,6 @@ end;
 { -------------------------------------------------------------------------- }
 function AbDOS2UnixFileAttributes(Attr: Integer): Integer;
 begin
-  {$WARN SYMBOL_PLATFORM OFF}
   Result := { default permissions }
     AB_FPERMISSION_OWNERREAD or
     AB_FPERMISSION_GROUPREAD or
@@ -1198,12 +1150,10 @@ begin
       AB_FPERMISSION_GROUPEXECUTE or AB_FPERMISSION_OTHEREXECUTE
   else
     Result := Result or AB_FMODE_FILE;
-  {$WARN SYMBOL_PLATFORM ON}
 end;
 { -------------------------------------------------------------------------- }
 function AbUnix2DosFileAttributes(Attr: Integer): Integer;
 begin
-  {$WARN SYMBOL_PLATFORM OFF}
   Result := 0;
   case (Attr and $F000) of
     AB_FMODE_FILE, AB_FMODE_FILE2: { standard file }
@@ -1222,22 +1172,15 @@ begin
 
   if (Attr and AB_FPERMISSION_OWNERWRITE) <> AB_FPERMISSION_OWNERWRITE then
     Result := Result or faReadOnly;
-  {$WARN SYMBOL_PLATFORM ON}
 end;
 { -------------------------------------------------------------------------- }
 procedure AbSetFileAttr(const aFileName : string; aAttr: Integer);
-{$IFDEF POSIX}
-var
-  pMarshaller: TMarshaller;
-{$ENDIF}
 begin
 {$IFDEF MSWINDOWS}
-{$WARN SYMBOL_PLATFORM OFF}
   FileSetAttr(aFileName, aAttr);
-{$WARN SYMBOL_PLATFORM ON}
 {$ENDIF}
-{$IFDEF POSIX}
-  chmod(pMarshaller.AsAnsi(aFileName).ToPointer, aAttr);
+{$IFDEF UNIX}
+  FpChmod(PChar(aFileName), aAttr);
 {$ENDIF}
 end;
 { -------------------------------------------------------------------------- }
@@ -1258,9 +1201,8 @@ var
   FindData: TWin32FindData;
   LocalFileTime: TFileTime;
 {$ENDIF}
-{$IFDEF POSIX}
-  StatBuf: _stat;
-  M: TMarshaller;
+{$IFDEF UNIX}
+  StatBuf: Stat;
 {$ENDIF}
 begin
   aAttr.Time := 0;
@@ -1279,8 +1221,8 @@ begin
     aAttr.Mode := AbToUInt32(AbDOS2UnixFileAttributes(AbToInt32(FindData.dwFileAttributes)));
   end;
 {$ENDIF}
-{$IFDEF POSIX}
-  Result := (stat(M.AsAnsi(aFileName).ToPointer, StatBuf) = 0);
+{$IFDEF UNIX}
+  Result := (FpStat(PChar(aFileName), StatBuf) = 0);
   if Result then begin
     aAttr.Time := FileDateToDateTime(StatBuf.st_mtime);
     aAttr.Size := StatBuf.st_size;

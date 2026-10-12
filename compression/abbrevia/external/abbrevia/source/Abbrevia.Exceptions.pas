@@ -100,7 +100,7 @@ type
   end;
 
   EAbZipException = class( EAbException ); {Zip exception}
-  EAbCabException = class( EAbException ); {Cab exception}
+  EAbCabinetException = class( EAbException ); {Cab exception}
   EAbTarException = class( EAbException ); {Tar Exception}
   EAbGzipException = class( EAbException); {GZip exception}
 
@@ -134,7 +134,7 @@ type
     constructor Create;
   end;
 
-  EAbZipInvalidLFH = class( EAbZipException )
+  EAbZipInvalidLocalFileHeader = class( EAbZipException )
   public
     constructor Create;
   end;
@@ -224,157 +224,157 @@ type
     constructor Create;
   end;
 
-  EAbTarBadOp = class( EAbTarException)
+  EAbTarInvalidOperation = class( EAbTarException)
   public
     constructor Create;
   end;
 
-  EAbVMSInvalidOrigin = class( EAbZipException )
+  EAbVirtualMemoryStreamInvalidOrigin = class( EAbZipException )
   public
     constructor Create( Value : Integer );
   end;
 
-  EAbVMSErrorOpenSwap = class( EAbZipException )
+  EAbVirtualMemoryStreamOpenSwapError = class( EAbZipException )
   public
     constructor Create( const Value : string );
   end;
 
-  EAbVMSSeekFail = class( EAbZipException )
+  EAbVirtualMemoryStreamSeekFailed = class( EAbZipException )
   public
     constructor Create( const Value : string );
   end;
 
-  EAbVMSReadFail = class( EAbZipException )
+  EAbVirtualMemoryStreamReadFailed = class( EAbZipException )
   public
     constructor Create( Count : Integer; const Value : string );
   end;
 
-  EAbVMSWriteFail = class( EAbZipException )
+  EAbVirtualMemoryStreamWriteFailed = class( EAbZipException )
   public
     constructor Create( Count : Integer; const Value : string );
   end;
 
-  EAbVMSWriteTooManyBytes = class( EAbZipException )
+  EAbVirtualMemoryStreamWriteTooManyBytes = class( EAbZipException )
   public
     constructor Create( Count : Integer );
   end;
 
-  EAbBBSReadTooManyBytes = class( EAbZipException )
+  EAbBitBucketStreamReadTooManyBytes = class( EAbZipException )
   public
     constructor Create(Count : Integer );
   end;
 
-  EAbBBSSeekOutsideBuffer = class( EAbZipException )
+  EAbBitBucketStreamSeekOutsideBuffer = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbBBSInvalidOrigin = class( EAbZipException )
+  EAbBitBucketStreamInvalidOrigin = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbBBSWriteTooManyBytes = class( EAbZipException )
+  EAbBitBucketStreamWriteTooManyBytes = class( EAbZipException )
   public
     constructor Create(Count : Integer );
   end;
 
-  EAbSWSNotEndofStream = class( EAbZipException )
+  EAbSlidingWindowStreamNotAtEnd = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbSWSSeekFailed = class( EAbZipException )
+  EAbSlidingWindowStreamSeekFailed = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbSWSWriteFailed = class( EAbZipException )
+  EAbSlidingWindowStreamWriteFailed = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbSWSInvalidOrigin = class( EAbZipException )
+  EAbSlidingWindowStreamInvalidOrigin = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbSWSInvalidNewOrigin = class( EAbZipException )
+  EAbSlidingWindowStreamInvalidNewOrigin = class( EAbZipException )
   public
     constructor Create;
   end;
 
-  EAbNoCabinetDll = class( EAbCabException )
+  EAbNoCabinetDll = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileOpenError = class( EAbCabException )
+  EAbCabinetBuilderFileOpenError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileReadError = class( EAbCabException )
+  EAbCabinetBuilderFileReadError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileWriteError = class( EAbCabException )
+  EAbCabinetBuilderFileWriteError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileCloseError = class( EAbCabException )
+  EAbCabinetBuilderFileCloseError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileSeekError = class( EAbCabException )
+  EAbCabinetBuilderFileSeekError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFileDeleteError = class( EAbCabException )
+  EAbCabinetBuilderFileDeleteError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIAddFileError = class( EAbCabException )
+  EAbCabinetBuilderAddFileError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCICreateError = class( EAbCabException )
+  EAbCabinetBuilderCreateError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFlushCabinetError = class( EAbCabException )
+  EAbCabinetBuilderFlushCabinetError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFCIFlushFolderError = class( EAbCabException )
+  EAbCabinetBuilderFlushFolderError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFDICopyError = class( EAbCabException )
+  EAbCabinetExtractorCopyError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbFDICreateError = class( EAbCabException )
+  EAbCabinetExtractorCreateError = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbInvalidCabTemplate = class( EAbCabException )
+  EAbInvalidCabinetTemplate = class( EAbCabinetException )
   public
     constructor Create;
   end;
 
-  EAbInvalidCabFile = class( EAbCabException )
+  EAbInvalidCabinetFile = class( EAbCabinetException )
   public
     constructor Create;
   end;
@@ -489,7 +489,7 @@ begin
   ErrorCode := AbInvalidFactor;
 end;
 
-constructor EAbZipInvalidLFH.Create;
+constructor EAbZipInvalidLocalFileHeader.Create;
 begin
   inherited Create(AbInvalidLFHS);
   ErrorCode := AbInvalidLFH;
@@ -561,97 +561,97 @@ begin
   ErrorCode := AbReadError;
 end;
 
-constructor EAbVMSInvalidOrigin.Create( Value : Integer );
+constructor EAbVirtualMemoryStreamInvalidOrigin.Create( Value : Integer );
 begin
   inherited Create(Format(AbVMSInvalidOriginS, [Value]));
   ErrorCode := AbVMSInvalidOrigin;
 end;
 
-constructor EAbBBSReadTooManyBytes.Create(Count : Integer );
+constructor EAbBitBucketStreamReadTooManyBytes.Create(Count : Integer );
 begin
   inherited Create(Format(AbBBSReadTooManyBytesS, [Count]));
   ErrorCode := AbBBSReadTooManyBytes;
 end;
 
-constructor EAbBBSSeekOutsideBuffer.Create;
+constructor EAbBitBucketStreamSeekOutsideBuffer.Create;
 begin
   inherited Create(AbBBSSeekOutsideBufferS);
   ErrorCode := AbBBSSeekOutsideBuffer;
 end;
 
-constructor EAbBBSInvalidOrigin.Create;
+constructor EAbBitBucketStreamInvalidOrigin.Create;
 begin
   inherited Create(AbBBSInvalidOriginS);
   ErrorCode := AbBBSInvalidOrigin;
 end;
 
-constructor EAbBBSWriteTooManyBytes.Create(Count : Integer);
+constructor EAbBitBucketStreamWriteTooManyBytes.Create(Count : Integer);
 begin
   inherited Create(Format(AbBBSWriteTooManyBytesS, [Count]));
   ErrorCode := AbBBSWriteTooManyBytes;
 end;
 
-constructor EAbVMSErrorOpenSwap.Create( const Value : string );
+constructor EAbVirtualMemoryStreamOpenSwapError.Create( const Value : string );
 begin
   inherited Create(Format(AbVMSErrorOpenSwapS, [Value]));
   ErrorCode := AbVMSErrorOpenSwap;
 end;
 
-constructor EAbVMSSeekFail.Create( const Value : string );
+constructor EAbVirtualMemoryStreamSeekFailed.Create( const Value : string );
 begin
   inherited Create(Format(AbVMSSeekFailS, [Value]));
   ErrorCode := AbVMSSeekFail;
 end;
 
-constructor EAbVMSReadFail.Create( Count : Integer; const Value : string );
+constructor EAbVirtualMemoryStreamReadFailed.Create( Count : Integer; const Value : string );
 begin
   inherited Create(Format(AbVMSReadFailS, [Count, Value]));
   ErrorCode := AbVMSReadFail;
 end;
 
-constructor EAbVMSWriteFail.Create( Count : Integer; const Value : string );
+constructor EAbVirtualMemoryStreamWriteFailed.Create( Count : Integer; const Value : string );
 begin
   inherited Create(Format(AbVMSWriteFailS, [Count, Value]));
   ErrorCode := AbVMSWriteFail;
 end;
 
-constructor EAbVMSWriteTooManyBytes.Create( Count : Integer );
+constructor EAbVirtualMemoryStreamWriteTooManyBytes.Create( Count : Integer );
 begin
   inherited Create(Format(AbVMSWriteTooManyBytesS, [Count]));
   ErrorCode := AbVMSWriteTooManyBytes;
 end;
 
-constructor EAbSWSNotEndofStream.Create;
+constructor EAbSlidingWindowStreamNotAtEnd.Create;
 begin
   inherited Create(AbSWSNotEndofStreamS);
   ErrorCode := AbSWSNotEndofStream;
 end;
 
-constructor EAbSWSSeekFailed.Create;
+constructor EAbSlidingWindowStreamSeekFailed.Create;
 begin
   inherited Create(AbSWSSeekFailedS);
   ErrorCode := AbSWSSeekFailed;
 end;
 
-constructor EAbSWSWriteFailed.Create;
+constructor EAbSlidingWindowStreamWriteFailed.Create;
 begin
   inherited Create(AbSWSWriteFailedS);
   ErrorCode := AbSWSWriteFailed;
 end;
 
-constructor EAbSWSInvalidOrigin.Create;
+constructor EAbSlidingWindowStreamInvalidOrigin.Create;
 begin
   inherited Create(AbSWSInvalidOriginS);
   ErrorCode := AbSWSInvalidOrigin;
 end;
 
-constructor EAbSWSInvalidNewOrigin.Create;
+constructor EAbSlidingWindowStreamInvalidNewOrigin.Create;
 begin
   inherited Create(AbSWSInvalidNewOriginS);
   ErrorCode := AbSWSInvalidNewOrigin;
 end;
 
-constructor EAbFCIFileOpenError.Create;
+constructor EAbCabinetBuilderFileOpenError.Create;
 begin
   inherited Create(AbFCIFileOpenErrorS);
   ErrorCode := AbFCIFileOpenError;
@@ -663,79 +663,79 @@ begin
   ErrorCode := AbNoCabinetDllError;
 end;
 
-constructor EAbFCIFileReadError.Create;
+constructor EAbCabinetBuilderFileReadError.Create;
 begin
   inherited Create(AbFCIFileReadErrorS);
   ErrorCode := AbFCIFileReadError;
 end;
 
-constructor EAbFCIFileWriteError.Create;
+constructor EAbCabinetBuilderFileWriteError.Create;
 begin
   inherited Create(AbFCIFileWriteErrorS);
   ErrorCode := AbFCIFileWriteError;
 end;
 
-constructor EAbFCIFileCloseError.Create;
+constructor EAbCabinetBuilderFileCloseError.Create;
 begin
   inherited Create(AbFCIFileCloseErrorS);
   ErrorCode := AbFCIFileCloseError;
 end;
 
-constructor EAbFCIFileSeekError.Create;
+constructor EAbCabinetBuilderFileSeekError.Create;
 begin
   inherited Create(AbFCIFileSeekErrorS);
   ErrorCode := AbFCIFileSeekError;
 end;
 
-constructor EAbFCIFileDeleteError.Create;
+constructor EAbCabinetBuilderFileDeleteError.Create;
 begin
   inherited Create(AbFCIFileDeleteErrorS);
   ErrorCode := AbFCIFileDeleteError;
 end;
 
-constructor EAbFCIAddFileError.Create;
+constructor EAbCabinetBuilderAddFileError.Create;
 begin
   inherited Create(AbFCIAddFileErrorS);
   ErrorCode := AbFCIAddFileError;
 end;
 
-constructor EAbFCICreateError.Create;
+constructor EAbCabinetBuilderCreateError.Create;
 begin
   inherited Create(AbFCICreateErrorS);
   ErrorCode := AbFCICreateError;
 end;
 
-constructor EAbFCIFlushCabinetError.Create;
+constructor EAbCabinetBuilderFlushCabinetError.Create;
 begin
   inherited Create(AbFCIFlushCabinetErrorS);
   ErrorCode := AbFCIFlushCabinetError;
 end;
 
-constructor EAbFCIFlushFolderError.Create;
+constructor EAbCabinetBuilderFlushFolderError.Create;
 begin
   inherited Create(AbFCIFlushFolderErrorS);
   ErrorCode := AbFCIFlushFolderError;
 end;
 
-constructor EAbFDICopyError.Create;
+constructor EAbCabinetExtractorCopyError.Create;
 begin
   inherited Create(AbFDICopyErrorS);
   ErrorCode := AbFDICopyError;
 end;
 
-constructor EAbFDICreateError.Create;
+constructor EAbCabinetExtractorCreateError.Create;
 begin
   inherited Create(AbFDICreateErrorS);
   ErrorCode := AbFDICreateError;
 end;
 
-constructor EAbInvalidCabTemplate.Create;
+constructor EAbInvalidCabinetTemplate.Create;
 begin
   inherited Create(AbInvalidCabTemplateS);
   ErrorCode := AbInvalidCabTemplate;
 end;
 
-constructor EAbInvalidCabFile.Create;
+constructor EAbInvalidCabinetFile.Create;
 begin
   inherited Create(AbInvalidCabFileS);
   ErrorCode := AbInvalidCabFile;
@@ -820,9 +820,9 @@ begin
   ErrorCode := AbTarBadLinkName;
 end;
 
-{ EAbTarBadOp }
+{ EAbTarInvalidOperation }
 
-constructor EAbTarBadOp.Create;
+constructor EAbTarInvalidOperation.Create;
 begin
   inherited Create(AbTarBadOpS);
   ErrorCode := AbTarBadOp;

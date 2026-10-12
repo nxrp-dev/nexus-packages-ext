@@ -70,7 +70,7 @@ uses
   {$ENDIF}
   Classes, SysUtils,
   TestFrameWork,
-  Abbrevia.Archive.Types, Abbrevia.Utilities, Abbrevia.Unzipper, Abbrevia.Zip.Types;
+  Abbrevia.Archive, Abbrevia.Utilities, Abbrevia.Unzipper, Abbrevia.Zip;
 
 { TAbZipperTests }
 
@@ -311,11 +311,8 @@ begin
   sZipFile := TestTempDir +  'PWStream.zip';
 
   // Create the directory if it doesn't exist
-  {$IFDEF DELPHI5} // ForceDirectories not part of Delphi 4 so assume created by hand
   Check(ForceDirectories(TestTempDir),'Unable to create Test Temp directory.');
-  {$ELSE}
-  Check(DirectoryExists(TestTempDir),'Test Temp Directory needs to be created.');
-  {$ENDIF}
+
 
   // File we need to zip
   Component.FileName := sZipFile;

@@ -41,11 +41,11 @@ interface
 
 uses
   Classes,
-  Abbrevia.Archive.Types;
+  Abbrevia.Archive;
 
 type
-{ TAbSpanBaseStream interface ============================================== }
-  TAbSpanBaseStream = class(TStream)
+{ TAbSpanningStream interface ============================================== }
+  TAbSpanningStream = class(TStream)
   protected {private}
     FArchiveName: string;
 
@@ -63,8 +63,8 @@ type
       write FOnRequestImage;
   end;
 
-{ TAbSpanReadStream interface ============================================== }
-  TAbSpanReadStream = class(TAbSpanBaseStream)
+{ TAbSpanningReadStream interface ============================================== }
+  TAbSpanningReadStream = class(TAbSpanningStream)
   protected {private}
     FCurrentImage: UInt32;
     FIsSplit: Boolean;
@@ -98,8 +98,8 @@ type
       write FOnRequestNthDisk;
   end;
 
-{ TAbSpanWriteStream interface ============================================= }
-  TAbSpanWriteStream = class(TAbSpanBaseStream)
+{ TAbSpanningWriteStream interface ============================================= }
+  TAbSpanningWriteStream = class(TAbSpanningStream)
   protected {private}
     FCurrentImage: UInt32;
     FImageSize: Int64;
@@ -146,14 +146,14 @@ uses
 
 
 {============================================================================}
-{ TAbSpanBaseStream implementation ========================================= }
-constructor TAbSpanBaseStream.Create( const ArchiveName: string );
+{ TAbSpanningStream implementation ========================================= }
+constructor TAbSpanningStream.Create( const ArchiveName: string );
 begin
   inherited Create;
   FArchiveName := ArchiveName;
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanBaseStream.GetImageName( ImageNumber: Integer ): string;
+function TAbSpanningStream.GetImageName( ImageNumber: Integer ): string;
 var
   Abort : Boolean;
   Ext : string;
@@ -175,8 +175,8 @@ begin
 end;
 
 {============================================================================}
-{ TAbSpanReadStream implementation ========================================= }
-constructor TAbSpanReadStream.Create( const ArchiveName: string;
+{ TAbSpanningReadStream implementation ========================================= }
+constructor TAbSpanningReadStream.Create( const ArchiveName: string;
   CurrentImage: UInt32; Stream: TStream );
 begin
   inherited Create(ArchiveName);
@@ -186,13 +186,13 @@ begin
   FStream := Stream;
 end;
 {------------------------------------------------------------------------------}
-destructor TAbSpanReadStream.Destroy;
+destructor TAbSpanningReadStream.Destroy;
 begin
   FreeAndNil(FStream);
   inherited;
 end;
 {------------------------------------------------------------------------------}
-procedure TAbSpanReadStream.GotoImage( ImageNumber: Integer );
+procedure TAbSpanningReadStream.GotoImage( ImageNumber: Integer );
 var
   Abort: Boolean;
   ImageName: string;
@@ -221,7 +221,7 @@ begin
   FStream := TBufferedFileStream.Create(ImageName, fmOpenRead or fmShareDenyWrite);
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanReadStream.Read(var Buffer; Count: Longint): Longint;
+function TAbSpanningReadStream.Read(var Buffer; Count: Longint): Longint;
 var
   BytesRead, BytesLeft: Integer;
   PBuf: PByte;
@@ -246,22 +246,22 @@ begin
   end;
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanReadStream.Write(const Buffer; Count: Longint): Longint;
+function TAbSpanningReadStream.Write(const Buffer; Count: Longint): Longint;
 begin
-  raise EAbException.Create('TAbSpanReadStream.Write unsupported');
+  raise EAbException.Create('TAbSpanningReadStream.Write unsupported');
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanReadStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TAbSpanningReadStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 begin
   if FStream = nil then
     Result := 0
   else if (Offset = 0) and (Origin = soCurrent) then
     Result := FStream.Position
   else
-    raise EAbException.Create('TAbSpanReadStream.Seek unsupported');
+    raise EAbException.Create('TAbSpanningReadStream.Seek unsupported');
 end;
 {------------------------------------------------------------------------------}
-procedure TAbSpanReadStream.SeekImage( Image: UInt32; const Offset: Int64);
+procedure TAbSpanningReadStream.SeekImage( Image: UInt32; const Offset: Int64);
 begin
   if FStream = nil then
     Exit;
@@ -270,15 +270,15 @@ begin
   FStream.Position := Offset;
 end;
 {------------------------------------------------------------------------------}
-procedure TAbSpanReadStream.SetOnRequestImage(Value: TAbRequestImageEvent);
+procedure TAbSpanningReadStream.SetOnRequestImage(Value: TAbRequestImageEvent);
 begin
   FOnRequestImage := Value;
   FIsSplit := FileExists(GetImageName(1)) or not AbDriveIsRemovable(FArchiveName);
 end;
 
 {============================================================================}
-{ TAbSpanWriteStream implementation ======================================== }
-constructor TAbSpanWriteStream.Create( const ArchiveName: string;
+{ TAbSpanningWriteStream implementation ======================================== }
+constructor TAbSpanningWriteStream.Create( const ArchiveName: string;
   Stream: TStream; Threshold: Int64 );
 begin
   inherited Create(ArchiveName);
@@ -287,13 +287,13 @@ begin
   FThreshold := Threshold;
 end;
 {------------------------------------------------------------------------------}
-destructor TAbSpanWriteStream.Destroy;
+destructor TAbSpanningWriteStream.Destroy;
 begin
   FStream.Free;
   inherited;
 end;
 {------------------------------------------------------------------------------}
-procedure TAbSpanWriteStream.NewImage;
+procedure TAbSpanningWriteStream.NewImage;
 var
   Abort: Boolean;
 begin
@@ -320,12 +320,12 @@ begin
   FImageSize := 0;
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanWriteStream.Read(var Buffer; Count: Longint): Longint;
+function TAbSpanningWriteStream.Read(var Buffer; Count: Longint): Longint;
 begin
-  raise EAbException.Create('TAbSpanWriteStream.Read unsupported');
+  raise EAbException.Create('TAbSpanningWriteStream.Read unsupported');
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanWriteStream.Write(const Buffer; Count: Longint): Longint;
+function TAbSpanningWriteStream.Write(const Buffer; Count: Longint): Longint;
 var
   BytesWritten: NativeInt;
   BytesLeft: Integer;
@@ -351,7 +351,7 @@ begin
   end;
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanWriteStream.WriteUnspanned(const Buffer; Count: Int64;
+function TAbSpanningWriteStream.WriteUnspanned(const Buffer; Count: Int64;
   FailOnSpan: Boolean = False): Boolean;
 var
   BytesWritten: Int64;
@@ -380,17 +380,17 @@ begin
   Result := (BytesWritten = Count);
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanWriteStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TAbSpanningWriteStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 begin
   if FStream = nil then
     Result := 0
   else if (Offset = 0) and (Origin = soCurrent) then
     Result := FStream.Position
   else
-    raise EAbException.Create('TAbSpanWriteStream.Seek unsupported');
+    raise EAbException.Create('TAbSpanningWriteStream.Seek unsupported');
 end;
 {------------------------------------------------------------------------------}
-function TAbSpanWriteStream.ReleaseStream: TStream;
+function TAbSpanningWriteStream.ReleaseStream: TStream;
 begin
   Result := FStream;
   FStream := nil;

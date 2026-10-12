@@ -327,13 +327,13 @@ procedure RaiseLzmaException(AResultCode: SRes);
 { Linker directives ======================================================== }
 
 {$IF DEFINED(CPU386)}
-  {$L Win32\CpuArch.obj}
-  {$L Win32\LzFind.obj}
-  {$L Win32\LzFindMt.obj}
-  {$L Win32\LzFindOpt.obj}
-  {$L Win32\LzmaDec.obj}
-  {$L Win32\LzmaEnc.obj}
-  {$L Win32\Threads.obj}
+  {$L Win32\CpuArch.o}
+  {$L Win32\LzFind.o}
+  {$L Win32\LzFindMt.o}
+  {$L Win32\LzFindOpt.o}
+  {$L Win32\LzmaDec.o}
+  {$L Win32\LzmaEnc.o}
+  {$L Win32\Threads.o}
 {$ELSEIF DEFINED(CPUX64)}
   {$L Win64\CpuArch.o}
   {$L Win64\LzFind.o}
@@ -400,7 +400,7 @@ begin
 end;
 
 var
-  DelphiMMInterface: ISzAlloc = (Alloc: SzAlloc; Free: SzFree);
+  PascalMMInterface: ISzAlloc = (Alloc: SzAlloc; Free: SzFree);
 
 
 { CSeq*Stream implementation =============================================== }
@@ -515,10 +515,10 @@ var
 begin
   LzmaDec_Construct(LLZMADecState);
   try
-    LzmaCheck(LzmaDec_Allocate(LLZMADecState, AProperties, APropSize, @DelphiMMInterface));
+    LzmaCheck(LzmaDec_Allocate(LLZMADecState, AProperties, APropSize, @PascalMMInterface));
     LzmaCheck(LzmaDecode2(LLZMADecState, ADes, ASrc, AUncompressedSize));
   finally
-    LzmaDec_Free(LLZMADecState, @DelphiMMInterface);
+    LzmaDec_Free(LLZMADecState, @PascalMMInterface);
   end;
 end;
 
@@ -557,7 +557,7 @@ begin
   LOutStreamRec.Intf.Write := ISeqOutStream_Write;
   LOutStreamRec.Stream := ATargetStream;
 
-  LEncHandle := LzmaEnc_Create(@DelphiMMInterface);
+  LEncHandle := LzmaEnc_Create(@PascalMMInterface);
   if LEncHandle = nil then
     LzmaCheck(SZ_ERROR_MEM);
 
@@ -576,10 +576,10 @@ begin
     ATargetStream.WriteBuffer(LHeader, SizeOf(LHeader));
 
     LzmaCheck(LzmaEnc_Encode(LEncHandle, @LOutStreamRec.Intf,
-      @LInStreamRec.Intf, nil, @DelphiMMInterface, @DelphiMMInterface));
+      @LInStreamRec.Intf, nil, @PascalMMInterface, @PascalMMInterface));
 
   finally
-    LzmaEnc_Destroy(LEncHandle, @DelphiMMInterface, @DelphiMMInterface);
+    LzmaEnc_Destroy(LEncHandle, @PascalMMInterface, @PascalMMInterface);
   end;
 end;
 
@@ -623,7 +623,7 @@ begin
   LOutputByteCount := LUncompressedSize;
   LzmaCheck(LzmaDecode(APUncompressedData, LOutputByteCount,
     APCompressedData, LInputByteCount, PByte(@LPropertyData), LZMA_PROPS_SIZE,
-    LZMA_FINISH_END, LStatus, @DelphiMMInterface));
+    LZMA_FINISH_END, LStatus, @PascalMMInterface));
 
   // Check that the input buffer was fully consumed and the output buffer was filled up.
   if (LOutputByteCount <> LUncompressedSize) or (LInputByteCount <> ACompressedSize) then
@@ -664,13 +664,13 @@ begin
   LPropsSize := LZMA_PROPS_SIZE;
   LzmaCheck(LzmaEncode(LPOutBuf, LOutputBytes, APUncompressedData,
     AUncompressedSize, LEncProps, APCompressedData, LPropsSize, 0, nil,
-    @DelphiMMInterface, @DelphiMMInterface));
+    @PascalMMInterface, @PascalMMInterface));
 
   Result := LOutputBytes + SizeOf(TLZMAHeader);
 end;
 
 initialization
-  // The LZMA routines are multithreaded and use the Delphi memory manager.
+  // The LZMA routines are multithreaded and use the Pascal memory manager.
   IsMultiThread := True;
 
 {$ENDIF}

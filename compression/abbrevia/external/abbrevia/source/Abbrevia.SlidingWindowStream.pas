@@ -30,9 +30,9 @@
 {*********************************************************}
 
 unit Abbrevia.SlidingWindowStream;
-                 
+
 {$I AbDefine.inc}
-                 
+
 {Notes: The TabSlidingWindowStream class provides a simple buffered
         stream for sliding window compression/decompression routines.
         The sliding window stream is limited when compared with a true
@@ -54,21 +54,21 @@ unit Abbrevia.SlidingWindowStream;
         gets filled, the class will drop off the first chunk (writing
         it to the underlying stream, and shift the other chunks in the
         array.}  
-                 
-                 
+
+
 {Define this if you wish to see a trace of the stream usage in a file
  called C:\SlideWin.LOG}
 {.$DEFINE DebugTrace}
-                 
+
 interface        
-                 
+
 uses             
   SysUtils,      
   Classes;       
-                 
+
 const            
   abSWChunkCount = 5;
-                 
+
 type             
   TabSlidingWindowStream = class(TStream)
     protected {private}
@@ -87,13 +87,13 @@ type
     protected    
       procedure bsWriteChunk(aIndex : integer);
       procedure bsSlide;
-                 
+
     public       
       constructor Create(aStream : TStream);
         {-create the buffered stream}
       destructor Destroy; override;
         {-destroy the buffered stream}
-                 
+
       procedure Flush;
         {-ensures that all dirty buffered data is flushed}
       function Read(var Buffer; Count : Longint) : Longint; override;
@@ -103,9 +103,9 @@ type
       function Write(const Buffer; Count : Longint) : Longint; override;
         {-write to the stream from a buffer}
   end;           
-                 
+
 implementation   
-                 
+
 const
   ChunkSize = 8192; {cannot be greater than MaxInt}
 
@@ -116,8 +116,8 @@ begin
   raise Exception.Create(S);
 end;             
 {====================================================================}
-                 
-                 
+
+
 {===TabSlidingWindowStream===========================================}
 constructor TabSlidingWindowStream.Create(aStream  : TStream);
 var              
@@ -233,12 +233,12 @@ begin
   {we do not support reads greater than 32KB bytes}
   if (Count > 32*1024) then
     Count := 32*1024;
-                 
+
   {reading is complicated by the fact we can only read in chunks of
    ChunkSize: we need to partition out the overall read into a
    read from part of the chunk, zero or more reads from complete
    chunks and then a possible read from part of a chunk}
-                 
+
   {calculate the actual number of bytes we can read - this depends on
    the current position and size of the stream as well as the number
    of bytes requested}
@@ -251,7 +251,7 @@ begin
   end;           
   {remember to return the result of our calculation}
   Result := BytesToGo;
-                 
+
   {calculate the number of bytes we can read prior to the loop}
   BytesToRead := ChunkSize - bsPosInChunk;
   if (BytesToRead > BytesToGo) then
@@ -263,7 +263,7 @@ begin
     Move(bsChunks[bsCurChunk]^[bsPosInChunk], BufPtr^, BytesToRead);
   {calculate the number of bytes still to read}
   dec(BytesToGo, BytesToRead);
-                 
+
   {while we have bytes to read, read them}
   while (BytesToGo > 0) do begin
     {advance the pointer for the caller's buffer}
@@ -330,24 +330,24 @@ begin
   {we ONLY write at the end of the stream}
   if ((bsBufferStart + bsPosInBuffer) <> bsSize) then
     RaiseException('TabSlidingWindowStream.Write: Not at end of stream');
-                 
+
   {we do not support writes greater than 32KB bytes}
   if (Count > 32*1024) then
     Count := 32*1024;
-                 
+
   {writing is complicated by the fact we write in chunks of Chunksize
    bytes: we need to partition out the overall write into a write
    to part of the chunk, zero or more writes to complete chunks and
    then a possible write to part of a chunk; every time we fill a
    chunk we have toi slide the buffer}
-                 
+
   {when we write to this stream we always assume that we can write the
    requested number of bytes: if we can't (eg, the disk is full) we'll
    get an exception somewhere eventually}
   BytesToGo := Count;
   {remember to return the result of our calculation}
   Result := BytesToGo;
-                 
+
   {calculate the number of bytes we can write prior to the loop}
   BytesToWrite := ChunkSize - bsPosInChunk;
   if (BytesToWrite > BytesToGo) then
@@ -363,7 +363,7 @@ begin
   bsDirty := true;
   {calculate the number of bytes still to write}
   dec(BytesToGo, BytesToWrite);
-                 
+
   {while we have bytes to write, write them}
   while (BytesToGo > 0) do begin
     {slide the buffer}
@@ -393,5 +393,5 @@ begin
     bsSlide;     
 end;             
 {====================================================================}
-                 
+
 end.             

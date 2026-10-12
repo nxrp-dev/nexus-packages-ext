@@ -50,7 +50,7 @@ type
 implementation
 
 uses
-  SysUtils, TestFrameWork, Abbrevia.Unzip.Procedures, Abbrevia.Utilities, AbTestConsts;
+  SysUtils, TestFrameWork, Abbrevia.ZipExtraction, Abbrevia.Utilities, AbTestConsts;
 
 { TAbUnzPrcTests }
 

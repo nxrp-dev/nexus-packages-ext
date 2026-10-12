@@ -34,7 +34,7 @@ type
 
   TAbSelfExTests = class(TabCompTestCase)
   private
-    Component : TAbMakeSelfExe;
+    Component : TAbSelfExtractorBuilder;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -52,7 +52,7 @@ uses
 procedure TAbSelfExTests.SetUp;
 begin
   inherited;
-  Component := TAbMakeSelfExe.Create(nil);
+  Component := TAbSelfExtractorBuilder.Create(nil);
 end;
 
 procedure TAbSelfExTests.TearDown;
@@ -73,4 +73,3 @@ initialization
 
 end.
 
- 

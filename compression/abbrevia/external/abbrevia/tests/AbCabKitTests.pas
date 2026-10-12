@@ -28,13 +28,13 @@ unit AbCabKitTests;
 interface
 
 uses
-  AbTestFrameWork, Abbrevia.Cabinet.Kit;
+  AbTestFrameWork, Abbrevia.CabinetKit;
 
 type
 
-  TAbCabKitTests = class(TabCompTestCase)
+  TAbCabinetKitTests = class(TabCompTestCase)
   private
-    Component : TAbCabKit;
+    Component : TAbCabinetKit;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -48,27 +48,27 @@ implementation
 uses
   TestFrameWork;
 
-{ TAbCabKitTests }
+{ TAbCabinetKitTests }
 
-procedure TAbCabKitTests.SetUp;
+procedure TAbCabinetKitTests.SetUp;
 begin
   inherited;
-  Component := TAbCabKit.Create(nil);
+  Component := TAbCabinetKit.Create(nil);
 end;
 
-procedure TAbCabKitTests.TearDown;
+procedure TAbCabinetKitTests.TearDown;
 begin
   Component.Free;
   inherited;
 end;
 
-procedure TAbCabKitTests.TestComponentLinks;
+procedure TAbCabinetKitTests.TestComponentLinks;
 begin
   TestComponentLink(Component, 'ArchiveProgressMeter', TAbTestMeter);
   TestComponentLink(Component, 'ItemProgressMeter', TAbTestMeter);
 end;
 
-procedure TAbCabKitTests.TestDefaultStreaming;
+procedure TAbCabinetKitTests.TestDefaultStreaming;
 begin
   inherited TestDefaultStreaming(Component);
 end;
@@ -76,8 +76,7 @@ end;
 initialization
 
   TestFramework.RegisterTest('Abbrevia.Component Level Test Suite',
-    TAbCabKitTests.Suite);
- 
+    TAbCabinetKitTests.Suite);
+
 end.
 
- 

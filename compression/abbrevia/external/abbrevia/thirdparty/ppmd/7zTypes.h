@@ -51,8 +51,6 @@ typedef int SRes;
   #else
     #define MY_ALIGN(n)
   #endif
-#elif defined(__BORLANDC__) && !defined(__clang__)
-  #define MY_ALIGN(n)
 #else
   /*
   // C11/C++11:
@@ -223,7 +221,7 @@ typedef unsigned long UInt64;
 
 #else
 
-#if (defined(_MSC_VER) || defined(__BORLANDC__)) && !defined(__clang__)
+#if defined(_MSC_VER) && !defined(__clang__)
 typedef __int64 Int64;
 typedef unsigned __int64 UInt64;
 #else

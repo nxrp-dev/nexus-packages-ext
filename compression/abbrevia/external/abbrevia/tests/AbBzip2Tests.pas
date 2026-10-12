@@ -70,7 +70,7 @@ var
 begin
   OutStream := TMemoryStream.Create;
   try
-    Bz2DStream := TBZDecompressionStream.Create(aStream);
+    Bz2DStream := TAbBZip2DecompressionStream.Create(aStream);
     try
       // Bzip2 streams don't support .Size
       BytesRead := Bz2DStream.Read(Buf, SizeOf(Buf));
@@ -106,7 +106,7 @@ var
 begin
   CompressedStream := TMemoryStream.Create;
   try
-    Bz2CStream := TBZCompressionStream.Create(bs5, CompressedStream);
+    Bz2CStream := TAbBZip2CompressionStream.Create(bs5, CompressedStream);
     try
       MPLStream := TBufferedFileStream.Create(MPLDir + 'MPL-1_1.txt', fmOpenRead or fmShareDenyNone);
       try
@@ -128,7 +128,6 @@ initialization
 
   TestFramework.RegisterTest('Abbrevia.Low-Level Compression Test Suite',
     TAbBzip2Tests.Suite);
- 
+
 end.
 
- 

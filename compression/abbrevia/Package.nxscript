@@ -27,7 +27,7 @@ Package Abbrevia {
             Source: "external/abbrevia/source";
             Destination: "output/forge/source";
             Recursive: True;
-            IncludeMasks: ["*.pas", "*.inc", "*.res", "*.dfm", "*.lfm"];
+            IncludeMasks: ["*.pas", "*.inc"];
         }
         CreateDirectory Objects { Path: @Abbrevia.Outputs.Objects; }
         Clang Compile {

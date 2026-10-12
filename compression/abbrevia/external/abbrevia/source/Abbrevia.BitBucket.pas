@@ -115,7 +115,7 @@ begin
   OutBuffer := @Buffer;
   {we cannot read more bytes than there is buffer}
   if (Count > FBufSize) then
-    raise EAbBBSReadTooManyBytes.Create(Count);
+    raise EAbBitBucketStreamReadTooManyBytes.Create(Count);
   {calculate the size of the chunks}
   if (FBufPosn <= FTail) then begin
     Chunk1Size := FTail - FBufPosn;
@@ -137,7 +137,7 @@ begin
   end;
   {we cannot read more bytes than there are available}
   if (Count > (Chunk1Size + Chunk2Size)) then
-    raise EAbBBSReadTooManyBytes.Create(Count);
+    raise EAbBitBucketStreamReadTooManyBytes.Create(Count);
   {perform the read}
   if (Chunk1Size > 0) then begin
     Move(FBuffer[FBufPosn], OutBuffer^, Chunk1Size);
@@ -218,13 +218,13 @@ begin
         Posn := FSize + Offset;
       end;
   else
-    raise EAbBBSInvalidOrigin.Create;
+    raise EAbBitBucketStreamInvalidOrigin.Create;
   end;
   {calculate whether the new position is within the buffer; if not,
    raise exception}
   if (Posn > FSize) or
      (Posn <= (FSize - FBufSize)) then
-    raise EAbBBSSeekOutsideBuffer.Create;
+    raise EAbBitBucketStreamSeekOutsideBuffer.Create;
   {set the internal fields for the new position}
   FPosn := Posn;
   BytesBack := FSize - Posn;

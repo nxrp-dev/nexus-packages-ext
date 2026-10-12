@@ -58,7 +58,7 @@ implementation
 uses
   SysUtils,
   TestFrameWork,
-  Abbrevia.Utilities, AbTestConsts, Abbrevia.Unzip.Procedures, Abbrevia.Zip.Procedures;
+  Abbrevia.Utilities, AbTestConsts, Abbrevia.ZipExtraction, Abbrevia.ZipCompression;
 
 { TAbZipPrcTests }
 

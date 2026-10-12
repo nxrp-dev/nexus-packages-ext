@@ -37,7 +37,7 @@ interface
 
 uses
   Classes,
-  Abbrevia.Zip.Browser, Abbrevia.Archive.Types, Abbrevia.Zip.Types;
+  Abbrevia.ZipBrowser, Abbrevia.Archive, Abbrevia.Zip;
 
 type
   TAbCustomUnZipper = class(TAbCustomZipBrowser)
@@ -127,7 +127,7 @@ uses
   SysUtils,
   Abbrevia.Utilities,
   Abbrevia.Exceptions,
-  Abbrevia.Unzip.Procedures;
+  Abbrevia.ZipExtraction;
 
 { -------------------------------------------------------------------------- }
 constructor TAbCustomUnZipper.Create( AOwner : TComponent );

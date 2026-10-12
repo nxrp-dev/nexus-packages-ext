@@ -1,21 +1,21 @@
-DUnit tests for Abbrevia
-========================
+Retained Abbrevia regression cases
+=================================
 
-This project tests most of the basic functionality of Abbrevia.  It should
-catch any obvious errors, but there are plenty of cases that still aren't fully 
-covered.
+The Delphi IDE/GUI runner, visual-control tests, and WinZip/SysTools runner
+were retired on 2026-10-12. The remaining Pascal test cases and helper code
+are retained as references for migration to nxtest. They are not a runnable
+Nexus test suite and have not been counted as passing in current validation.
+The archive fixtures under testfiles remain unchanged.
 
-The "testfiles" subdirectory contains all of the data necessary for the tests, 
-and care should be taken when modifying it.  Temporary data is written to 
-"testfiles/temp".  The tests should clean up after themselves, but if you see 
-any unexpected test failures you may need to delete it manually.  Any automated 
-processes that access that directory may cause transient failures as well (anti-
-virus, dropbox).
+Coverage includes archive lists and ownership, browser/component properties,
+ZIP creation/extraction, Deflate streams, Bzip2, LZMA, TAR/GZip, CAB, archive
+splitting, self-extractor construction, virtual-memory streams, filenames,
+Unicode, metadata, and failure handling. Preserve the assertions when porting.
+GUI rendering/property tests refer to removed controls and need no migration.
+The removed floppy/WinZip integration cases covered spanned-archive media
+changes and external-tool interoperability; any replacement belongs in nxtest.
 
-The console build does not test VCL/CLX components, but does work with 
-FreePascal if it's compiled against DUnit2.
-
-Setup:
+Historical fixture notes (not current test instructions):
 
 - The WavPack data is too large to include in the repository, and is available 
 as a separate download from the SourceForge project.  After downloading, 
@@ -31,21 +31,15 @@ Download any files in the "Test Files/Zip64" folder and copy them into the
 the "OEM & ANSI" zips using WinZip or PowerArchiver into the "source" 
 subdirectory.  The readme there includes original filenames for verification.
 
-- If a: is a floppy drive the spanning tests will use it and prompt for disks 
-interactively.  If not it relies on the ImDisk Virtual Disk Driver 
-(http://www.ltr-data.se/opencode.html/#ImDisk).  When using ImDisk the tests 
-are completely automated.
-
-
-Known Failues:
+Historical reported failures (not reverified):
 
 TAbUnZipperTests/TestGZipDecompress
     This is a failure in the deflate engine (bug 822243).
 
 
-Known Non-Bugs:
+Historical limitations (not reverified):
 
-These tests can be disabled and safely ignored.  They show limitations in the library that should be fixed, but aren't necessary for correct operation.
+Keep these cases and their expected behavior explicit when migrating to nxtest.
 
 TAbZipArchiveTests/Decompress Canterbury/DCLImpl
     The "DCL Implode" compression algorithm is an optional algorithm available
@@ -55,6 +49,6 @@ TAbZipArchiveTests/Decompress Unicode/OSX
     OS X stores accented Unicode characters differently than Windows.  For 
     proper handling the filenames should converted when storing and extracting.
 
-TAbCabArchiveTests/TestAddFromStream
-    TAbCabArchive.AddFromStream is not supported.  Cabs are solid archives, so 
+TAbCabinetArchiveTests/TestAddFromStream
+    TAbCabinetArchive.AddFromStream is not supported.  Cabs are solid archives, so
     adding a single stream will require decompressing the cab and recreating it.

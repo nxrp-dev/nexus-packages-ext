@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  SysUtils, Abbrevia.Tar.Types;
+  SysUtils, Abbrevia.Tar;
 
 {----------------------------------------------------------------------------}
 { TAbTarArchiveTests }

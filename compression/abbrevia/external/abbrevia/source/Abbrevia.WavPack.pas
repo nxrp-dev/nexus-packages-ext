@@ -51,8 +51,7 @@ implementation
 {$IFDEF MSWINDOWS}
 
 uses
-  {$IFDEF FPC}Math, SysUtils,{$ELSE}
-  Crtl, System.Math, System.AnsiStrings, System.SysUtils,{$ENDIF}
+  Math, SysUtils,
   Abbrevia.CRuntime, Abbrevia.Utilities;
 
 type
@@ -73,7 +72,7 @@ end;
 
 function floor2(x: Double): Integer; cdecl;
 begin
-  Result := {$IFDEF FPC}Math{$ELSE}System.Math{$ENDIF}.Floor(x);
+  Result := Math.Floor(x);
 end;
 
 function labs(n: Integer): Integer; cdecl;
@@ -84,12 +83,12 @@ end;
 
 function _stricmp(str1, str2: PAnsiChar): Integer; cdecl;
 begin
-  Result := {$IFDEF FPC}SysUtils{$ELSE}System.AnsiStrings{$ENDIF}.StrIComp(str1, str2);
+  Result := SysUtils.StrIComp(str1, str2);
 end;
 
 function strncmp(str1, str2: PAnsiChar; num: Integer): Integer; cdecl;
 begin
-  Result := {$IFDEF FPC}SysUtils{$ELSE}System.AnsiStrings{$ENDIF}.StrLComp(str1, str2, AbToUInt32(num));
+  Result := SysUtils.StrLComp(str1, str2, AbToUInt32(num));
 end;
 
 { Forward declarations ===================================================== }
@@ -195,26 +194,26 @@ procedure write_hybrid_profile; external
 
 {$IFDEF MSWINDOWS}
   {$IF DEFINED(CPU386)}
-    {$L Win32\WavPack_write_words.obj}
-    {$L Win32\WavPack_common_utils.obj}
-    {$L Win32\WavPack_decorr_utils.obj}
-    {$L Win32\WavPack_entropy_utils.obj}
-    {$L Win32\WavPack_extra1.obj}
-    {$L Win32\WavPack_extra2.obj}
-    {$L Win32\WavPack_open_legacy.obj}
-    {$L Win32\WavPack_open_raw.obj}
-    {$L Win32\WavPack_open_utils.obj}
-    {$L Win32\WavPack_read_words.obj}
-    {$L Win32\WavPack_tag_utils.obj}
-    {$L Win32\WavPack_tags.obj}
-    {$L Win32\WavPack_unpack.obj}
-    {$L Win32\WavPack_unpack_dsd.obj}
-    {$L Win32\WavPack_unpack_floats.obj}
-    {$L Win32\WavPack_unpack_seek.obj}
-    {$L Win32\WavPack_unpack_utils.obj}
-    {$L Win32\WavPack_unpack3.obj}
-    {$L Win32\WavPack_unpack3_open.obj}
-    {$L Win32\WavPack_unpack3_seek.obj}
+    {$L Win32\write_words.o}
+    {$L Win32\common_utils.o}
+    {$L Win32\decorr_utils.o}
+    {$L Win32\entropy_utils.o}
+    {$L Win32\extra1.o}
+    {$L Win32\extra2.o}
+    {$L Win32\open_legacy.o}
+    {$L Win32\open_raw.o}
+    {$L Win32\open_utils.o}
+    {$L Win32\read_words.o}
+    {$L Win32\tag_utils.o}
+    {$L Win32\tags.o}
+    {$L Win32\unpack.o}
+    {$L Win32\unpack_dsd.o}
+    {$L Win32\unpack_floats.o}
+    {$L Win32\unpack_seek.o}
+    {$L Win32\unpack_utils.o}
+    {$L Win32\unpack3.o}
+    {$L Win32\unpack3_open.o}
+    {$L Win32\unpack3_seek.o}
   {$ELSEIF DEFINED(CPUX64)}
     {$L Win64\write_words.o}
     {$L Win64\common_utils.o}

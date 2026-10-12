@@ -39,7 +39,7 @@ uses
   Classes,
   Abbrevia.Base,
   Abbrevia.Utilities,
-  Abbrevia.Archive.Types;
+  Abbrevia.Archive;
 
 type
   IAbProgressMeter = interface
@@ -220,11 +220,11 @@ implementation
 uses
   SysUtils,
   Abbrevia.Exceptions,
-  Abbrevia.Cabinet.Types,
-  Abbrevia.Zip.Types,
-  Abbrevia.Tar.Types,
-  Abbrevia.GZip.Types,
-  Abbrevia.BZip2.Types;
+  Abbrevia.Cabinet,
+  Abbrevia.Zip,
+  Abbrevia.Tar,
+  Abbrevia.GZip,
+  Abbrevia.BZip2Archive;
 
 { TAbBaseBrowser implementation ======================================= }
 

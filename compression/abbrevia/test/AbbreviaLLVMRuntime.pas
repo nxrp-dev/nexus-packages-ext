@@ -4,7 +4,7 @@ program AbbreviaLLVMRuntime;
 {$mode delphi}
 
 uses
-  SysUtils, Abbrevia.Tar.Types, Abbrevia.Zip.Types, Abbrevia.GZip.Types, Abbrevia.Zip.Procedures, Abbrevia.Unzip.Procedures,
+  SysUtils, Abbrevia.Tar, Abbrevia.Zip, Abbrevia.GZip, Abbrevia.ZipCompression, Abbrevia.ZipExtraction,
   Abbrevia.LZMA, Abbrevia.PPMd, Abbrevia.WavPack, Abbrevia.BZip2;
 
 begin

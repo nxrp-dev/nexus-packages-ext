@@ -26,21 +26,18 @@
  unit AbArcTypTests;
 
 {$I AbDefine.inc}
-{$IF NOT DEFINED(FPC) AND (CompilerVersion >= 17.0)}
-  {$DEFINE HasEnumerators}    { Test for..in support in D2005+ }
-{$IFEND}
 
 interface
 
 uses
-  Classes, TestFrameWork, AbTestFrameWork, Abbrevia.Archive.Types, Abbrevia.Charset, Abbrevia.Utilities;
+  Classes, TestFrameWork, AbTestFrameWork, Abbrevia.Archive, Abbrevia.Charset, Abbrevia.Utilities;
 
 type
   TAbArchiveListTests = class(TAbTestCase)
   published
-    {$IFDEF HasEnumerators}
+
     procedure TestEnumerator;
-    {$ENDIF}
+
     procedure TestGenerateHash;
   end;
 
@@ -140,7 +137,7 @@ uses
 {----------------------------------------------------------------------------}
 { TAbArchiveListTests }
 {----------------------------------------------------------------------------}
-{$IFDEF HasEnumerators}
+
 procedure TAbArchiveListTests.TestEnumerator;
 var
   ItemList: TAbArchiveList;
@@ -164,7 +161,7 @@ begin
     ItemList.Free;
   end;
 end;
-{$ENDIF}
+
 {----------------------------------------------------------------------------}
 procedure TAbArchiveListTests.TestGenerateHash;
   {- Test issue 1196468, range check error in TAbArchiveList.GenerateHash }

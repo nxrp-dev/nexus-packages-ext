@@ -32,10 +32,8 @@ interface
 
 uses
   TestFramework,
-{$IFDEF LibcAPI}
-  Libc,
-{$ENDIF}
-{$IFDEF FPCUnixAPI}
+
+{$IFDEF UNIX}
   BaseUnix, Unix,
 {$ENDIF}
 {$IFDEF MSWINDOWS}
@@ -106,13 +104,9 @@ type
 
 implementation
 
-{$WARN SYMBOL_PLATFORM OFF}
 
 uses
-{$IFDEF PosixAPI}
-  Posix.SysStat,
-{$ENDIF}
-  Math, SysUtils, IOUtils, Variants,
+  Math, SysUtils, Variants,
   Abbrevia.Utilities;
 
 var
@@ -139,19 +133,19 @@ begin
     else if j = Length(d2) then cmp := -1
     else cmp := CompareText(d1[i].Name, d2[j].Name); // Allow case insensitive matches on case-sensitive filesystems
     if cmp < 0 then begin
-      Check(not FileExists(TPath.Combine(aDir1, d1[i].Name)),
+      Check(not FileExists(AbCombinePath(aDir1, d1[i].Name)),
         d1[i].Name + ' is missing in ' + aDir2);
       Inc(i);
     end
     else if cmp > 0 then begin
-      Check(not FileExists(TPath.Combine(aDir2, d2[j].Name)),
+      Check(not FileExists(AbCombinePath(aDir2, d2[j].Name)),
         d2[j].Name + ' is missing in ' + aDir1);
       Inc(j);
     end
     else begin
       CheckEquals(d1[i].Size, d2[j].Size, d1[i].Name + 'sizes do not match');
       if (d1[i].Size > 0) or (d2[j].Size > 0) then
-        CheckFilesMatch(TPath.Combine(aDir1, d1[i].Name), TPath.Combine(aDir2, d2[i].Name),
+        CheckFilesMatch(AbCombinePath(aDir1, d1[i].Name), AbCombinePath(aDir2, d2[i].Name),
           d1[i].Name + ' does not match');
       Inc(i);
       Inc(j);
@@ -274,13 +268,9 @@ begin
           FileSetAttr(aDir + SR.Name, SR.Attr and not faReadOnly);
         {$ENDIF}
         {$IFDEF UNIX}
-        {$IFDEF FPCUnixAPI}
         if fpS_ISDIR(SR.Mode) and (SR.Mode and (S_IWUSR or S_IXUSR) <> S_IWUSR or S_IXUSR) then
           FpChmod(PAnsiChar(AbSysString(aDir + SR.Name)), SR.Mode or S_IWUSR or S_IXUSR);
-        {$ELSE}
-        if S_ISDIR(SR.Mode) and (SR.Mode and (S_IWUSR or S_IXUSR) <> S_IWUSR or S_IXUSR) then
-          chmod(PAnsiChar(AbSysString(aDir + SR.Name)), SR.Mode or S_IWUSR or S_IXUSR);
-        {$ENDIF !FPCUnixAPI}
+
         {$ENDIF UNIX}
       until FindNext(SR) <> 0;
       // Close search to free locks on files/directories
@@ -312,7 +302,7 @@ begin
   if not DirectoryExists(aDir) then
     raise ETestFailure.Create('Directory Requested does not exist : ' + aDir);
   Result := nil;
-  if FindFirst(TPath.Combine(aDir,  '*'), faAnyFile, SR) = 0 then begin
+  if FindFirst(AbCombinePath(aDir,  '*'), faAnyFile, SR) = 0 then begin
     repeat
       if (SR.Attr and faDirectory = 0) and  // Don't include sub directories
          (Pos('?', SR.Name) = 0) then begin // Don't include Unicode filenames in ANSI builds
@@ -497,9 +487,6 @@ var
   BinStream: TMemoryStream;
   ErrStream  : TBufferedFileStream;
 begin
-{$IF COMPILERVERSION < 32}
-  Result := nil;
-{$ENDIF}
 
   StrStream := TStringStream.Create(aCompStr);
   try
@@ -562,17 +549,14 @@ begin
     case PropInfo^.PropType^.Kind of
       tkInteger, tkChar, tkWChar, tkClass:
         Result := GetOrdProp(Instance, PropInfo);
-      {$IFDEF FPC}
+
       tkBool:
         Result := Boolean(GetOrdProp(Instance, PropInfo));
-      {$ENDIF}
+
       tkEnumeration:
         if PreferStrings then
-          Result := GetEnumName(PropInfo^.PropType{$IFNDEF FPC}^{$ENDIF}, GetOrdProp(Instance, PropInfo))
-        {$IFNDEF FPC}
-        else if GetTypeData(PropInfo^.PropType^)^.BaseType^ = TypeInfo(Boolean) then
-          Result := Boolean(GetOrdProp(Instance, PropInfo))
-        {$ENDIF}
+          Result := GetEnumName(PropInfo^.PropType, GetOrdProp(Instance, PropInfo))
+
         else
           Result := GetOrdProp(Instance, PropInfo);
       tkSet:
@@ -580,7 +564,7 @@ begin
           begin
             Result := '';
             Integer(S) := GetOrdProp(Instance, PropInfo);
-            TInfo := GetTypeData(PropInfo^.PropType{$IFNDEF FPC}^{$ENDIF})^.CompType{$IFNDEF FPC}^{$ENDIF};
+            TInfo := GetTypeData(PropInfo^.PropType)^.CompType;
             for I := 0 to SizeOf(Integer) * 8 - 1 do
             if I in S then
             begin
@@ -595,7 +579,7 @@ begin
         Result := GetFloatProp(Instance, PropInfo);
       tkMethod:
         Result := PropInfo^.PropType^.Name;
-      tkString, tkLString {$IFDEF FPC}, tkAString{$ENDIF}:
+      tkString, tkLString , tkAString:
         Result := GetStrProp(Instance, PropInfo);
       tkWString:
         Result := GetWideStrProp(Instance, PropInfo);

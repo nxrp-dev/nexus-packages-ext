@@ -107,7 +107,7 @@ uses
   {$IFDEF MSWINDOWS}
   Windows, // Fix warning about unexpanded inline functions
   {$ENDIF}
-  SysUtils, {$IFNDEF FPC}IOUtils,{$ENDIF}
+  SysUtils,
   Abbrevia.Exceptions;
 
 const
@@ -212,7 +212,7 @@ begin
     soCurrent   : inc(vmsPosition, Offset);
     soEnd       : vmsPosition := vmsSize + Offset;
   else
-    raise EAbVMSInvalidOrigin.Create( Integer(Origin));
+    raise EAbVirtualMemoryStreamInvalidOrigin.Create( Integer(Origin));
   end;
   Result := vmsPosition;
 end;
@@ -435,7 +435,7 @@ begin
       vmsSwapStream := TBufferedFileStream.Create(vmsSwapFileName, fmCreate);
     except
       DeleteFile(vmsSwapFileName);
-      raise EAbVMSErrorOpenSwap.Create( vmsSwapFileName );
+      raise EAbVirtualMemoryStreamOpenSwapError.Create( vmsSwapFileName );
     end;
     vmsSwapFileSize := 0;
   end;
@@ -462,10 +462,10 @@ begin
   else {there is something to be read from the swap file} begin
     SeekResult := vmsSwapStream.Seek(aPage^.vpStmOfs, soBeginning);
     if (SeekResult = -1) then
-      raise EAbVMSSeekFail.Create( vmsSwapFileName );
+      raise EAbVirtualMemoryStreamSeekFailed.Create( vmsSwapFileName );
     BytesRead := vmsSwapStream.Read(aPage^.vpData, AB_VMSPageSize);
     if (BytesRead <> AB_VMSPageSize) then
-      raise EAbVMSReadFail.Create( AB_VMSPageSize, vmsSwapFileName );
+      raise EAbVirtualMemoryStreamReadFailed.Create( AB_VMSPageSize, vmsSwapFileName );
   end;
 end;
 {--------}
@@ -479,10 +479,10 @@ begin
     vmsSwapFileCreate;
   SeekResult := vmsSwapStream.Seek(aPage^.vpStmOfs, soBeginning);
   if (SeekResult = -1) then
-    raise EAbVMSSeekFail.Create( vmsSwapFileName );
+    raise EAbVirtualMemoryStreamSeekFailed.Create( vmsSwapFileName );
   BytesWritten := vmsSwapStream.Write(aPage^.vpData, AB_VMSPageSize);
   if BytesWritten <> AB_VMSPageSize then
-    raise EAbVMSWriteFail.Create( AB_VMSPageSize, vmsSwapFileName );   
+    raise EAbVirtualMemoryStreamWriteFailed.Create( AB_VMSPageSize, vmsSwapFileName );
   NewPos := aPage^.vpStmOfs + AB_VMSPageSize;
   if (NewPos > vmsSwapFileSize) then
     vmsSwapFileSize := NewPos;

@@ -36,8 +36,8 @@ unit Abbrevia.Zipper;
 interface
 
 uses
-  Classes, IOUtils,
-  Abbrevia.Browser, Abbrevia.Zip.Browser, Abbrevia.Archive.Types, Abbrevia.Zip.Types;
+  Classes, Abbrevia.ZipCompression,
+  Abbrevia.Browser, Abbrevia.ZipBrowser, Abbrevia.Archive, Abbrevia.Zip;
 
 type
   TAbCustomZipper = class(TAbCustomZipBrowser)
@@ -178,7 +178,7 @@ type
 implementation
 
 uses
-  SysUtils, Abbrevia.Utilities, Abbrevia.Tar.Types, Abbrevia.GZip.Types, Abbrevia.BZip2.Types, Abbrevia.Exceptions, Abbrevia.Zip.Procedures;
+  SysUtils, Abbrevia.Utilities, Abbrevia.Tar, Abbrevia.GZip, Abbrevia.BZip2Archive, Abbrevia.Exceptions;
 
 { -------------------------------------------------------------------------- }
 constructor TAbCustomZipper.Create( AOwner : TComponent );

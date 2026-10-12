@@ -79,7 +79,7 @@ type
   end;
 
   // Abstract ancestor class
-  TCustomBZip2Stream = class(TStream)
+  TAbCustomBZip2Stream = class(TStream)
   private
     FStrm: TStream;
     FStrmPos: Int64;
@@ -92,10 +92,10 @@ type
     constructor Create(Strm: TStream);
   end;
 
-{ TBZCompressionStream compresses data on the fly as data is written to it, and
+{ TAbBZip2CompressionStream compresses data on the fly as data is written to it, and
   stores the compressed data to another stream.
 
-  TBZCompressionStream is write-only and strictly sequential. Reading from the
+  TAbBZip2CompressionStream is write-only and strictly sequential. Reading from the
   stream will raise an exception. Using Seek to move the stream pointer
   will raise an exception.
 
@@ -119,7 +119,7 @@ type
 
   TBlockSize100k = (bs1, bs2, bs3, bs4, bs5, bs6, bs7, bs8, bs9);
 
-  TBZCompressionStream = class(TCustomBZip2Stream)
+  TAbBZip2CompressionStream = class(TAbCustomBZip2Stream)
   private
     function GetCompressionRate: Single;
   public
@@ -150,7 +150,7 @@ type
   This is useful for updating a progress indicator when you are reading a
   large chunk of data from the decompression stream in a single call.}
 
-  TBZDecompressionStream = class(TCustomBZip2Stream)
+  TAbBZip2DecompressionStream = class(TAbCustomBZip2Stream)
   public
     constructor Create(Source: TStream);
     destructor Destroy; override;
@@ -180,9 +180,9 @@ procedure BZDecompressBuf(const InBuf: Pointer; InBytes: Integer;
 
 
 type
-  EBZip2Error = class(Exception);
-  EBZCompressionError = class(EBZip2Error);
-  EBZDecompressionError = class(EBZip2Error);
+  EAbBZip2Error = class(Exception);
+  EAbBZip2CompressionError = class(EAbBZip2Error);
+  EAbBZip2DecompressionError = class(EAbBZip2Error);
 
 {$ENDIF}
 
@@ -210,18 +210,18 @@ const
     {$ELSEIF DEFINED(MACOS)}'libbz2.dylib'
     {$ELSE}'libbz2.so.1'{$IFEND};
 
-{$IF DEFINED(Bzip2Dynamic) OR (DEFINED(Bzip2Static) AND DEFINED(EXTERNALLINKER))}
+{$IFDEF Bzip2Dynamic}
   {$DEFINE USE_LIBBZ2}
 {$IFEND}
 
 {$IFDEF Bzip2Static}
 {$IFDEF MSWINDOWS}
   {$IF DEFINED(CPU386)}
-    {$L Win32\blocksort.obj}
-    {$L Win32\huffman.obj}
-    {$L Win32\compress.obj}
-    {$L Win32\decompress.obj}
-    {$L Win32\bzlib.obj}
+    {$L Win32\blocksort.o}
+    {$L Win32\huffman.o}
+    {$L Win32\compress.o}
+    {$L Win32\decompress.o}
+    {$L Win32\bzlib.o}
   {$ELSEIF DEFINED(CPUX64)}
     {$L Win64\blocksort.o}
     {$L Win64\huffman.o}
@@ -394,7 +394,7 @@ const
 
 procedure bz_internal_error(errcode: Integer); cdecl;
 begin
-  raise EBZip2Error.CreateFmt('Compression Error %d', [errcode]);
+  raise EAbBZip2Error.CreateFmt('Compression Error %d', [errcode]);
 end; { _bz_internal_error }
 
 function malloc(size: Integer): Pointer; cdecl;
@@ -491,7 +491,7 @@ begin
     Exit;
   hBzip2 := LoadLibrary(libbz2);
   if hBzip2 = 0 then
-    raise EBZip2Error.Create('Bzip2 shared library not found');
+    raise EAbBZip2Error.Create('Bzip2 shared library not found');
   @BZ2_bzCompressInit := GetProcAddress(hBzip2, 'BZ2_bzCompressInit');
   @BZ2_bzCompress := GetProcAddress(hBzip2, 'BZ2_bzCompress');
   @BZ2_bzCompressEnd := GetProcAddress(hBzip2, 'BZ2_bzCompressEnd');
@@ -517,14 +517,14 @@ function CCheck(code: Integer): Integer;
 begin
   Result := code;
   if code < 0 then
-    raise EBZCompressionError.CreateFmt('error %d', [code]); //!!
+    raise EAbBZip2CompressionError.CreateFmt('error %d', [code]); //!!
 end; { CCheck }
 
 function DCheck(code: Integer): Integer;
 begin
   Result := code;
   if code < 0 then
-    raise EBZDecompressionError.CreateFmt('error %d', [code]); //!!
+    raise EAbBZip2DecompressionError.CreateFmt('error %d', [code]); //!!
 end; { DCheck }
 
 procedure BZCompressBuf(const InBuf: Pointer; InBytes: Integer;
@@ -609,9 +609,9 @@ begin
   end;
 end;
 
-// TCustomBZip2Stream
+// TAbCustomBZip2Stream
 
-constructor TCustomBZip2Stream.Create(Strm: TStream);
+constructor TAbCustomBZip2Stream.Create(Strm: TStream);
 begin
   inherited Create;
   FStrm := Strm;
@@ -620,15 +620,15 @@ begin
   FBZRec.bzfree := bzip2FreeMem;
 end;
 
-procedure TCustomBZip2Stream.Progress(Sender: TObject);
+procedure TAbCustomBZip2Stream.Progress(Sender: TObject);
 begin
   if Assigned(FOnProgress) then FOnProgress(Sender);
-end; { TCustomBZip2Stream }
+end; { TAbCustomBZip2Stream }
 
 
-// TBZCompressionStream
+// TAbBZip2CompressionStream
 
-constructor TBZCompressionStream.Create(BlockSize100k: TBlockSize100k; Dest: TStream);
+constructor TAbBZip2CompressionStream.Create(BlockSize100k: TBlockSize100k; Dest: TStream);
 const
   BlockSizes: array[TBlockSize100k] of ShortInt = (1, 2, 3, 4, 5, 6, 7, 8, 9);
 begin
@@ -639,7 +639,7 @@ begin
   CCheck(BZ2_bzCompressInit(FBZRec, BlockSizes[BlockSize100k], 0, 0));
 end;
 
-destructor TBZCompressionStream.Destroy;
+destructor TAbBZip2CompressionStream.Destroy;
 begin
   if FBZRec.state <> nil then begin
     FBZRec.next_in := nil;
@@ -662,12 +662,12 @@ begin
   inherited Destroy;
 end;
 
-function TBZCompressionStream.Read(var Buffer; Count: Longint): Longint;
+function TAbBZip2CompressionStream.Read(var Buffer; Count: Longint): Longint;
 begin
-  raise EBZCompressionError.Create('Invalid stream operation');
-end; { TBZCompressionStream }
+  raise EAbBZip2CompressionError.Create('Invalid stream operation');
+end; { TAbBZip2CompressionStream }
 
-function TBZCompressionStream.Write(const Buffer; Count: Longint): Longint;
+function TAbBZip2CompressionStream.Write(const Buffer; Count: Longint): Longint;
 begin
   FBZRec.next_in := @Buffer;
   FBZRec.avail_in := Count;
@@ -685,9 +685,9 @@ begin
     Progress(Self);
   end;
   Result := Count;
-end; { TBZCompressionStream }
+end; { TAbBZip2CompressionStream }
 
-function TBZCompressionStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TAbBZip2CompressionStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 var
   conv64 : TLargeInteger;
 begin
@@ -697,10 +697,10 @@ begin
     Result := conv64.QuadPart
     end
   else
-    raise EBZCompressionError.Create('Invalid stream operation');
-end; { TBZCompressionStream }
+    raise EAbBZip2CompressionError.Create('Invalid stream operation');
+end; { TAbBZip2CompressionStream }
 
-function TBZCompressionStream.GetCompressionRate: Single;
+function TAbBZip2CompressionStream.GetCompressionRate: Single;
 var
   conv64In : TLargeInteger;
   conv64Out: TLargeInteger;
@@ -714,11 +714,11 @@ begin
     Result := 0
   else
     Result := (1.0 - (conv64Out.QuadPart / conv64In.QuadPart)) * 100.0;
-end; { TBZCompressionStream }
+end; { TAbBZip2CompressionStream }
 
 // TDecompressionStream
 
-constructor TBZDecompressionStream.Create(Source: TStream);
+constructor TAbBZip2DecompressionStream.Create(Source: TStream);
 begin
   inherited Create(Source);
   LoadBzip2DLL;
@@ -727,14 +727,14 @@ begin
   DCheck(BZ2_bzDecompressInit(FBZRec, 0, 0));
 end;
 
-destructor TBZDecompressionStream.Destroy;
+destructor TAbBZip2DecompressionStream.Destroy;
 begin
   if FBZRec.state <> nil then
     BZ2_bzDecompressEnd(FBZRec);
   inherited Destroy;
 end;
 
-function TBZDecompressionStream.Read(var Buffer; Count: Longint): Longint;
+function TAbBZip2DecompressionStream.Read(var Buffer; Count: Longint): Longint;
 begin
   FBZRec.next_out := @Buffer;
   FBZRec.avail_out := Count;
@@ -756,14 +756,14 @@ begin
     Progress(Self);
   end;
   Result := Count;
-end; { TBZDecompressionStream }
+end; { TAbBZip2DecompressionStream }
 
-function TBZDecompressionStream.Write(const Buffer; Count: Longint): Longint;
+function TAbBZip2DecompressionStream.Write(const Buffer; Count: Longint): Longint;
 begin
-  raise EBZDecompressionError.Create('Invalid stream operation');
-end; { TBZDecompressionStream }
+  raise EAbBZip2DecompressionError.Create('Invalid stream operation');
+end; { TAbBZip2DecompressionStream }
 
-function TBZDecompressionStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
+function TAbBZip2DecompressionStream.Seek(const Offset: Int64; Origin: TSeekOrigin): Int64;
 var
   I     : Int64;
   Buf   : array[0..4095] of Char;
@@ -799,9 +799,9 @@ begin
     end;
   end
   else
-    raise EBZDecompressionError.Create('Invalid stream operation');
+    raise EAbBZip2DecompressionError.Create('Invalid stream operation');
   Result := conv64.QuadPart;
-end; { TBZDecompressionStream }
+end; { TAbBZip2DecompressionStream }
 
 {$ENDIF}
 

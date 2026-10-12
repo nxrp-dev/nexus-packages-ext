@@ -9,98 +9,108 @@ configuration loads its library at runtime.
 
 Upstream history, authors, preserved corrections, and license indicators are in
 the [central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#abbrevia).
-Original notices, codec sources, bundled binaries, and archive fixtures remain
-with the imported material.
+Original notices, codec sources, and archive fixtures remain with the runtime.
 
 ## Unit names
 
-Pascal units use descriptive dotted names beginning with `Abbrevia.`. Unit
-declarations, filenames, uses clauses, qualified references, package manifests,
-examples, tests, localization alternatives, and companion resources use the same
-names. Classes and other public identifiers retain their upstream names.
-Consumers must update their uses clauses; no legacy alias units are supplied.
+Pascal units use two-part names: `Abbrevia.` followed by a descriptive unit name,
+such as `Abbrevia.Zip`, `Abbrevia.ZipCompression`, or `Abbrevia.DeflateStreams`. Unit
+declarations, filenames, uses clauses, qualified references, test cases, and
+localization alternatives use the same names. Classes and exceptions retain the `TAb` and `EAb` prefixes to avoid name
+collisions, with cryptic abbreviations expanded. Consumers must update their uses
+clauses and renamed identifiers; no compatibility aliases are supplied.
 
 | Previous unit | Current unit |
 | --- | --- |
-| `AbArcTyp` | `Abbrevia.Archive.Types` |
+| `AbArcTyp` | `Abbrevia.Archive` |
 | `AbBase` | `Abbrevia.Base` |
 | `AbBitBkt` | `Abbrevia.BitBucket` |
 | `AbBrowse` | `Abbrevia.Browser` |
-| `AbBseCLX` | `Abbrevia.CLX.Base` |
-| `AbBseVCL` | `Abbrevia.VCL.Base` |
 | `AbBytes` | `Abbrevia.Bytes` |
 | `AbBzip2` | `Abbrevia.BZip2` |
-| `AbBzip2Typ` | `Abbrevia.BZip2.Types` |
-| `AbCBrows` | `Abbrevia.Cabinet.Browser` |
-| `AbCView` | `Abbrevia.Cabinet.View` |
-| `AbCabExt` | `Abbrevia.Cabinet.Extractor` |
-| `AbCabKit` | `Abbrevia.Cabinet.Kit` |
-| `AbCabMak` | `Abbrevia.Cabinet.Builder` |
-| `AbCabTyp` | `Abbrevia.Cabinet.Types` |
+| `AbBzip2Typ` | `Abbrevia.BZip2Archive` |
+| `AbCBrows` | `Abbrevia.CabinetBrowser` |
+| `AbCabExt` | `Abbrevia.CabinetExtractor` |
+| `AbCabKit` | `Abbrevia.CabinetKit` |
+| `AbCabMak` | `Abbrevia.CabinetBuilder` |
+| `AbCabTyp` | `Abbrevia.Cabinet` |
 | `AbCharset` | `Abbrevia.Charset` |
-| `AbComCtrls` | `Abbrevia.CommonControls` |
 | `AbCompnd` | `Abbrevia.CompoundFile` |
 | `AbConst` | `Abbrevia.Constants` |
 | `AbCrtl` | `Abbrevia.CRuntime` |
-| `AbDfBase` | `Abbrevia.Deflate.Base` |
-| `AbDfCryS` | `Abbrevia.Deflate.CryptoStream` |
-| `AbDfDec` | `Abbrevia.Deflate.Decoder` |
-| `AbDfEnc` | `Abbrevia.Deflate.Encoder` |
-| `AbDfHufD` | `Abbrevia.Deflate.HuffmanDecoder` |
-| `AbDfInW` | `Abbrevia.Deflate.InputWindow` |
-| `AbDfOutW` | `Abbrevia.Deflate.OutputWindow` |
-| `AbDfPkMg` | `Abbrevia.Deflate.PackageMerge` |
-| `AbDfStrm` | `Abbrevia.Deflate.Stream` |
-| `AbDfXlat` | `Abbrevia.Deflate.Translation` |
-| `AbDlgDir` | `Abbrevia.Dialogs.Directory` |
+| `AbDfBase` | `Abbrevia.DeflateBase` |
+| `AbDfCryS` | `Abbrevia.DeflateCryptoStream` |
+| `AbDfDec` | `Abbrevia.DeflateDecoder` |
+| `AbDfEnc` | `Abbrevia.DeflateEncoder` |
+| `AbDfHufD` | `Abbrevia.DeflateHuffmanDecoder` |
+| `AbDfInW` | `Abbrevia.DeflateInputWindow` |
+| `AbDfOutW` | `Abbrevia.DeflateOutputWindow` |
+| `AbDfPkMg` | `Abbrevia.DeflatePackageMerge` |
+| `AbDfStrm` | `Abbrevia.DeflateStreams` |
+| `AbDfXlat` | `Abbrevia.DeflateTranslation` |
 | `AbExcept` | `Abbrevia.Exceptions` |
-| `AbFciFdi` | `Abbrevia.Cabinet.API` |
-| `AbGzTyp` | `Abbrevia.GZip.Types` |
-| `AbHexVw` | `Abbrevia.HexView` |
+| `AbFciFdi` | `Abbrevia.CabinetAPI` |
+| `AbGzTyp` | `Abbrevia.GZip` |
 | `AbLZMA` | `Abbrevia.LZMA` |
-| `AbLZMAStream` | `Abbrevia.LZMA.Stream` |
-| `AbMeter` | `Abbrevia.Meter` |
+| `AbLZMAStream` | `Abbrevia.LZMAStream` |
 | `AbPPMd` | `Abbrevia.PPMd` |
-| `AbPeCol` | `Abbrevia.Editors.Collection` |
-| `AbReg` | `Abbrevia.Registration` |
 | `AbResString` | `Abbrevia.ResourceStrings` |
 | `AbSWStm` | `Abbrevia.SlidingWindowStream` |
 | `AbSelfEx` | `Abbrevia.SelfExtractor` |
 | `AbSpanSt` | `Abbrevia.SpanningStream` |
-| `AbTarTyp` | `Abbrevia.Tar.Types` |
-| `AbUnzOutStm` | `Abbrevia.Unzip.OutputStream` |
-| `AbUnzPrc` | `Abbrevia.Unzip.Procedures` |
+| `AbTarTyp` | `Abbrevia.Tar` |
+| `AbUnzOutStm` | `Abbrevia.UnzipOutputStream` |
+| `AbUnzPrc` | `Abbrevia.ZipExtraction` |
 | `AbUnzper` | `Abbrevia.Unzipper` |
 | `AbUtils` | `Abbrevia.Utilities` |
 | `AbVMStrm` | `Abbrevia.VirtualMemoryStream` |
-| `AbView` | `Abbrevia.View` |
 | `AbWavPack` | `Abbrevia.WavPack` |
-| `AbZBrows` | `Abbrevia.Zip.Browser` |
-| `AbZLTyp` | `Abbrevia.ZLib.Types` |
-| `AbZView` | `Abbrevia.Zip.View` |
-| `AbZipExt` | `Abbrevia.Zip.Extractor` |
-| `AbZipKit` | `Abbrevia.Zip.Kit` |
-| `AbZipOut` | `Abbrevia.Zip.Output` |
-| `AbZipPrc` | `Abbrevia.Zip.Procedures` |
-| `AbZipTyp` | `Abbrevia.Zip.Types` |
+| `AbZBrows` | `Abbrevia.ZipBrowser` |
+| `AbZLTyp` | `Abbrevia.ZLib` |
+| `AbZipExt` | `Abbrevia.ZipExtractor` |
+| `AbZipKit` | `Abbrevia.ZipKit` |
+| `AbZipPrc` | `Abbrevia.ZipCompression` |
+| `AbZipTyp` | `Abbrevia.Zip` |
 | `AbZipper` | `Abbrevia.Zipper` |
-| `Abbrevia_TLB` | `Abbrevia.COM.TypeLibrary` |
-| `FMX.AbDlgPwd` | `Abbrevia.FMX.Dialogs.Password` |
-| `FMX.AbPeDir` | `Abbrevia.FMX.Editors.Directory` |
-| `FMX.AbPeFn` | `Abbrevia.FMX.Editors.FileName` |
-| `FMX.AbPePass` | `Abbrevia.FMX.Editors.Password` |
-| `FMX.AbPeVer` | `Abbrevia.FMX.Editors.Version` |
-| `FMX.AbReg` | `Abbrevia.FMX.Registration` |
-| `Vcl.AbDlgPwd` | `Abbrevia.VCL.Dialogs.Password` |
-| `Vcl.AbPeDir` | `Abbrevia.VCL.Editors.Directory` |
-| `Vcl.AbPeFn` | `Abbrevia.VCL.Editors.FileName` |
-| `Vcl.AbPePass` | `Abbrevia.VCL.Editors.Password` |
-| `Vcl.AbPeVer` | `Abbrevia.VCL.Editors.Version` |
-| `Vcl.AbReg` | `Abbrevia.VCL.Registration` |
-| `_GZipItem` | `Abbrevia.COM.GZipItem` |
-| `_TarItem` | `Abbrevia.COM.TarItem` |
-| `_ZipItem` | `Abbrevia.COM.ZipItem` |
-| `_ZipKit` | `Abbrevia.COM.ZipKit` |
+
+Examples of the class and exception names:
+
+| Previous name | Current name |
+| --- | --- |
+| `TAbDfInBitStream` | `TAbDeflateInputBitStream` |
+| `TAbDfCodeLenStream` | `TAbDeflateCodeLengthTokenStream` |
+| `TAbDfLZStream` | `TAbDeflateLZ77TokenStream` |
+| `TAbMakeCab` | `TAbCabinetBuilder` |
+| `TAbCabBrowser` | `TAbCabinetBrowser` |
+| `TAbMakeSelfExe` | `TAbSelfExtractorBuilder` |
+| `TBZCompressionStream` | `TAbBZip2CompressionStream` |
+| `EAbVMSSeekFail` | `EAbVirtualMemoryStreamSeekFailed` |
+| `EAbZipInvalidLFH` | `EAbZipInvalidLocalFileHeader` |
+
+The two-part unit names and expanded class names were verified with a clean Win64
+Forge build and all 33 archive extraction checks described below. The Delphi-only distribution material has since been retired as described below.
+
+## Retired toolchain material
+
+The maintained package targets NexusFPC. Delphi/C++Builder package projects,
+VCL/CLX/FireMonkey controls, property editors, registration code and icons,
+the Delphi COM automation wrapper, IDE test runners, and Borland OMF/ELF codec
+binaries were removed on 2026-10-12 (376 files). Native codec linker directives
+now use the LLVM object names on both Windows architectures; the Forge recipe supplies
+Win64 objects. Win32 still requires its own native codec build.
+
+Nonvisual archive components, Windows CAB support, self-extractor construction,
+and compound-file storage remain. The compound-file classes no longer expose
+VCL tree-view population methods. Runtime units use FPC string/file helpers;
+Unix code uses `BaseUnix` instead of Delphi's `Posix.*` bindings. Compiler-version
+workarounds and Borland-only C header branches are gone.
+
+The retained `external/abbrevia/tests` Pascal cases document runtime behavior
+for migration to nxtest; see its `readme.txt`. They are not an active Nexus test
+suite. Archive fixtures and localization alternatives are preserved.
+
+The Forge `Mode: delphi` setting selects NexusFPC's Object Pascal language mode;
+it does not require or invoke the Delphi compiler.
 
 ## Forge build
 
@@ -109,11 +119,11 @@ the `NativeCodecs` group, prepares `output/forge` and compiles all 37 bundled C
 sources with **one Clang invocation**: LZMA (7), PPMd (3), WavPack (20), bzip2 (7).
 There is no PowerShell build script or helper executable.
 
-The group copies Pascal sources and resources into `output/forge/source`,
+The group copies Pascal sources into `output/forge/source`,
 excluding prebuilt objects and compiled units. Clang writes its objects directly
 to `output/forge/source/Win64`. Win64 Pascal linker directives use these generated
-`.o` filenames, without a WavPack prefix or a renaming step. Imported C sources
-and bundled binaries are not overwritten.
+`.o` filenames, without a WavPack prefix or a renaming step. Native objects are
+generated from the retained C sources.
 
 Subsequent children stage the four SDK/CRT import libraries, compile the existing
 Pascal runtime probe, and run it. `Outputs.Objects` exports the actual object
@@ -158,7 +168,29 @@ Bzip2 still uses runtime DLL loading; this object build does not create that DLL
 The separately retained C/C++ bzip2 round-trip project is
 `projects/forge/examples/AbbreviaLLVM.Forge.nxscript` in the Nexus repository.
 
+The Win64 PPMd binding was corrected on 2026-10-12: imported records use C
+alignment, internal references occupy 32 bits, and the small packed records match
+`Ppmd.h`. Before this correction, extracting the bundled `Canterbury/PPMd.zip`
+raised an access violation. After a clean Forge rebuild, all 11 files from each
+of `Deflate.zip`, `LZMA.zip`, and `PPMd.zip` matched the original bytes (33 checks).
+
+Regression case for nxtest: extract every entry in
+`external/abbrevia/tests/testfiles/Canterbury/PPMd.zip` through
+`Abbrevia.ZipExtraction.AbUnzipToStream` and compare it with the corresponding
+entry in the bundled `Store.zip`. Use the stored archive as the byte reference;
+Git can convert line endings in the checked-out `Canterbury/source` text files.
+This behavioral check is separate from the package's existing startup probe.
+
 The previously identified static-bzip2 Pascal linkage gap remains: that path
-lacks `bz_internal_error`, `BZ2_rNums`, and `BZ2_crc32Table`. The full Delphi/IDE
-unit list also previously stopped at `Abbrevia.Cabinet.Types`'s missing `AnsiStrings` unit.
-Neither path is part of this build migration. The recipe currently targets Win64.
+lacks `bz_internal_error`, `BZ2_rNums`, and `BZ2_crc32Table`. The runtime now uses
+FPC's string routines in place of `AnsiStrings`. The recipe currently targets Win64.
+
+After retiring the Delphi-specific material, the clean Forge build again passed
+with all 37 LLVM object files, and all 33 archive extraction checks passed. All
+50 retained runtime units compiled and linked together on Win64 and passed the
+startup check, including the nonvisual components and compound-file classes.
+Their compilation also passed with the existing x86-64 Linux cross compiler;
+that check did not link or execute a Linux program, and Windows-only codec/CAB
+implementations are excluded by their platform guards. Win32 was not rebuilt.
+All 87 archive-fixture files were verified byte-for-byte unchanged. The only C
+source/header changes removed Borland-only preprocessor branches in three headers.

@@ -75,7 +75,7 @@ uses
   Windows,
   {$ENDIF}
   SysUtils, Classes, TestFrameWork,
-  Abbrevia.Archive.Types, Abbrevia.Deflate.Base, Abbrevia.Exceptions, Abbrevia.Utilities, Abbrevia.Zip.Types;
+  Abbrevia.Archive, Abbrevia.DeflateBase, Abbrevia.Exceptions, Abbrevia.Utilities, Abbrevia.Zip;
 
 { TAbUnZipperTests }
 

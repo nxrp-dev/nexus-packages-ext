@@ -27,7 +27,7 @@
 {*********************************************************}
 {* ABBREVIA: Abbrevia.CRuntime.pas                                  *}
 {*********************************************************}
-{* ABBREVIA: C++Builder C runtime functions              *}
+{* ABBREVIA: Native codec C runtime functions              *}
 {*********************************************************}
 
 unit Abbrevia.CRuntime;
@@ -39,13 +39,12 @@ interface
 {$IFDEF MSWINDOWS}
 
 uses
-  {$IFDEF FPC}Windows{$ELSE}Winapi.Windows{$ENDIF};
+  Windows;
 
 type
   size_t = NativeInt;
 
 const
-  __turboFloat: Integer = 0;
   _fltused: Integer = 0;
 
 procedure abs; cdecl;
@@ -87,7 +86,7 @@ procedure ___cpuid(CPUInfo: PInteger; InfoType: Integer); cdecl;
   external 'msvcrt.dll';
 
 function sprintf(S: PChar; const Format: PChar): Integer; cdecl;
-{$IFDEF FPC}external 'msvcrt.dll' name 'sprintf';{$ENDIF}
+external 'msvcrt.dll' name 'sprintf';
 
 { process.h declarations =================================================== }
 function _beginthreadex(security: Pointer; stack_size: Cardinal;
@@ -95,11 +94,9 @@ function _beginthreadex(security: Pointer; stack_size: Cardinal;
   var thrdaddr: Cardinal): THandle; cdecl;
 
 { MSVC/Win64 declarations ================================================== }
-{$IF Defined(BCB) and Defined(WIN64)}
-procedure __C_specific_handler; cdecl;
-{$ELSE}
+
 procedure __C_specific_handler; cdecl; external 'msvcrt.dll';
-{$ENDIF}
+
 {$ENDIF}
 
 implementation
@@ -107,7 +104,7 @@ implementation
 {$IFDEF MSWINDOWS}
 
 uses
-  {$IFNDEF FPC}System.Win.Crtl,{$ENDIF} Abbrevia.Utilities;
+   Abbrevia.Utilities;
 
 { ctype.h declarations ===================================================== }
 function isdigit(ch: Integer): Integer; cdecl;
@@ -148,16 +145,8 @@ begin
 end;
 { -------------------------------------------------------------------------- }
 function strlen(P: PAnsiChar): size_t; cdecl;
-{$IFNDEF FPC}
-{$IF (RTLVersion >= 20) AND DEFINED(CPU386)}
-{$DEFINE AB_CRTL_ASM_STRLEN}
-{$IFEND}
-{$ENDIF}
-{$IFDEF AB_CRTL_ASM_STRLEN}
-asm
-  jmp System.@PCharLen
-end;
-{$ELSE}
+
+
 begin
   Result := 0;
   while P^ <> #0 do
@@ -166,7 +155,7 @@ begin
     Inc(Result);
   end;
 end;
-{$IFEND}
+
 { -------------------------------------------------------------------------- }
 function strcpy(Des, Src: PAnsiChar): PAnsiChar; cdecl;
 begin
@@ -233,19 +222,9 @@ begin
   Result := AbToInt32(Round(AValue));
 end;
 
-{$IFNDEF FPC}
-function sprintf(S: PChar; const Format: PChar): Integer;
-begin
-  Result := System.Win.Crtl.sprintf(PAnsiChar(AnsiString(S)), PAnsiChar(AnsiString(Format)));
-end;
-{$ENDIF}
 
-{$IF Defined(BCB) and Defined(WIN64)}
-procedure __C_specific_handler;
-begin
-end;
 
-{$ENDIF}
+
 
 {$ENDIF}
 

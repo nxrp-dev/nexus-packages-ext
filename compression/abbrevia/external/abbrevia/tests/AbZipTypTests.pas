@@ -30,7 +30,7 @@
 interface
 
 uses
-  Classes, TestFrameWork, AbTestFrameWork, AbArcTypTests, Abbrevia.Archive.Types, Abbrevia.Utilities, Abbrevia.Zip.Types;
+  Classes, TestFrameWork, AbTestFrameWork, AbArcTypTests, Abbrevia.Archive, Abbrevia.Utilities, Abbrevia.Zip;
 
 type
   TAbZipArchiveTests = class(TAbArchiveMultiFileTests)
@@ -87,14 +87,14 @@ type
 implementation
 
 uses
-  SysUtils, Abbrevia.BitBucket, Abbrevia.Constants, Abbrevia.Exceptions, Abbrevia.Unzip.Procedures, Abbrevia.Zip.Procedures;
+  SysUtils, Abbrevia.BitBucket, Abbrevia.Constants, Abbrevia.Exceptions, Abbrevia.ZipExtraction, Abbrevia.ZipCompression;
 
 {----------------------------------------------------------------------------}
 { TAbZipArchive with Extract/Insert helpers }
 {----------------------------------------------------------------------------}
 
 type
-  TAbZipArchive = class(Abbrevia.Zip.Types.TAbZipArchive)
+  TAbZipArchive = class(Abbrevia.Zip.TAbZipArchive)
   private
     procedure DoExtractHelper(Sender : TObject; Item : TAbArchiveItem;
       const NewName : string);
@@ -258,7 +258,7 @@ begin
       Arc.TestItemAt(0);
     except
       on E: Exception do
-        Check((E is EAbZipBadCRC) or (E is EAbZipInvalidLFH));
+        Check((E is EAbZipBadCRC) or (E is EAbZipInvalidLocalFileHeader));
     end;
   finally
     Arc.Free;

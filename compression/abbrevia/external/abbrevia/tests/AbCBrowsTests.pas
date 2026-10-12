@@ -30,12 +30,12 @@ unit AbCBrowsTests;
 interface
 
 uses
-  AbTestFrameWork, Abbrevia.Cabinet.Browser;
+  AbTestFrameWork, Abbrevia.CabinetBrowser;
 
 type
-  TAbCabBrowserTests = class(TAbCompTestCase)
+  TAbCabinetBrowserTests = class(TAbCompTestCase)
   private
-    Component : TAbCabBrowser;
+    Component : TAbCabinetBrowser;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -49,27 +49,27 @@ implementation
 uses
   TestFrameWork;
 
-{ TAbCabBrowserTests }
+{ TAbCabinetBrowserTests }
 
-procedure TAbCabBrowserTests.SetUp;
+procedure TAbCabinetBrowserTests.SetUp;
 begin
   inherited;
-  Component := TAbCabBrowser.Create(nil);
+  Component := TAbCabinetBrowser.Create(nil);
 end;
 
-procedure TAbCabBrowserTests.TearDown;
+procedure TAbCabinetBrowserTests.TearDown;
 begin
   Component.Free;
   inherited;
 end;
 
-procedure TAbCabBrowserTests.TestComponentLinks;
+procedure TAbCabinetBrowserTests.TestComponentLinks;
 begin
   TestComponentLink(Component, 'ArchiveProgressMeter', TAbTestMeter);
   TestComponentLink(Component, 'ItemProgressMeter', TAbTestMeter);
 end;
 
-procedure TAbCabBrowserTests.TestDefaultStreaming;
+procedure TAbCabinetBrowserTests.TestDefaultStreaming;
 begin
   inherited TestDefaultStreaming(Component);
 end;
@@ -77,7 +77,7 @@ end;
 initialization
 
   TestFramework.RegisterTest('Abbrevia.Component Level Test Suite',
-    TAbCabBrowserTests.Suite);
+    TAbCabinetBrowserTests.Suite);
 
 end.
 

@@ -30,10 +30,10 @@
 interface
 
 uses
-  Classes, TestFrameWork, Abbrevia.Archive.Types, Abbrevia.Utilities, AbArcTypTests, AbTestFrameWork;
+  Classes, TestFrameWork, Abbrevia.Archive, Abbrevia.Utilities, AbArcTypTests, AbTestFrameWork;
 
 type
-  TAbCabArchiveTests = class(TAbArchiveMultiFileTests)
+  TAbCabinetArchiveTests = class(TAbArchiveMultiFileTests)
   private
     FItemFailed: Boolean;
 
@@ -56,32 +56,32 @@ type
 implementation
 
 uses
-  SysUtils, Abbrevia.Cabinet.Types, Abbrevia.Cabinet.API;
+  SysUtils, Abbrevia.Cabinet, Abbrevia.CabinetAPI;
 
 {----------------------------------------------------------------------------}
-{ TAbCabArchiveTests }
+{ TAbCabinetArchiveTests }
 {----------------------------------------------------------------------------}
-class function TAbCabArchiveTests.ArchiveClass: TAbArchiveClass;
+class function TAbCabinetArchiveTests.ArchiveClass: TAbArchiveClass;
 begin
-  Result := TAbCabArchive;
+  Result := TAbCabinetArchive;
 end;
 { -------------------------------------------------------------------------- }
-class function TAbCabArchiveTests.ArchiveExt: string;
+class function TAbCabinetArchiveTests.ArchiveExt: string;
 begin
   Result := '.cab';
 end;
 { -------------------------------------------------------------------------- }
-class function TAbCabArchiveTests.ArchiveType: TAbArchiveType;
+class function TAbCabinetArchiveTests.ArchiveType: TAbArchiveType;
 begin
   Result := atCab;
 end;
 { -------------------------------------------------------------------------- }
-class function TAbCabArchiveTests.VerifyArchive(aStream: TStream): TAbArchiveType;
+class function TAbCabinetArchiveTests.VerifyArchive(aStream: TStream): TAbArchiveType;
 begin
   Result := VerifyCab(aStream);
 end;
 {----------------------------------------------------------------------------}
-procedure TAbCabArchiveTests.IncompleteItemFailure(Sender : TObject;
+procedure TAbCabinetArchiveTests.IncompleteItemFailure(Sender : TObject;
   Item : TAbArchiveItem; ProcessType : TAbProcessType;
   ErrorClass : TAbErrorClass; ErrorCode : Integer);
 begin
@@ -92,14 +92,14 @@ begin
   Check(ErrorCode = Ord(FDIError_User_Abort), 'ItemFailure: ErrorCode was not user abort');
 end;
 {----------------------------------------------------------------------------}
-procedure TAbCabArchiveTests.TestAddFromStream;
+procedure TAbCabinetArchiveTests.TestAddFromStream;
 begin
   //This Test currently doesn't work!
   CheckTrue(True);
 //  inherited TestAddFromStream;
 end;
 
-procedure TAbCabArchiveTests.TestIncompleteSpan;
+procedure TAbCabinetArchiveTests.TestIncompleteSpan;
 var
   Arc: TAbArchive;
 begin
@@ -118,13 +118,13 @@ begin
   end;
 end;
 {----------------------------------------------------------------------------}
-procedure TAbCabArchiveTests.TestNoSpan;
+procedure TAbCabinetArchiveTests.TestNoSpan;
 var
-  Arc: TAbCabArchive;
+  Arc: TAbCabinetArchive;
 begin
   // Check that creating a single cabinet archive doesn't flag the cab as having
-  // a second volume (issue with D2007->D2009 conversion and Boolean vs BOOL in Abbrevia.Cabinet.API)
-  Arc := TAbCabArchive.Create(TestTempDir + 'test.cab', fmCreate);
+  // a second volume (issue with D2007->D2009 conversion and Boolean vs BOOL in Abbrevia.CabinetAPI)
+  Arc := TAbCabinetArchive.Create(TestTempDir + 'test.cab', fmCreate);
   try
     Arc.Load;
     Arc.BaseDirectory := MPLDir;
@@ -133,7 +133,7 @@ begin
   finally
     Arc.Free;
   end;
-  Arc := TAbCabArchive.Create(TestTempDir + 'test.cab', fmOpenRead);
+  Arc := TAbCabinetArchive.Create(TestTempDir + 'test.cab', fmOpenRead);
   try
     Arc.Load;
     Check(not Arc.HasNext and not Arc.HasPrev, 'Archive is part of a multi-cab set');
@@ -146,6 +146,6 @@ end;
 initialization
 
   TestFramework.RegisterTest('Abbrevia.Low-Level Compression Test Suite',
-    TAbCabArchiveTests.Suite);
+    TAbCabinetArchiveTests.Suite);
 
 end.

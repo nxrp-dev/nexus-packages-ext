@@ -45,7 +45,7 @@ type
                               var Abort : Boolean) of object;
 
 type
-  TAbMakeSelfExe = class(TAbBaseComponent)
+  TAbSelfExtractorBuilder = class(TAbBaseComponent)
   protected {private}
     FStubExe      : string;
     FZipFile      : string;
@@ -86,10 +86,10 @@ implementation
 
 uses
   SysUtils,
-  Abbrevia.Exceptions, Abbrevia.Zip.Types;
+  Abbrevia.Exceptions, Abbrevia.Zip;
 
 { -------------------------------------------------------------------------- }
-function TAbMakeSelfExe.Execute : Boolean;
+function TAbSelfExtractorBuilder.Execute : Boolean;
 var
   Abort : Boolean;
 begin
@@ -122,13 +122,13 @@ begin
   end;
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbMakeSelfExe.DoGetStubExe(var Abort: Boolean);
+procedure TAbSelfExtractorBuilder.DoGetStubExe(var Abort: Boolean);
 begin
   if Assigned(FOnGetStubExe) then
     FOnGetStubExe(Self, FStubExe, Abort);
 end;
 { -------------------------------------------------------------------------- }
-procedure TAbMakeSelfExe.DoGetZipFile(var Abort : Boolean);
+procedure TAbSelfExtractorBuilder.DoGetZipFile(var Abort : Boolean);
 begin
   if Assigned(FOnGetZipFile) then
     FOnGetZipFile(Self, FZipFile, Abort);

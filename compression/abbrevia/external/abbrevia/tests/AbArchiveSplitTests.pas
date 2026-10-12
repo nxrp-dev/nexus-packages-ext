@@ -53,7 +53,7 @@ type
 implementation
 
 uses
-  SysUtils, TestFrameWork, Abbrevia.Exceptions, Abbrevia.Unzipper, Abbrevia.Zip.Types, Abbrevia.Zipper;
+  SysUtils, TestFrameWork, Abbrevia.Exceptions, Abbrevia.Unzipper, Abbrevia.Zip, Abbrevia.Zipper;
 
 { TAbArchiveSplitTests }
 
@@ -141,7 +141,7 @@ initialization
 
   TestFramework.RegisterTest('Abbrevia.File Splitting Tests',
     TAbArchiveSplitTests.Suite);
- 
+
 end.
 
- 
+

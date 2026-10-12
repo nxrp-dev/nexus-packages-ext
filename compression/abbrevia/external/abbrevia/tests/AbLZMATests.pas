@@ -41,17 +41,17 @@ type
   published
     procedure TestDecodeStream;
     procedure TestEncodeStream;
-    {$IFDEF HasAdvancedRecords}
+
     procedure TestDecompressionStream;
     procedure TestCompressionStream;
-    {$ENDIF}
+
   end;
 
 implementation
 
 uses
   Classes, SysUtils, TestFrameWork, Abbrevia.Utilities,
-  {$IFDEF HasAdvancedRecords}Abbrevia.LZMA.Stream,{$ENDIF} Abbrevia.LZMA;
+  Abbrevia.LZMAStream, Abbrevia.LZMA;
 
 { TAbLZMATests }
 
@@ -108,7 +108,7 @@ begin
   end;
 end;
 
-{$IFDEF HasAdvancedRecords}
+
 procedure TAbLZMATests.TestDecompressionStream;
 var
   InStream, LZDStream: TStream;
@@ -154,13 +154,12 @@ begin
     CompressedStream.Free;
   end;
 end;
-{$ENDIF}
+
 
 initialization
 
   TestFramework.RegisterTest('Abbrevia.Low-Level Compression Test Suite',
     TAbLZMATests.Suite);
- 
+
 end.
 
- 

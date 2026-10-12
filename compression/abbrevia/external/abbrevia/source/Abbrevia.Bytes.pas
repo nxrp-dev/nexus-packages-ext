@@ -3,7 +3,7 @@ unit Abbrevia.Bytes;
 interface
 
 uses
-  {$IFDEF FPC}SysUtils{$ELSE}System.SysUtils{$ENDIF};
+  SysUtils;
 
 type
   TAbBytes = record

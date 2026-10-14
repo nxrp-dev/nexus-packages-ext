@@ -4,8 +4,11 @@ Package identity: `NXRP.Compression.Abbrevia`.
 
 `external/abbrevia` is maintained directly by `nexus-packages-ext`, including its
 NexusFPC corrections. It is an ordinary tracked directory; no separate fork is
-required. Nexus consumes runtime units directly. The default FPC bzip2
-configuration loads its library at runtime.
+required. `Abbrevia.nxpk` declares all 51 runtime units and requires the shared
+`nxrtl` package. The nxbuild recipe compiles it into `Abbrevia.nxpl`; its
+development metadata is embedded by default. Static consumers can still compile
+the same Pascal unit sources directly. The default FPC bzip2 configuration loads
+its library at runtime.
 
 Upstream history, authors, preserved corrections, and license indicators are in
 the [central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#abbrevia).
@@ -114,6 +117,25 @@ it does not require or invoke the Delphi compiler.
 
 Build and run the native nxtest suite using [test/README.md](test/README.md).
 The package build no longer runs the superseded standalone linkage probe.
+
+## Runtime package build
+
+From the Nexus root, use the ordered nxbuild recipe:
+
+```powershell
+output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=projects/nxbuild/examples/Abbrevia.nxpackage
+```
+
+It builds the LLVM codec objects, the bzip2 shared library, then `Abbrevia.nxpk`
+in one FPC invocation. Products are under
+`output/nxbuild-abbrevia/<target>/pascal`. The installed package SDK and its
+identity are selected in `projects/nxbuild/nxbuild.environment.nxscript`.
+Use matching SDK compiler, shared RTL, and startup units together.
+
+`AbbreviaTests.nxproject` consumes `Abbrevia.nxpl` through RequiredPackages;
+it does not list the Abbrevia source directory as a UnitPath. At runtime the
+matching `nxrtl.nxpl` must be beside the executable or available on the platform
+library search path. See [test/README.md](test/README.md) for the commands.
 
 ## Historical Forge build
 

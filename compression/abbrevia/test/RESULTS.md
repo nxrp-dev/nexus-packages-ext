@@ -1,6 +1,26 @@
 # Abbrevia nxtest results - 2026-10-14
 
-The original migration registered 214 cases. The current complete suite contains
+## Runtime package run
+
+The Win64 suite now builds against `Abbrevia.nxpl` and `nxrtl.nxpl`, using the
+new `Abbrevia.nxpk` declaration containing all 51 runtime units. The executable's
+native import table confirms both package dependencies. It no longer compiles
+Abbrevia source units into the executable.
+
+**232 passed; 0 failed; 0 errors; 0 skipped.** This retains all 231 existing cases
+and adds `Abbrevia.NativeCodecs.SharedRTLReferences`, covering inline Trim and
+encoding factories plus checked Int64 overflow and shared exception identity.
+The existing LZMA worker/stream cases pass through the package boundary unchanged.
+
+The compiler/RTL package fixes and validation are recorded in NexusFPC's
+`nexusfpc-package-storage.md`. The normal nxbuild executable and matching package
+SDK were updated; its two self-hosted compiler generations are byte-identical.
+No commits were made. Linux and Win32 were not rerun for this package conversion;
+the earlier platform results below remain historical executable-suite evidence.
+
+## Previous executable-suite verification
+
+The original migration registered 214 cases. At that checkpoint the complete suite contained
 231 cases across 33 logical suites: the retained supplied cases, 20 native-codec
 cases, three Cabinet API cases, six focused decompression cases, two ZIP filename
 cases, and twelve LZMA stream regressions. Both formerly skipped Linux LZMA stream

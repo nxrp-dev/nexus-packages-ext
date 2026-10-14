@@ -1,0 +1,69 @@
+// Copyright (c) 2026 Kevin Collins.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses",
+// as defined by the Mozilla Public License, v. 2.0.
+//
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+package Abbrevia;
+
+requires nxrtl;
+
+contains
+  Abbrevia.Archive,
+  Abbrevia.Base,
+  Abbrevia.BitBucket,
+  Abbrevia.Browser,
+  Abbrevia.Bytes,
+  Abbrevia.BZip2,
+  Abbrevia.BZip2Archive,
+  Abbrevia.Cabinet,
+  Abbrevia.CabinetAPI,
+  Abbrevia.CabinetBrowser,
+  Abbrevia.CabinetBuilder,
+  Abbrevia.CabinetExtractor,
+  Abbrevia.CabinetKit,
+  Abbrevia.Charset,
+  Abbrevia.CompoundFile,
+  Abbrevia.Constants,
+  Abbrevia.CRuntime,
+  Abbrevia.DCL,
+  Abbrevia.DeflateBase,
+  Abbrevia.DeflateCryptoStream,
+  Abbrevia.DeflateDecoder,
+  Abbrevia.DeflateEncoder,
+  Abbrevia.DeflateHuffmanDecoder,
+  Abbrevia.DeflateInputWindow,
+  Abbrevia.DeflateOutputWindow,
+  Abbrevia.DeflatePackageMerge,
+  Abbrevia.DeflateStreams,
+  Abbrevia.DeflateTranslation,
+  Abbrevia.Exceptions,
+  Abbrevia.GZip,
+  Abbrevia.LZMA,
+  Abbrevia.LZMAStream,
+  Abbrevia.PPMd,
+  Abbrevia.ResourceStrings,
+  Abbrevia.SelfExtractor,
+  Abbrevia.SlidingWindowStream,
+  Abbrevia.SpanningStream,
+  Abbrevia.Tar,
+  Abbrevia.UnzipOutputStream,
+  Abbrevia.Unzipper,
+  Abbrevia.Utilities,
+  Abbrevia.VirtualMemoryStream,
+  Abbrevia.WavPack,
+  Abbrevia.Zip,
+  Abbrevia.ZipBrowser,
+  Abbrevia.ZipCompression,
+  Abbrevia.ZipExtraction,
+  Abbrevia.ZipExtractor,
+  Abbrevia.ZipKit,
+  Abbrevia.Zipper,
+  Abbrevia.ZLib;
+
+end.

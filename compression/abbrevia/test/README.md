@@ -6,16 +6,25 @@ result objects, failure handling, and skip reporting. This is the same executabl
 runner pattern used by the existing SQLite and nxbuild tests. No DUnit dependency
 or compatibility layer is used by the active suite.
 
-There are 231 registered cases across 33 logical suites. Six supplied disabled
+There are 232 registered cases across 33 logical suites. Six supplied disabled
 cases with unavailable reference inputs were removed. The custom codec checks retain all 52
 previous byte comparisons/round trips plus the C layout and library checks.
+A shared-RTL regression also checks inline Trim/encoding references and checked
+Int64 arithmetic while consuming the compiled packages.
 See [RESULTS.md](RESULTS.md) for the latest results and remaining limitations.
 
 ## Build and run
 
 Run from the Nexus repository root. The shared nxbuild environment module supplies
 the compiler, RTL, LLVM, and platform paths. Build the package first to produce its
-native objects and bzip2 shared library, then build the test executable:
+native objects, bzip2 shared library, and `Abbrevia.nxpl`, then build the test
+executable. Configure PackageSDKPath and PackageSDKIdentity in the shared
+environment from the installed matching SDK. On Windows, make the SDK runtime
+package available for execution:
+
+```powershell
+$env:PATH = "C:/gitdev/tools/nexus-fpc/build/forge-bootstrap/package-sdk/packages;$env:PATH"
+```
 
 ```powershell
 output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=projects/nxbuild/examples/Abbrevia.nxpackage
@@ -34,8 +43,11 @@ that text, for example `Abbrevia.CabinetArchiveTests.TestExtract`. IDs and asser
 messages are printed for every executed case; integer comparisons retain Int64
 precision in nxtest's expected/actual result fields.
 
-The test project recompiles its dependencies into the output folder. It expects
-the native objects and bzip2 library already built by the package. Test files are
+The test project declares RequiredPackages `[nxrtl, Abbrevia]` and uses the
+compiled package metadata. Abbrevia's source directory is retained only as an
+include path for the test declarations, not as a UnitPath. The test executable
+imports Abbrevia's runtime code, classes and globals from `Abbrevia.nxpl`.
+It expects the package and bzip2 library already built. Test files are
 never generated into the source tree: each fixture owns a unique OS temporary
 directory and removes it on completion, including failure paths.
 

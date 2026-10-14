@@ -14,6 +14,8 @@ Project AbbreviaTests {
         CompilerPath: @Tools.Native.FPCCompiler;
         SourceFiles: [@AbbreviaTests.SourceRoot + "/test/AbbreviaTests.lpr"];
         OutputPath: @AbbreviaTests.OutputRoot + "/pascal";
+        PackageSDKIdentity: @Tools.Native.PackageSDKIdentity;
+        RequiredPackages: [nxrtl, Abbrevia];
         Target Platform { OperatingSystem: @Tools.Native.OS; }
         Config Options { DisableDefaultConfigFiles: True; }
         Language Pascal { Mode: Delphi; }
@@ -23,19 +25,20 @@ Project AbbreviaTests {
             UnitPaths: [
                 @AbbreviaTests.SourceRoot + "/test",
                 "packages/nexus-packages/nxtest/src",
+                @Tools.Native.PackageSDKPath + "/units",
                 @Tools.Native.RTLPath,
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src",
                 @Tools.NexusFPC.SourcePath + "/packages/fcl-base/src",
-                @Tools.NexusFPC.SourcePath + "/packages/fcl-registry/src",
-                @AbbreviaTests.SourceRoot + "/external/abbrevia/source"
+                @Tools.NexusFPC.SourcePath + "/packages/fcl-registry/src"
             ];
             IncludePaths: [
                 @AbbreviaTests.SourceRoot + "/external/abbrevia/source",
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
             ];
-            LibraryPaths: @Tools.Native.LibraryPaths;
+            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages", @AbbreviaTests.OutputRoot + "/pascal"];
+            LibraryPaths: @Tools.Native.PackageLibraryPaths;
             // Codec object directives include their platform subdirectory.
             ObjectPaths: [@AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory, @AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory + "/.."];
             CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;

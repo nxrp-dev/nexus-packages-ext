@@ -22,6 +22,29 @@ begin
     Result[lIndex] := (lIndex * 37 xor (lIndex shr 8)) and $FF;
 end;
 
+{$PUSH}{$Q+}
+function CheckedIncrement(AValue: Int64): Int64;
+begin
+  Result := AValue + 1;
+end;
+{$POP}
+
+procedure CheckSharedRTLReferences(AContext: TNXTestContext);
+var
+  lCaught: Boolean;
+begin
+  AContext.AssertEquals('package', Trim(' package '));
+  AContext.AssertTrue(TEncoding.ANSI <> nil, 'Shared ANSI encoding factory');
+  AContext.AssertTrue(TEncoding.ASCII <> nil, 'Shared ASCII encoding factory');
+  AContext.AssertTrue(TEncoding.UTF8 <> nil, 'Shared UTF8 encoding factory');
+  lCaught := False;
+  try
+    CheckedIncrement(High(Int64));
+  except
+    on E: EIntOverflow do lCaught := True;
+  end;
+  AContext.AssertTrue(lCaught, 'Shared overflow helper and exception identity');
+end;
 procedure CheckCLayout(AContext: TNXTestContext);
 begin
   AContext.AssertTrue(SizeOf(size_t) = SizeOf(Pointer), 'C size_t must be pointer-sized');
@@ -340,6 +363,7 @@ var
 begin
   lSuite := ARegistry.AddSuite('Abbrevia.NativeCodecs');
   lSuite.AddTest('CLayout', @CheckCLayout);
+  lSuite.AddTest('SharedRTLReferences', @CheckSharedRTLReferences);
   lSuite.AddTest('GeneratedBzip2Library', @CheckLoadedLibrary);
   lSuite.AddTest('Buffer0', @Buffer0);
   lSuite.AddTest('Stream0', @Stream0);

@@ -80,9 +80,7 @@
   {$DEFINE NoBZip2}
 {$ENDIF}
 
-{$IFDEF LINUX}
-  {$DEFINE NoBZip2}
-{$ENDIF}
+
 
 
 
@@ -173,8 +171,8 @@ all newer (zipx) compatible methods (Bzip2, Lzma, PPMd, WavPack)}
   {$DEFINE UnzipWavPackSupport}
 {$ENDIF}
 
-{ Native codec bindings currently link Windows objects. }
-{$IF NOT DEFINED(MSWINDOWS)}
+{ Native codec bindings use target objects supplied by the build. }
+{$IF NOT DEFINED(MSWINDOWS) AND NOT DEFINED(LINUX)}
   {$UNDEF UnzipLzmaSupport}
   {$UNDEF UnzipPPMdSupport}
   {$UNDEF UnzipWavPackSupport}

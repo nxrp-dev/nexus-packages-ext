@@ -35,7 +35,7 @@ unit Abbrevia.PPMd;
 
 interface
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 
 uses
   Classes;
@@ -46,10 +46,9 @@ procedure DecompressPPMd(aSrc, aDes: TStream);
 
 implementation
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 
 uses
-  Windows,
   SysUtils, Types,
   Abbrevia.CRuntime, Abbrevia.Exceptions;
 
@@ -57,6 +56,12 @@ uses
 { Linker derectives ======================================================== }
 
 // Don't re-order these;  it will cause linker errors
+{$IFDEF LINUX}
+  {$LINKLIB c}
+  {$L Ppmd8Enc.o}
+  {$L Ppmd8.o}
+  {$L Ppmd8Dec.o}
+{$ELSE}
 {$IF DEFINED(CPU386)}
   {$L Win32\Ppmd8Enc.o}
   {$L Win32\Ppmd8.o}
@@ -71,6 +76,7 @@ uses
 {$ELSE}
   {$FATAL 'Unsupported CPU/platform'}
 {$IFEND}
+{$ENDIF}
 
 
 { 7zTypes.h ================================================================== }
@@ -197,12 +203,16 @@ end;
 
 function SzAlloc(p: ISzAllocPtr; size: size_t): Pointer; cdecl;
 begin
-  Result := Abbrevia.CRuntime.malloc(size);
+  try
+    GetMem(Result, size);
+  except
+    Result := nil;
+  end;
 end;
 { -------------------------------------------------------------------------- }
 procedure SzFree(p: ISzAllocPtr; address: Pointer); cdecl;
 begin
-  Abbrevia.CRuntime.free(address);
+  FreeMemory(address);
 end;
 
 var

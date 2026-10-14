@@ -36,12 +36,12 @@ unit Abbrevia.LZMA;
 
 interface
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 {$IFDEF CPUX64}
 {$HINTS OFF}
 {$ENDIF}
 uses
-  Classes, Windows, SysUtils, Abbrevia.CRuntime, Abbrevia.Utilities;
+  Classes, SysUtils, Abbrevia.CRuntime, Abbrevia.Utilities;
 
 { Raw LZMA decompression =================================================== }
 
@@ -81,7 +81,7 @@ function LzmaEncodeBuffer(APUncompressedData: Pointer; AUncompressedSize: Intege
   APCompressedData: Pointer; ACompressedDataBufferCapacity: Integer;
   ACompressionLevel: Integer = -1; ADictionarySize: Integer = -1): NativeInt;
 
-{$IFDEF CPUARM64}
+{$IF DEFINED(CPUARM64) AND DEFINED(MSWINDOWS)}
 {$DEFINE USE_LIBLZMA}
 const
   liblzma = 'WinARM64EC\lzma.a';
@@ -326,6 +326,18 @@ procedure RaiseLzmaException(AResultCode: SRes);
 
 { Linker directives ======================================================== }
 
+{$IFDEF LINUX}
+{$LINKLIB c}
+{$LINKLIB pthread}
+  {$L CpuArch.o}
+  {$L LzFind.o}
+  {$L LzFindMt.o}
+  {$L LzFindOpt.o}
+  {$L LzmaDec.o}
+  {$L LzmaEnc.o}
+  {$L Threads.o}
+{$ELSE}
+
 {$IF DEFINED(CPU386)}
   {$L Win32\CpuArch.o}
   {$L Win32\LzFind.o}
@@ -343,12 +355,13 @@ procedure RaiseLzmaException(AResultCode: SRes);
   {$L Win64\LzmaEnc.o}
   {$L Win64\Threads.o}
 {$IFEND}
+{$ENDIF}
 
 {$ENDIF}
 
 implementation
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 
 { Error handling =========================================================== }
 

@@ -36,13 +36,14 @@ unit Abbrevia.CRuntime;
 
 interface
 
-{$IFDEF MSWINDOWS}
-
 uses
-  Windows;
+  ctypes
+  {$IFDEF MSWINDOWS}, Windows{$ENDIF};
 
 type
-  size_t = NativeInt;
+  size_t = ctypes.csize_t;
+
+{$IFDEF MSWINDOWS}
 
 const
   _fltused: Integer = 0;

@@ -35,7 +35,7 @@ unit Abbrevia.WavPack;
 
 interface
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 
 uses
   Classes;
@@ -48,16 +48,16 @@ procedure DecompressWavPack(aSrc, aDes: TStream);
 
 implementation
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 
 uses
   Math, SysUtils,
-  Abbrevia.CRuntime, Abbrevia.Utilities;
+  {$IFDEF MSWINDOWS}Abbrevia.CRuntime,{$ENDIF} Abbrevia.Utilities;
 
 type
   PUInt32 = ^UInt32;
 
-{$IFDEF CPUARM64}
+{$IF DEFINED(CPUARM64) AND DEFINED(MSWINDOWS)}
   {$DEFINE USE_LIBWAVPACK}
   const libwavpack = 'WinARM64EC\wavpack.a';
 {$ENDIF}
@@ -238,6 +238,31 @@ procedure write_hybrid_profile; external
   {$IFEND}
 {$ENDIF}
 
+{$IFDEF LINUX}
+  {$LINKLIB c}
+  {$LINKLIB m}
+  {$L write_words.o}
+  {$L common_utils.o}
+  {$L decorr_utils.o}
+  {$L entropy_utils.o}
+  {$L extra1.o}
+  {$L extra2.o}
+  {$L open_legacy.o}
+  {$L open_raw.o}
+  {$L open_utils.o}
+  {$L read_words.o}
+  {$L tag_utils.o}
+  {$L tags.o}
+  {$L unpack.o}
+  {$L unpack_dsd.o}
+  {$L unpack_floats.o}
+  {$L unpack_seek.o}
+  {$L unpack_utils.o}
+  {$L unpack3.o}
+  {$L unpack3_open.o}
+  {$L unpack3_seek.o}
+{$ENDIF}
+
 { wavpack_local.h ========================================================== }
 
 const
@@ -270,7 +295,7 @@ type
 
 { wputils.c ================================================================ }
 
-function WavpackOpenFileInputEx(const reader: WavpackStreamReader;
+function WavpackOpenFileInputEx(var reader: WavpackStreamReader;
   wv_id, wvc_id: Pointer; error: PAnsiChar; flags, norm_offset: Integer): WavpackContext;
   cdecl; external
   {$IFDEF USE_LIBWAVPACK}libwavpack{$ENDIF};

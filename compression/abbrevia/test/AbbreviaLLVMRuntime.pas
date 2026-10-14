@@ -4,6 +4,7 @@ program AbbreviaLLVMRuntime;
 {$mode delphi}
 
 uses
+  {$IFDEF LINUX}cthreads,{$ENDIF}
   SysUtils, Abbrevia.Tar, Abbrevia.Zip, Abbrevia.GZip, Abbrevia.ZipCompression, Abbrevia.ZipExtraction,
   Abbrevia.LZMA, Abbrevia.PPMd, Abbrevia.WavPack, Abbrevia.BZip2;
 

@@ -60,6 +60,8 @@ type
   TFree = procedure(opaque, Block: Pointer); cdecl;
 
   // Internal structure.  Ignore.
+  {$PUSH}
+  {$PACKRECORDS C}
   TBZStreamRec = record
     next_in: PByte; // next input byte
     avail_in: Integer; // number of bytes available at next_in
@@ -77,6 +79,7 @@ type
     bzfree: TFree; // used to free the internal state
     opaque: Pointer;
   end;
+  {$POP}
 
   // Abstract ancestor class
   TAbCustomBZip2Stream = class(TStream)

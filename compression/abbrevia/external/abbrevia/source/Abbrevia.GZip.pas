@@ -520,17 +520,42 @@ end;
 
 procedure TAbGzipStreamHelper.ExtractItemData(AStream: TStream);
 var
-  Helper : TAbDeflateHelper;
+  lHelper: TAbDeflateHelper;
+  lTotalSize: Int64;
+  lValidate: Boolean;
 begin
-  Helper := TAbDeflateHelper.Create;
+  lHelper := TAbDeflateHelper.Create;
   try
-    SeekToItemData;
-    if (AStream is TAbBitBucketStream) then
-      Helper.Options := Helper.Options or dfc_TestOnly;
-    FItem.CRC32 := Inflate(FStream, AStream, Helper);
-    FItem.UncompressedSize := AStream.Size{Helper.NormalSize};
+    FStream.Position := 0;
+    lTotalSize := 0;
+    lValidate := AStream is TAbBitBucketStream;
+    if lValidate then
+      lHelper.Options := lHelper.Options or dfc_TestOnly;
+    {$IFDEF STRICTGZIP}
+    lValidate := True;
+    {$ENDIF}
+    // A gzip file is a sequence of members, including empty members.
+    // Each member has its own deflate dictionary, CRC, and size trailer.
+    repeat
+      if FStream.Size - FStream.Position < SizeOf(TAbGzHeader) then
+        raise EReadError.Create('Truncated gzip member header');
+      ReadHeader;
+      if not VerifyHeader(FItem.FGZHeader) then
+        raise EAbGzipInvalid.Create;
+      FItem.CRC32 := Inflate(FStream, AStream, lHelper);
+      ReadTail;
+      if lValidate then
+      begin
+        if FItem.CRC32 <> FTail.CRC32 then
+          raise EAbGzipBadCRC.Create;
+        if UInt32(lHelper.NormalSize and $FFFFFFFF) <> FTail.ISize then
+          raise EAbGzipBadFileSize.Create;
+      end;
+      Inc(lTotalSize, lHelper.NormalSize);
+    until FStream.Position = FStream.Size;
+    FItem.UncompressedSize := lTotalSize;
   finally
-    Helper.Free;
+    lHelper.Free;
   end;
 end;
 
@@ -603,7 +628,7 @@ end;
 
 procedure TAbGzipStreamHelper.ReadTail;
 begin
-  FStream.Read(FTail, SizeOf(TAbGzTailRec));
+  FStream.ReadBuffer(FTail, SizeOf(TAbGzTailRec));
 end;
 
 function TAbGzipStreamHelper.GetGzCRC: Integer;
@@ -980,33 +1005,8 @@ begin
 
     GZHelp := TAbGzipStreamHelper.Create(FGzStream);
     try
-      { read GZip Header }
-      GzHelp.ReadHeader;
-
-      { extract copy data from GZip}
       GzHelp.ExtractItemData(aStream);
-
-      { Get validation data }
-      GzHelp.ReadTail;
-
-      {$IFDEF STRICTGZIP}
-      { According to
-          http://www.gzip.org/zlib/rfc1952.txt
-
-       A compliant gzip compressor should calculate and set the CRC32 and ISIZE.
-       However, a compliant decompressor should not check these values.
-
-       If you want to check the the values of the CRC32 and ISIZE in a GZIP file
-       when decompressing enable the STRICTGZIP define contained in AbDefine.inc }
-
-      { validate against CRC }
-      if GzHelp.FItem.Crc32 <> GzHelp.TailCRC then
-        raise EAbGzipBadCRC.Create;
-
-      { validate against file size }
-      if GzHelp.FItem.UncompressedSize <> GZHelp.TailSize then
-        raise EAbGzipBadFileSize.Create;
-      {$ENDIF}
+      Items[0].UncompressedSize := GzHelp.FileSize;
     finally
       GzHelp.Free;
     end;
@@ -1267,22 +1267,12 @@ begin
       GZHelp := TAbGzipStreamHelper.Create(FGZStream);
 
       GZHelp.ExtractItemData(BitBucket);
-      GZHelp.ReadTail;
-
-      { validate against CRC }
-      if GzHelp.FItem.Crc32 <> GZHelp.TailCRC then
-        raise EAbGzipBadCRC.Create;
-
-      { validate against file size }
-      if GzHelp.FItem.UncompressedSize <> GZHelp.TailSize then
-        raise EAbGzipBadFileSize.Create;
-
+      Items[0].UncompressedSize := GzHelp.FileSize;
     finally
       GZHelp.Free;
       BitBucket.Free;
+      FGzStream.Position := SavePos;
     end;
-
-    FGzStream.Position := SavePos;
   end;
 end;
 

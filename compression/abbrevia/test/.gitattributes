@@ -1,0 +1,2 @@
+# Compression fixtures must preserve their exact bytes on every checkout.
+testfiles/** -text

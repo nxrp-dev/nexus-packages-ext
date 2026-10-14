@@ -610,6 +610,34 @@ uses
   Abbrevia.Exceptions,
   Abbrevia.VirtualMemoryStream;
 
+function DecodeZipHeaderFileName(const ABytes: TBytes; AIsUTF8: Boolean): string;
+var
+  lEncoding: TEncoding;
+  lCodePage: Integer;
+begin
+  if AIsUTF8 then
+    Exit(TEncoding.UTF8.GetString(ABytes));
+  case AbDetectCharSet(ABytes) of
+    csASCII: Result := TEncoding.ASCII.GetString(ABytes);
+    csUTF8: Result := TEncoding.UTF8.GetString(ABytes);
+    csANSI:
+      begin
+        lCodePage := TEncoding.ANSI.CodePage;
+        // Untagged Windows archives commonly use CP1252. A UTF-8 host's
+        // "ANSI" decoder cannot read bytes already identified as non-UTF-8.
+        // Retain the system legacy codepage when it actually is one.
+        if lCodePage = 65001 then
+          lCodePage := 1252;
+        lEncoding := TEncoding.GetEncoding(lCodePage);
+        try
+          Result := lEncoding.GetString(ABytes);
+        finally
+          lEncoding.Free;
+        end;
+      end;
+  end;
+end;
+
 function VerifyZip(Strm : TStream) : TAbArchiveType;
 { determine if stream appears to be in PkZip format }
 var
@@ -1058,11 +1086,7 @@ begin
   begin
     SetLength(pBytes, FileNameLength );
     Stream.ReadBuffer(pBytes[0], Length(pBytes));
-    case AbDetectCharSet(pBytes) of
-      csASCII: FFileName := TEncoding.ASCII.GetString(pBytes);
-      csANSI: FFileName := TEncoding.ANSI.GetString(pBytes);
-      csUTF8: FFileName := TEncoding.UTF8.GetString(pBytes);
-    end;
+    FFileName := DecodeZipHeaderFileName(pBytes, IsUTF8);
   end
   else
     FFileName := '';
@@ -1144,11 +1168,7 @@ begin
     begin
       SetLength(FRawFileName, FileNameLength);
       Read(FRawFileName, Length(FRawFileName));
-      case AbDetectCharSet(FRawFileName) of
-        csASCII: FFileName := TEncoding.ASCII.GetString(FRawFileName);
-        csANSI: FFileName := TEncoding.ANSI.GetString(FRawFileName);
-        csUTF8: FFileName := TEncoding.UTF8.GetString(FRawFileName);
-      end;
+      FFileName := DecodeZipHeaderFileName(FRawFileName, IsUTF8);
     end
     else
     begin
@@ -1490,7 +1510,7 @@ begin
   else if FItemInfo.ExtraField.Get(Ab_InfoZipUnicodePathSubfieldID, Pointer(InfoZipField), FieldSize) and
      (FieldSize > SizeOf(TInfoZipUnicodePathRec)) and
      (InfoZipField.Version = 1) and
-     (InfoZipField.NameCRC32 = AbCRC32Of(TEncoding.ANSI.GetBytes(FItemInfo.FileName))) then
+     (InfoZipField.NameCRC32 = AbCRC32Of(FItemInfo.FRawFileName)) then
   begin
     SetLength(pBuffer, FieldSize - SizeOf(TInfoZipUnicodePathRec) + 1);
     Move(InfoZipField.UnicodeName, pBuffer[0], Length(pBuffer));
@@ -1505,7 +1525,9 @@ begin
     FFileName := string(UnicodeName);
   end
   {$IFDEF MSWINDOWS}
-  else if (GetACP <> GetOEMCP) and ((HostOS = hosDOS) or AbIsOEM(TEncoding.ANSI.GetBytes(FItemInfo.FileName))) then begin
+  // Windows NT origin selects ANSI; do not override it with an OEM guess.
+  else if (GetACP <> GetOEMCP) and ((HostOS = hosDOS) or
+    ((HostOS <> hosWinNT) and AbIsOEM(FItemInfo.FRawFileName))) then begin
     SetLength(FFileName, Length(FItemInfo.FileName));
     pBuffer := TEncoding.ANSI.GetBytes(FItemInfo.FileName);
     if pBuffer <> nil then

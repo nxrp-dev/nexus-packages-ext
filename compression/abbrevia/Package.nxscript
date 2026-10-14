@@ -16,7 +16,7 @@ Package Abbrevia {
     Author: "TurboPower, TurboPack and contributors";
     Description: "Abbrevia archive and compression runtime units.";
     License: "MPL-1.1";
-    Outputs: [RuntimeCheck: "output/forge/AbbreviaLLVMRuntime.exe", Objects: "output/forge/source/Win64"];
+    Outputs: [Objects: "output/forge/source/Win64"];
     UnitPaths: ["output/forge/units"];
     IncludePaths: ["output/forge/source"];
     LibraryPaths: ["output/forge/source/Win64", "output/forge/runtime-libs"];
@@ -72,12 +72,11 @@ Package Abbrevia {
         Source: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.29.30133/lib/x64/msvcrt.lib";
         Destination: "output/forge/runtime-libs/msvcrt.lib";
     }
-    FPC CompileRuntime {
+    FPC CompileRuntimeUnits {
         Template: "../../../../projects/forge/examples/FPC.mustache";
         Compiler: "../../../../../tools/nexus-fpc/build/forge-bootstrap/cycle3/ppcx64.exe";
-        Source: ["test/AbbreviaLLVMRuntime.pas"];
-        EntryPoint: "test/AbbreviaLLVMRuntime.pas";
-        Output: @Abbrevia.Outputs.RuntimeCheck;
+        Source: ["output/forge/source/Abbrevia.Zip.pas"];
+        EntryPoint: "output/forge/source/Abbrevia.Zip.pas";
         UnitOutput: "output/forge/units";
         UnitPaths: [
             "../../../../../tools/nexus-fpc/build/forge-bootstrap/cycle3/rtl64",
@@ -99,9 +98,5 @@ Package Abbrevia {
             "output/forge/runtime-libs/kernel32.lib", "output/forge/runtime-libs/ucrt.lib",
             "output/forge/runtime-libs/vcruntime.lib", "output/forge/runtime-libs/msvcrt.lib"
         ];
-    }
-    Run VerifyRuntime {
-        Template: "../../../../projects/forge/examples/Run.mustache";
-        Executable: @Abbrevia.Outputs.RuntimeCheck;
     }
 }

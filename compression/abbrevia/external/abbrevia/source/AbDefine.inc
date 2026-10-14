@@ -52,6 +52,11 @@
 {$X+ Extended syntax}
 {$Z1 Enumerations are byte sized}
 
+{ The existing i386 deflate assembler blocks use Intel syntax. }
+{$IFDEF CPU386}
+  {$ASMMODE INTEL}
+{$ENDIF}
+
 {====Bzip2 defines===================================================}
 
 {Activate this define to statically link bzip2 object files into the application.

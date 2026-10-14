@@ -146,7 +146,7 @@ uses
   {$ENDIF}
   Abbrevia.BitBucket,
   Abbrevia.Constants,
-  Abbrevia.DeflateBase,
+  Abbrevia.DCL, Abbrevia.DeflateBase,
   Abbrevia.DeflateCryptoStream,
   Abbrevia.DeflateDecoder,
   Abbrevia.Exceptions,
@@ -1064,6 +1064,9 @@ begin
         DecompressWavPack(aInStream, OutStream);
       end;
       {$ENDIF}
+      cmDCLImploded: begin
+        AbDecompressDCL(aInStream, OutStream, aItem.UncompressedSize);
+      end;
       cmShrunk..cmImploded: begin
         DoLegacyUnzip(aZipArchive, aItem, aInStream, OutStream);
       end;

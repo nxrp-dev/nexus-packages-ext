@@ -182,7 +182,8 @@ implementation
 {$IFDEF MSWINDOWS}
 
 uses
-  SysUtils, Abbrevia.Charset, Abbrevia.Constants, Abbrevia.Exceptions;
+  SysUtils, Abbrevia.Charset, Abbrevia.Constants, Abbrevia.Exceptions,
+  Abbrevia.UnzipOutputStream;
 
 {$WARN UNIT_PLATFORM OFF}
 
@@ -209,54 +210,41 @@ end;
 
 
 { == FCI Callback Functions - cdecl calling convention ===================== }
-function FCI_FileOpen(lpPathName: PAnsiChar; Flag, Mode: Integer;
-  PError: PInteger; Archive: TAbCabinetArchive) : PtrInt;
-  cdecl;
-  {open a file}
+function FCI_FileOpen(APathName: PAnsiChar; AFlag, AMode: Integer;
+  AError: PInteger; AArchive: TAbCabinetArchive): PtrInt; cdecl;
+var
+  lMode: Word;
 begin
-  Result := AbToNativeInt(_lcreat(lpPathName, 0));
-  if (Result = -1) then
-    raise EAbCabinetBuilderFileOpenError.Create;
+  if (AFlag and $0300) <> 0 then // C O_CREAT / O_TRUNC
+    lMode := fmCreate
+  else
+    lMode := Word(AFlag and 3) or fmShareDenyNone;
+  Result := PtrInt(TBufferedFileStream.Create(string(APathName), lMode));
 end;
 { -------------------------------------------------------------------------- }
-function FCI_FileRead(AFile: PtrInt; lpBuffer: Pointer;
-  uBytes: UINT; PError: PInteger; Archive: TAbCabinetArchive) : UINT;
-  cdecl;
-  {read from a file}
+function FCI_FileRead(AFile: PtrInt; ABuffer: Pointer; ABytes: UINT;
+  AError: PInteger; AArchive: TAbCabinetArchive): UINT; cdecl;
 begin
-  Result := _lread(HFILE(AFile), lpBuffer, uBytes);
-  if (Result = UINT(-1)) then
-    raise EAbCabinetBuilderFileReadError.Create;
+  Result := UINT(TStream(AFile).Read(ABuffer^, AbToInt32(ABytes)));
 end;
 { -------------------------------------------------------------------------- }
-function FCI_FileWrite(AFile: PtrInt; lpBuffer: Pointer;
-  uBytes: UINT; PError: PInteger; Archive: TAbCabinetArchive) : UINT;
-  cdecl;
-  {write to a file}
+function FCI_FileWrite(AFile: PtrInt; ABuffer: Pointer; ABytes: UINT;
+  AError: PInteger; AArchive: TAbCabinetArchive): UINT; cdecl;
 begin
-  Result := _lwrite(HFILE(AFile), lpBuffer, uBytes);
-  if (Result = UINT(-1)) then
-    raise EAbCabinetBuilderFileWriteError.Create;
+  Result := UINT(TStream(AFile).Write(ABuffer^, AbToInt32(ABytes)));
 end;
 { -------------------------------------------------------------------------- }
-function FCI_FileClose(AFile: PtrInt; PError: PInteger;
-  Archive: TAbCabinetArchive) : HFILE;
-  cdecl;
-  {close a file}
+function FCI_FileClose(AFile: PtrInt; AError: PInteger;
+  AArchive: TAbCabinetArchive): Integer; cdecl;
 begin
-  Result := _lclose(HFILE(AFile));
-//  if (Result = -1) then
-//    raise EAbCabinetBuilderFileCloseError.Create;
+  TStream(AFile).Free;
+  Result := 0;
 end;
 { -------------------------------------------------------------------------- }
-function FCI_FileSeek(AFile: PtrInt; Offset: Integer;
-  Origin: Integer; PError: PInteger; Archive: TAbCabinetArchive) : Integer;
-  cdecl;
-  {reposition file pointer}
+function FCI_FileSeek(AFile: PtrInt; AOffset, AOrigin: Integer;
+  AError: PInteger; AArchive: TAbCabinetArchive): Integer; cdecl;
 begin
-  Result := _llseek(HFILE(AFile), Offset, Origin);
-  if (Result = -1) then
-    raise EAbCabinetBuilderFileSeekError.Create;
+  Result := AbToInt32(TStream(AFile).Seek(AOffset, TSeekOrigin(AOrigin)));
 end;
 { -------------------------------------------------------------------------- }
 function FCI_FileDelete(lpFilename: PAnsiChar;  PError: PInteger;
@@ -296,30 +284,45 @@ begin
   Result := 0;
 end;
 { -------------------------------------------------------------------------- }
-function FCI_GetOpenInfo(lpPathname: Pointer; PDate, PTime, PAttribs : PWord;
-  PError: PInteger; Archive: TAbCabinetArchive) : PtrInt;
-  cdecl;
-  {open a file and return date/attributes}
+function FCI_GetOpenInfo(APathName: Pointer; ADate, ATime, AAttribs: PWord;
+  AError: PInteger; AArchive: TAbCabinetArchive): PtrInt; cdecl;
 var
-  AttrEx: TAbAttrExRec;
-  I, DT: Integer;
-  RawName: RawByteString;
+  lAttributes: TAbAttrExRec;
+  lIndex, lDateTime: Integer;
+  lRawName: RawByteString;
+  lStream: TStream;
 begin
-  Result := AbToNativeInt(FileOpen(string(lpPathname), fmOpenRead or fmShareDenyNone));
-  if (Result = -1) then
-    raise EAbCabinetBuilderFileOpenError.Create;
-  if not AbFileGetAttrEx(string(lpPathname), AttrEx) then
-    raise EAbFileNotFound.Create;
-  PAttribs^ := AbToUInt16(AttrEx.Attr);
-  DT := DateTimeToFileDate(AttrEx.Time);
-  PDate^ := AbToUInt16(DT shr 16);
-  PTime^ := AbToUInt16(DT and $0FFFF);
-  Archive.ItemProgress := 0;
-  Archive.FItemInProgress.UncompressedSize := AttrEx.Size;
-  RawName := Archive.FItemInProgress.RawFileName;
-  for I := 1 to Length(RawName) do
-    if Ord(RawName[I]) > 127 then
-      PAttribs^ := PAttribs^ or faUTF8Name;
+  if AArchive.FItemInProgress.Action = aaStreamAdd then
+  begin
+    // FCI owns the view, while AddFromStream's caller owns the input stream.
+    lStream := TAbUnzipSubsetStream.Create(AArchive.FInStream,
+      AArchive.FInStream.Size - AArchive.FInStream.Position);
+    lAttributes.Attr := 0;
+    lAttributes.Time := Now;
+    lAttributes.Size := lStream.Size;
+  end
+  else
+  begin
+    if not AbFileGetAttrEx(string(APathName), lAttributes) then
+      raise EAbFileNotFound.Create;
+    lStream := TBufferedFileStream.Create(string(APathName), fmOpenRead or fmShareDenyNone);
+  end;
+  try
+    AAttribs^ := AbToUInt16(lAttributes.Attr);
+    lDateTime := DateTimeToFileDate(lAttributes.Time);
+    ADate^ := AbToUInt16(lDateTime shr 16);
+    ATime^ := AbToUInt16(lDateTime and $0FFFF);
+    AArchive.ItemProgress := 0;
+    AArchive.FItemInProgress.UncompressedSize := lAttributes.Size;
+    lRawName := AArchive.FItemInProgress.RawFileName;
+    for lIndex := 1 to Length(lRawName) do
+      if Ord(lRawName[lIndex]) > 127 then
+        AAttribs^ := AAttribs^ or faUTF8Name;
+    Result := PtrInt(lStream);
+  except
+    lStream.Free;
+    raise;
+  end;
 end;
 { -------------------------------------------------------------------------- }
 function FCI_Status(Status: Word; cb1, cb2: DWord;
@@ -785,8 +788,39 @@ begin
 end;
 { -------------------------------------------------------------------------- }
 procedure TAbCabinetArchive.SaveArchive;
+var
+  lIndex: Integer;
+  lItem: TAbCabinetItem;
 begin
-  { No-op;  file is flushed in destructor }
+  // Disk files are submitted by Add; AddFromStream queues its item for Save.
+  try
+    for lIndex := 0 to FItemList.Count - 1 do
+    begin
+      lItem := Items[lIndex];
+      if lItem.Action <> aaStreamAdd then
+        Continue;
+      try
+        if (FMode <> fmOpenWrite) or (FInStream = nil) then
+          raise EAbCabinetBuilderAddFileError.Create;
+        if FFCIContext = nil then
+          CreateCabFile;
+        FItemInProgress := lItem;
+        lItem.RawFileName := UTF8Encode(lItem.FileName);
+        if not FCIAddFile(FFCIContext, PAnsiChar(lItem.RawFileName),
+          PAnsiChar(lItem.RawFileName), False, @FCI_GetNextCab, @FCI_Status,
+          @FCI_GetOpenInfo, CompressionTypeMap[FCompressionType]) then
+          raise EAbCabinetBuilderAddFileError.Create;
+        lItem.Action := aaNone;
+      except
+        lItem.Action := aaFailed;
+        raise;
+      end;
+    end;
+  finally
+    FItemInProgress := nil;
+    FInStream := nil;
+  end;
+  // Cabinet data is finalized by CloseCabFile, as for AddFiles.
 end;
 { -------------------------------------------------------------------------- }
 procedure TAbCabinetArchive.SetFolderThreshold(Value : UInt32);

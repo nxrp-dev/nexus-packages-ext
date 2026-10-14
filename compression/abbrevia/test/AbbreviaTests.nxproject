@@ -1,0 +1,47 @@
+// Copyright (c) 2026 Kevin Collins.
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "../../../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module "../../../../../projects/nxbuild/nxbuild.environment.nxscript";
+
+// One build sequence; target-specific installation settings come from the module.
+Project AbbreviaTests {
+    RootDirectory: "../../../../..";
+    SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
+    OutputRoot: "output/nxbuild-abbrevia/" + @Tools.Native.Name;
+
+    FPC Runtime {
+        CompilerPath: @Tools.Native.FPCCompiler;
+        SourceFiles: [@AbbreviaTests.SourceRoot + "/test/AbbreviaTests.lpr"];
+        OutputPath: @AbbreviaTests.OutputRoot + "/pascal";
+        Target Platform { OperatingSystem: @Tools.Native.OS; }
+        Config Options { DisableDefaultConfigFiles: True; }
+        Language Pascal { Mode: Delphi; }
+        BuildControl Rebuild { BuildAllModules: Enabled; }
+        Debug Checks { LineInfo: Enabled; }
+        Files Paths {
+            UnitPaths: [
+                @AbbreviaTests.SourceRoot + "/test",
+                "packages/nexus-packages/nxtest/src",
+                @Tools.Native.RTLPath,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src",
+                @Tools.NexusFPC.SourcePath + "/packages/fcl-base/src",
+                @Tools.NexusFPC.SourcePath + "/packages/fcl-registry/src",
+                @AbbreviaTests.SourceRoot + "/external/abbrevia/source"
+            ];
+            IncludePaths: [
+                @AbbreviaTests.SourceRoot + "/external/abbrevia/source",
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
+            ];
+            LibraryPaths: @Tools.Native.LibraryPaths;
+            // Codec object directives include their platform subdirectory.
+            ObjectPaths: [@AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory, @AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory + "/.."];
+            CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
+        }
+        Linking RuntimeLibraries {
+            LinkerOptions: @Tools.Native.LinkerOptions;
+        }
+    }
+}

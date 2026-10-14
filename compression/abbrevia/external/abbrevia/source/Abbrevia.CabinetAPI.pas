@@ -50,6 +50,11 @@ const
   cpuDefault  = cpuUnknown;
 
 
+{ The Cabinet SDK uses C records and 32-bit enums on both Win32 and Win64. }
+{$PUSH}
+{$PACKRECORDS C}
+{$PACKENUM 4}
+
 type
   {FDI errors}
   FDIError =
@@ -129,6 +134,8 @@ type
     iFolder  : Word;
     fdie     : FDIERROR;
   end;
+
+{$POP}
 
   {misc defines}
   HFDI    = Pointer;

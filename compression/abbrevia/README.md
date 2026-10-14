@@ -105,14 +105,17 @@ VCL tree-view population methods. Runtime units use FPC string/file helpers;
 Unix code uses `BaseUnix` instead of Delphi's `Posix.*` bindings. Compiler-version
 workarounds and Borland-only C header branches are gone.
 
-The retained `external/abbrevia/tests` Pascal cases document runtime behavior
-for migration to nxtest; see its `readme.txt`. They are not an active Nexus test
-suite. Archive fixtures and localization alternatives are preserved.
+The supplied Pascal cases and native codec checks have been migrated to [nxtest](test/README.md) in the package test folder. See [current results](test/RESULTS.md) for verified coverage and failures.
 
 The Forge `Mode: delphi` setting selects NexusFPC's Object Pascal language mode;
 it does not require or invoke the Delphi compiler.
 
-## Forge build
+## Tests
+
+Build and run the native nxtest suite using [test/README.md](test/README.md).
+The package build no longer runs the superseded standalone linkage probe.
+
+## Historical Forge build
 
 `Package.nxscript` owns the Win64 build through ordered children. Its first child,
 the `NativeCodecs` group, prepares `output/forge` and compiles all 37 bundled C
@@ -126,8 +129,8 @@ to `output/forge/source/Win64`. Win64 Pascal linker directives use these generat
 generated from the retained C sources.
 
 Subsequent children stage the four SDK/CRT import libraries, compile the existing
-Pascal runtime probe, and run it. `Outputs.Objects` exports the actual object
-directory. `Outputs.RuntimeCheck` identifies the probe executable; UnitPaths,
+Pascal runtime units. Run tests separately through the nxtest project. `Outputs.Objects` exports the actual object
+directory. UnitPaths,
 IncludePaths, and LibraryPaths expose the corresponding build directories.
 
 From the Nexus root, after building Forge and the native NexusFPC bootstrap:
@@ -175,7 +178,7 @@ raised an access violation. After a clean Forge rebuild, all 11 files from each
 of `Deflate.zip`, `LZMA.zip`, and `PPMd.zip` matched the original bytes (33 checks).
 
 Regression case for nxtest: extract every entry in
-`external/abbrevia/tests/testfiles/Canterbury/PPMd.zip` through
+`test/testfiles/Canterbury/PPMd.zip` through
 `Abbrevia.ZipExtraction.AbUnzipToStream` and compare it with the corresponding
 entry in the bundled `Store.zip`. Use the stored archive as the byte reference;
 Git can convert line endings in the checked-out `Canterbury/source` text files.

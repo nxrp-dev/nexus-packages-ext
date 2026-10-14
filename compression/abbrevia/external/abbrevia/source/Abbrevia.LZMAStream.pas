@@ -26,23 +26,14 @@
 
 
 Usage:
-  LZMA Compression:
-  1) Create a TAbLZMACompressionStream, passing as parameter to the constructor
-     the output stream where you want the compressed data stored.
-  2) Write the data that you want to compress to the TAbLZMACompressionStream.
-     Compression occurs in a background thread.
-  3) (Optional) Notify the background compression thread that no more data will
-     be written by calling NoMoreDataToCompress. Poll the IsBusy method to
-     determine whether the background thread is still busy.
-  4) Free the TAbLZMACompressionStream to finish up and release resources. The
-     compressed data will now be available in the output stream.
+  Write uncompressed data to TAbLZMACompressionStream, then call
+  WaitForCompressionToFinish and check its result. Destruction finishes and joins
+  the worker as cleanup, but cannot report successful completion to its caller.
+  The caller owns the output stream and must not access or free it until the
+  compressor has been joined. All producer operations belong to one caller.
+  Write waits when the fixed 1 MiB input buffer is full.
 
-  LZMA Decompression:
-  1) Create a TAbLZMADecompressionStream, passing as parameter to the constructor
-     the stream that contains the compressed data.
-  2) Read the decompressed data from TAbLZMADecompressionStream.
-  3) Free the TAbLZMADecompressionStream to finish up and release resources.
-
+  TAbLZMADecompressionStream reads synchronously from its borrowed input stream.
 *)
 
 unit Abbrevia.LZMAStream;
@@ -51,110 +42,68 @@ unit Abbrevia.LZMAStream;
 
 interface
 
-{$IFDEF MSWINDOWS}
-
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 uses
-  Windows, Classes, SysUtils, Abbrevia.LZMA, Abbrevia.Utilities;
+  Classes, SysUtils, Abbrevia.LZMA, Abbrevia.Utilities;
 
 const
-  {The size of the intermediate buffers for compressed and decompressed data.}
   CompressedDataBufferSize = 16 * 1024;
   UncompressedDataBufferSize = 32 * 1024;
-  {When reading/writing very small blocks from/to a (de)compression stream an
-   intermediate buffer is used to buffer the small IO operations in order to
-   improve performance. Reads and writes larger than this size are unbuffered
-   and handled by the (de)compression algorithm directly. This value must be
-   smaller than the compressed and uncompressed data buffers.}
   MaximumBlockSizeForBufferedIO = 1024;
 
 type
-
-  {------------LZMA compression stream------------}
-
   TAbLZMACompressionStream = class;
 
-  {The background compression thread.}
+  {The SDK encoder blocks asking for future input. This worker lets the producer
+   return from Write and supply that input; running it on the producer would
+   deadlock. No other thread is owned by this stream or available to do that work.}
   TAbLZMACompressionThread = class(TThread)
-  protected
+  private
     FCompressionStream: TAbLZMACompressionStream;
-  public
+  protected
     procedure Execute; override;
-  end;
-
-  {Buffers queued for compression by the background compression thread.}
-  PAbQueuedBuffer = ^TAbQueuedBuffer;
-  TAbQueuedBuffer = packed record
-    PreviousBuffer, NextBuffer: PAbQueuedBuffer;
-    DataSize: Integer;
-    {Adds this buffer to the compression queue for the given compression stream.
-     It is assumed that the compression stream has acquired the buffer critical
-     section.}
-    procedure QueueBuffer(ACompressionStream: TAbLZMACompressionStream);
-    {Removes this buffer from the compression queue}
-    procedure UnQueueBuffer;
-    {Returns a pointer to the data the given offset into the buffer}
-    function GetDataPointer(AOffset: Integer): Pointer;
+  public
+    constructor Create(ACompressionStream: TAbLZMACompressionStream);
   end;
 
   TAbLZMACompressionStream = class(TStream)
-  protected
+  private
     FOutputStream: TStream;
-    {The critical section used to control access to the buffers that are queued
-     for compression. The main thread and the compression thread may not access
-     the buffer queue at the same time.}
-    FBufferCriticalSection: TRTLCriticalSection;
-    {This semaphore is signalled by the main thread when it added a workload
-     for the compression thread (usually when a buffer has been added to
-     compress).}
-    FPendingWorkSemaphore: THandle;
-    {The LZMA compression handle}
+    FLock: TRTLCriticalSection;
+    FLockInitialized: Boolean;
+    FDataAvailable: PEventState;
+    FSpaceAvailable: PEventState;
+    FInputBuffer: TBytes;
+    FReadPosition, FWritePosition, FBufferedCount: Integer;
+    FInputComplete, FWorkerFinished: Boolean;
+    FWorkerStarted, FHeaderFinalized: Boolean;
     FLZMAEncHandle: CLzmaEncHandle;
-    {The background thread used to perform the compression}
     FCompressionThread: TAbLZMACompressionThread;
-    {The error code returned by the compression method. 0 = Success.}
     FCompressionErrorCode: Integer;
-    {The intermediate compression buffer used to aggregate small writes. When
-     NoMoreDataToCompress is called this buffer is freed, so no more data may
-     be written.}
-    FPIntermediateCompressionBuffer: PAbQueuedBuffer;
-    FIntermediateCompressionBufferAvailableBytes: Integer;
-    {The circular linked list of buffers that are queued for compression.}
-    FQueuedData: TAbQueuedBuffer;
-    {The number of bytes of buffer FQueuedData.NextBuffer that has already been
-     submitted to the compressor.}
-    FCurrentBufferBytesSubmitted: Integer;
-    {The position in the output stream where the uncompressed size must be
-     stored.}
     FOutputStreamHeaderSizeFieldPosition: Int64;
-    {The total number of bytes written to the compression stream}
     FTotalBytesWritten: Int64;
-    {Wakes up the compression thread by signalling the "pending work semaphore"}
-    procedure WakeCompressionThread; inline;
+    procedure RecordError(AError: Integer);
+    procedure CheckError;
+    function FinishCompression: Integer;
+  protected
+    function GetErrorCode: Integer;
   public
     constructor Create(AOutputStream: TStream; ACompressionLevel: Integer = 5;
       ADictionarySize: Integer = 65536);
     destructor Destroy; override;
-    {Reading is not supported and will raise an exception.}
     function Read(var ABuffer; ACount: Integer): Integer; override;
-    {Submits data to the compression queue.}
     function Write(const ABuffer; ACount: Integer): Integer; override;
-    {Will raise an exception if an attempt is made to seek off the current
-     position.}
     function Seek(AOffset: Integer; AOrigin: Word): Integer; override;
     function Seek(const AOffset: Int64; AOrigin: TSeekOrigin): Int64; override;
-    {Signals the compression thread that no more data will be submitted.
-     Calling write after NoMoreDataToCompress has been called will raise an
-     exception.}
+    {Close input. Further writes are rejected; compression may still be running.}
     procedure NoMoreDataToCompress;
-    {Calls NoMoreDataToCompress and then waits for the background compression
-     process to complete, returning the value of ErrorCode (0 = success).}
+    {Join, finalize the header, and return the error code. Repeated calls are safe.
+     Check this result before accepting the output. Destruction does not raise
+     compression errors, so it cannot replace an exception already unwinding.}
     function WaitForCompressionToFinish: Integer;
-    {Returns True if the background thread is still busy compressing data. Will
-     always return True until NoMoreDataToCompress is called.}
+    {Status only: call WaitForCompressionToFinish before accessing the output.}
     function IsBusy: Boolean;
-    {-------------Public properties---------------}
-    {The error code returned by the compression method. 0 = Success.}
-    property ErrorCode: Integer read FCompressionErrorCode;
+    property ErrorCode: Integer read GetErrorCode;
   end;
 
   {------------LZMA decompression stream------------}
@@ -205,294 +154,293 @@ type
 
 implementation
 
-{$IFDEF MSWINDOWS}
-
+{$IF DEFINED(MSWINDOWS) OR DEFINED(LINUX)}
 uses
   Abbrevia.CRuntime;
 
-{------------Memory management-------------}
+const
+  cInputBufferCapacity = 1024 * 1024;
+  cWaitForever = High(Cardinal);
+  cEventSignaled = 0; // BasicEventWaitFor result on both supported hosts.
 
-function SzAlloc(p: Pointer; size: size_t): Pointer; cdecl;
+function SzAlloc(AContext: Pointer; ASize: size_t): Pointer; cdecl;
 begin
-  Result := GetMemory(size);
+  try
+    Result := GetMemory(ASize);
+  except
+    Result := nil;
+  end;
 end;
 
-procedure SzFree(p, address: Pointer); cdecl;
+procedure SzFree(AContext, AAddress: Pointer); cdecl;
 begin
-  FreeMemory(address);
+  FreeMemory(AAddress);
 end;
 
 var
   PascalMMInterface: ISzAlloc = (Alloc: SzAlloc; Free: SzFree);
 
-{------------Compression "interface"-------------}
-
 type
-
-  {The "interfaces" for the input and output streams}
   CSeqInStream_Compress = packed record
     Intf: ISeqInStream;
     CompressionStream: TAbLZMACompressionStream;
   end;
-
   CSeqOutStream_Compress = packed record
     Intf: ISeqOutStream;
-    OutputStream: TStream;
+    CompressionStream: TAbLZMACompressionStream;
   end;
 
-function ISeqInStream_Compress_Read(p: Pointer; var buf; var size: size_t): SRes; cdecl;
+function ISeqInStream_Compress_Read(AContext: Pointer; var ABuffer;
+  var ASize: size_t): SRes; cdecl;
 var
-  LDoNotWaitForMoreData: Boolean;
-  LStream: TAbLZMACompressionStream;
-  LPSourceBuf, LPTargetBuf: PAnsiChar;
-  LTargetSpace: NativeInt;
-  LSourceBytesAvail: Integer;
-  LPCurBuf: PAbQueuedBuffer;
+  lStream: TAbLZMACompressionStream;
+  lCount, lFirst: Integer;
 begin
+  lStream := CSeqInStream_Compress(AContext^).CompressionStream;
   try
-    LTargetSpace := size;
-    LPTargetBuf := @buf;
-    LStream := CSeqInStream_Compress(p^).CompressionStream;
+    if ASize = 0 then Exit(SZ_OK);
     while True do
     begin
-      {Copy any buffered data to the LZMA buffer, returning the number of bytes
-       written}
-      EnterCriticalSection(LStream.FBufferCriticalSection);
+      EnterCriticalSection(lStream.FLock);
       try
-        {If the write buffer has been freed that the main thread will not add
-         any more buffers for compression.}
-        LDoNotWaitForMoreData := LStream.FPIntermediateCompressionBuffer = nil;
-
-        {Copy as much queued data to the LZMA compression buffer as we have (or
-         will fit).}
-        while True do
+        Result := lStream.FCompressionErrorCode;
+        if Result <> SZ_OK then
         begin
-          LPCurBuf := LStream.FQueuedData.NextBuffer;
-          {No buffers left? -> Break the loop}
-          if LPCurBuf = @LStream.FQueuedData then
-            Break;
-          {Can this buffer be submitted in its entirety, or only a part?}
-          LPSourceBuf := LPCurBuf.GetDataPointer(LStream.FCurrentBufferBytesSubmitted);
-          LSourceBytesAvail := LPCurBuf.DataSize - LStream.FCurrentBufferBytesSubmitted;
-          if LSourceBytesAvail > LTargetSpace then
-          begin
-            {Submit only part of the buffer}
-            System.Move(LPSourceBuf^, LPTargetBuf^, LTargetSpace);
-            Inc(LStream.FCurrentBufferBytesSubmitted, LTargetSpace);
-            LTargetSpace := 0;
-            Break;
-          end
-          else
-          begin
-            {Submit all the remaining bytes in the buffer and free it.}
-            System.Move(LPSourceBuf^, LPTargetBuf^, LSourceBytesAvail);
-            Inc(LPTargetBuf, LSourceBytesAvail);
-            Dec(LTargetSpace, LSourceBytesAvail);
-            LStream.FCurrentBufferBytesSubmitted := 0;
-            LPCurBuf.UnQueueBuffer;
-            FreeMem(LPCurBuf);
-          end;
+          ASize := 0;
+          Exit;
+        end;
+        if lStream.FBufferedCount <> 0 then
+        begin
+          lCount := lStream.FBufferedCount;
+          if ASize < size_t(lCount) then lCount := Integer(ASize);
+          lFirst := cInputBufferCapacity - lStream.FReadPosition;
+          if lFirst > lCount then lFirst := lCount;
+          Move(lStream.FInputBuffer[lStream.FReadPosition], ABuffer, lFirst);
+          if lFirst < lCount then
+            Move(lStream.FInputBuffer[0], PByte(@ABuffer)[lFirst], lCount - lFirst);
+          lStream.FReadPosition := (lStream.FReadPosition + lCount) mod cInputBufferCapacity;
+          Dec(lStream.FBufferedCount, lCount);
+          ASize := lCount;
+          BasicEventSetEvent(lStream.FSpaceAvailable);
+          Exit(SZ_OK);
+        end;
+        if lStream.FInputComplete then
+        begin
+          ASize := 0;
+          Exit(SZ_OK);
         end;
       finally
-        LeaveCriticalSection(LStream.FBufferCriticalSection);
+        LeaveCriticalSection(lStream.FLock);
       end;
-
-      {If data was submitted to the compressor, or the main thread indicated
-       that compression is complete then the loop is broken.}
-      if (LTargetSpace <> size) or LDoNotWaitForMoreData then
-        Break;
-      {No data currently queued, but there may still be more coming: Wait for
-       the main thread to notify this thread that more work is pending.}
-      WaitForSingleObject(LStream.FPendingWorkSemaphore, INFINITE);
+      if BasicEventWaitFor(cWaitForever, lStream.FDataAvailable) <> cEventSignaled then
+      begin
+        lStream.RecordError(SZ_ERROR_THREAD);
+        ASize := 0;
+        Exit(SZ_ERROR_THREAD);
+      end;
     end;
-    {Update the number of bytes written}
-    Dec(size, LTargetSpace);
-    Result := SZ_OK;
   except
-    Result := SZ_ERROR_DATA;
+    ASize := 0;
+    lStream.RecordError(SZ_ERROR_READ);
+    Result := SZ_ERROR_READ;
   end;
 end;
 
-function ISeqOutStream_Compress_Write(p: Pointer; const buf; size: size_t): size_t; cdecl;
+function ISeqOutStream_Compress_Write(AContext: Pointer; const ABuffer;
+  ASize: size_t): size_t; cdecl;
+var
+  lStream: TAbLZMACompressionStream;
 begin
+  lStream := CSeqOutStream_Compress(AContext^).CompressionStream;
   try
-    Result := CSeqOutStream_Compress(p^).OutputStream.Write(buf, size);
+    Result := lStream.FOutputStream.Write(ABuffer, ASize);
+    if Result <> ASize then lStream.RecordError(SZ_ERROR_WRITE);
   except
+    lStream.RecordError(SZ_ERROR_WRITE);
     Result := 0;
   end;
 end;
 
-{ TAbQueuedBuffer }
-
-function TAbQueuedBuffer.GetDataPointer(AOffset: Integer): Pointer;
+constructor TAbLZMACompressionThread.Create(ACompressionStream: TAbLZMACompressionStream);
 begin
-  Result := Pointer(PtrUInt(@Self) + SizeOf(TAbQueuedBuffer) + PtrUInt(AOffset));
+  inherited Create(True);
+  FCompressionStream := ACompressionStream;
 end;
 
-procedure TAbQueuedBuffer.QueueBuffer(ACompressionStream: TAbLZMACompressionStream);
-begin
-  PreviousBuffer:= ACompressionStream.FQueuedData.PreviousBuffer;
-  NextBuffer:= @ACompressionStream.FQueuedData;
-  ACompressionStream.FQueuedData.PreviousBuffer.NextBuffer := @Self;
-  ACompressionStream.FQueuedData.PreviousBuffer := @Self;
-end;
-
-procedure TAbQueuedBuffer.UnQueueBuffer;
-begin
-  PreviousBuffer.NextBuffer := NextBuffer;
-  NextBuffer.PreviousBuffer := PreviousBuffer;
-  PreviousBuffer := nil;
-  NextBuffer := nil;
-end;
-
-{ TAbLZMACompressionStream }
-
-constructor TAbLZMACompressionStream.Create(AOutputStream: TStream; ACompressionLevel,
-  ADictionarySize: Integer);
+procedure TAbLZMACompressionThread.Execute;
 var
-  LLZMAProps: CLzmaEncProps;
-  LLZMAPropData: TLZMAPropertyData;
-  LHeaderSize: size_t;
+  lInput: CSeqInStream_Compress;
+  lOutput: CSeqOutStream_Compress;
+  lError: Integer;
+begin
+  lError := SZ_ERROR_FAIL;
+  try
+    try
+      lInput.Intf.Read := ISeqInStream_Compress_Read;
+      lInput.CompressionStream := FCompressionStream;
+      lOutput.Intf.Write := ISeqOutStream_Compress_Write;
+      lOutput.CompressionStream := FCompressionStream;
+      lError := LzmaEnc_Encode(FCompressionStream.FLZMAEncHandle,
+        @lOutput.Intf, @lInput.Intf, nil, @PascalMMInterface, @PascalMMInterface);
+    except
+      lError := SZ_ERROR_FAIL;
+    end;
+  finally
+    FCompressionStream.RecordError(lError);
+    EnterCriticalSection(FCompressionStream.FLock);
+    try
+      FCompressionStream.FWorkerFinished := True;
+    finally
+      LeaveCriticalSection(FCompressionStream.FLock);
+    end;
+    BasicEventSetEvent(FCompressionStream.FSpaceAvailable);
+  end;
+end;
+
+constructor TAbLZMACompressionStream.Create(AOutputStream: TStream;
+  ACompressionLevel, ADictionarySize: Integer);
+var
+  lProperties: CLzmaEncProps;
+  lPropertyData: TLZMAPropertyData;
+  lHeaderSize: size_t;
 begin
   inherited Create;
-
+  if AOutputStream = nil then
+    raise EAbLZMAException.Create('An output stream is required.');
   FOutputStream := AOutputStream;
-
-  {Initialize the linked list of buffers.}
-  FQueuedData.PreviousBuffer := @FQueuedData;
-  FQueuedData.NextBuffer := @FQueuedData;
-
-  {Allocate the intermediate compression buffer}
-  GetMem(FPIntermediateCompressionBuffer, UncompressedDataBufferSize + SizeOf(TAbQueuedBuffer));
-  FIntermediateCompressionBufferAvailableBytes := UncompressedDataBufferSize;
-
-  {Initialize the critical section used to control access to the queued data
-   buffer.}
-  InitializeCriticalSection(FBufferCriticalSection);
-  {Create the semaphore used to put the worker thread to sleep when the input
-   buffer is empty.}
-  FPendingWorkSemaphore := CreateSemaphore(nil, 0, 1, nil);
-
-  {Create the LZMA encoder}
+  InitCriticalSection(FLock);
+  FLockInitialized := True;
+  FDataAvailable := BasicEventCreate(nil, False, False, '');
+  if FDataAvailable = nil then LzmaCheck(SZ_ERROR_THREAD);
+  FSpaceAvailable := BasicEventCreate(nil, False, False, '');
+  if FSpaceAvailable = nil then LzmaCheck(SZ_ERROR_THREAD);
+  SetLength(FInputBuffer, cInputBufferCapacity);
   FLZMAEncHandle := LzmaEnc_Create(@PascalMMInterface);
-  if FLZMAEncHandle = nil then
-    raise Exception.Create('Unable to allocate memory for the LZMA compressor.');
-
-  {Set the compression properties}
-  LzmaEncProps_Init(LLZMAProps);
-  LLZMAProps.level := ACompressionLevel;
-  LLZMAProps.dictSize := AbToUInt32(ADictionarySize);
-  LzmaCheck(LzmaEnc_SetProps(FLZMAEncHandle, LLZMAProps));
-
-  {Store the header in the output stream, making note of the position in the
-   stream where the uncompressed size will be stored when compression is
-   completed.}
-  LHeaderSize := LZMA_PROPS_SIZE;
-  LzmaCheck(LzmaEnc_WriteProperties(FLZMAEncHandle, PByte(@LLZMAPropData), LHeaderSize));
-  FOutputStream.WriteBuffer(LLZMAPropData, LHeaderSize);
+  if FLZMAEncHandle = nil then LzmaCheck(SZ_ERROR_MEM);
+  LzmaEncProps_Init(lProperties);
+  lProperties.level := ACompressionLevel;
+  lProperties.dictSize := AbToUInt32(ADictionarySize);
+  LzmaCheck(LzmaEnc_SetProps(FLZMAEncHandle, lProperties));
+  lHeaderSize := LZMA_PROPS_SIZE;
+  LzmaCheck(LzmaEnc_WriteProperties(FLZMAEncHandle, PByte(@lPropertyData), lHeaderSize));
+  FOutputStream.WriteBuffer(lPropertyData, lHeaderSize);
   FOutputStreamHeaderSizeFieldPosition := FOutputStream.Position;
   FOutputStream.WriteBuffer(FTotalBytesWritten, SizeOf(FTotalBytesWritten));
-
-  {Create and start the compression thread.}
-  FCompressionThread := TAbLZMACompressionThread.Create(True);
-  FCompressionThread.FCompressionStream := Self;
+  FCompressionThread := TAbLZMACompressionThread.Create(Self);
   FCompressionThread.Start;
+  FWorkerStarted := True;
 end;
 
-destructor TAbLZMACompressionStream.Destroy;
-var
-  LPBuf: PAbQueuedBuffer;
-  LOldPos: Int64;
+procedure TAbLZMACompressionStream.RecordError(AError: Integer);
 begin
-  WaitForCompressionToFinish;
-
-  {If something went wrong during creation of this object before the thread was
-   created, then the encoder handle may be non-nil.}
-  if FLZMAEncHandle <> nil then
-  begin
-    LzmaEnc_Destroy(FLZMAEncHandle, @PascalMMInterface, @PascalMMInterface);
-    FLZMAEncHandle := nil;
+  if AError = SZ_OK then Exit;
+  EnterCriticalSection(FLock);
+  try
+    if FCompressionErrorCode = SZ_OK then FCompressionErrorCode := AError;
+  finally
+    LeaveCriticalSection(FLock);
   end;
+  BasicEventSetEvent(FDataAvailable);
+  BasicEventSetEvent(FSpaceAvailable);
+end;
 
-  {Free the critical section and semaphore}
-  DeleteCriticalSection(FBufferCriticalSection);
-  CloseHandle(FPendingWorkSemaphore);
-
-  {Free the intermediate compression buffer if something went wrong before the
-   thread could be created.}
-  FreeMem(FPIntermediateCompressionBuffer);
-
-  {If compression failed there may be uncompressed data in the queue: free
-   those buffers.}
-  while True do
-  begin
-    LPBuf := FQueuedData.NextBuffer;
-    if LPBuf = @FQueuedData then
-      Break;
-    LPBuf.UnQueueBuffer;
-    FreeMem(LPBuf);
+function TAbLZMACompressionStream.GetErrorCode: Integer;
+begin
+  EnterCriticalSection(FLock);
+  try
+    Result := FCompressionErrorCode;
+  finally
+    LeaveCriticalSection(FLock);
   end;
+end;
 
-  {Unpdate the uncompressed size in the header}
-  if FTotalBytesWritten > 0 then
-  begin
-    LOldPos := FOutputStream.Position;
-    FOutputStream.Position := FOutputStreamHeaderSizeFieldPosition;
-    FOutputStream.WriteBuffer(FTotalBytesWritten, SizeOf(FTotalBytesWritten));
-    FOutputStream.Position := LOldPos;
+procedure TAbLZMACompressionStream.CheckError;
+begin
+  LzmaCheck(GetErrorCode);
+end;
+
+procedure TAbLZMACompressionStream.NoMoreDataToCompress;
+begin
+  EnterCriticalSection(FLock);
+  try
+    FInputComplete := True;
+  finally
+    LeaveCriticalSection(FLock);
   end;
+  BasicEventSetEvent(FDataAvailable);
+end;
 
-  inherited Destroy;
+function TAbLZMACompressionStream.FinishCompression: Integer;
+var
+  lPosition: Int64;
+begin
+  if not FWorkerStarted then Exit(SZ_OK);
+  NoMoreDataToCompress;
+  if FCompressionThread <> nil then
+  begin
+    FCompressionThread.WaitFor;
+    if FCompressionThread.FatalException <> nil then RecordError(SZ_ERROR_FAIL);
+    FreeAndNil(FCompressionThread);
+  end;
+  if (GetErrorCode = SZ_OK) and not FHeaderFinalized then
+  begin
+    try
+      lPosition := FOutputStream.Position;
+      try
+        FOutputStream.Position := FOutputStreamHeaderSizeFieldPosition;
+        FOutputStream.WriteBuffer(FTotalBytesWritten, SizeOf(FTotalBytesWritten));
+      finally
+        FOutputStream.Position := lPosition;
+      end;
+      FHeaderFinalized := True;
+    except
+      RecordError(SZ_ERROR_WRITE);
+    end;
+  end;
+  Result := GetErrorCode;
+end;
+
+function TAbLZMACompressionStream.WaitForCompressionToFinish: Integer;
+begin
+  Result := FinishCompression;
 end;
 
 function TAbLZMACompressionStream.IsBusy: Boolean;
 begin
-  Result := (FCompressionThread <> nil) and (not FCompressionThread.Finished);
+  EnterCriticalSection(FLock);
+  try
+    Result := FWorkerStarted and not FWorkerFinished;
+  finally
+    LeaveCriticalSection(FLock);
+  end;
 end;
 
-procedure TAbLZMACompressionStream.NoMoreDataToCompress;
-var
-  LUnqueuedBytes: Integer;
+destructor TAbLZMACompressionStream.Destroy;
 begin
-  if FPIntermediateCompressionBuffer <> nil then
-  begin
-    EnterCriticalSection(FBufferCriticalSection);
-    try
-      {No more data may be submitted at this point. Set the flag to indicate
-       this, and wake the compression thread so that it can finish up.}
-      LUnqueuedBytes := UncompressedDataBufferSize - FIntermediateCompressionBufferAvailableBytes;
-      if LUnqueuedBytes > 0 then
-      begin
-        FPIntermediateCompressionBuffer.DataSize := LUnqueuedBytes;
-        FPIntermediateCompressionBuffer.QueueBuffer(Self);
-      end
-      else
-        FreeMem(FPIntermediateCompressionBuffer);
-      {The temporary buffer is always released, so no further writes may be
-       performed.}
-      FPIntermediateCompressionBuffer := nil;
-    finally
-      LeaveCriticalSection(FBufferCriticalSection);
-    end;
-    {Wake up the compression thread so it can finish the compression process.}
-    WakeCompressionThread;
+  try
+    FinishCompression;
+  finally
+    FCompressionThread.Free;
+    if FLZMAEncHandle <> nil then
+      LzmaEnc_Destroy(FLZMAEncHandle, @PascalMMInterface, @PascalMMInterface);
+    if FSpaceAvailable <> nil then BasicEventDestroy(FSpaceAvailable);
+    if FDataAvailable <> nil then BasicEventDestroy(FDataAvailable);
+    if FLockInitialized then DoneCriticalSection(FLock);
+    inherited Destroy;
   end;
 end;
 
 function TAbLZMACompressionStream.Read(var ABuffer; ACount: Integer): Integer;
 begin
-  raise Exception.Create('The compression stream does not support reading.');
+  raise EAbLZMAException.Create('The compression stream does not support reading.');
 end;
 
-function TAbLZMACompressionStream.Seek(const AOffset: Int64;
-  AOrigin: TSeekOrigin): Int64;
+function TAbLZMACompressionStream.Seek(const AOffset: Int64; AOrigin: TSeekOrigin): Int64;
 begin
   Result := FTotalBytesWritten;
   if ((AOrigin <> soBeginning) or (AOffset <> Result))
-    and ((AOrigin = soBeginning) or (AOffset <> 0)) then
-  begin
-    raise Exception.Create('The compression stream does not support seeking away from the current position.');
-  end;
+    and ((AOrigin <> soCurrent) or (AOffset <> 0)) then
+    raise EAbLZMAException.Create('The compression stream does not support seeking away from the current position.');
 end;
 
 function TAbLZMACompressionStream.Seek(AOffset: Integer; AOrigin: Word): Integer;
@@ -500,115 +448,50 @@ begin
   Result := AbToInt32(Seek(Int64(AOffset), TSeekOrigin(AOrigin)));
 end;
 
-function TAbLZMACompressionStream.WaitForCompressionToFinish: Integer;
-begin
-  if FCompressionThread <> nil then
-  begin
-    {Notify the thread that no further data will be submitted.}
-    NoMoreDataToCompress;
-    {Wait for the compression thread to complete normally and then free it.}
-    FCompressionThread.WaitFor;
-    FreeAndNil(FCompressionThread);
-  end;
-  Result := FCompressionErrorCode;
-end;
-
-procedure TAbLZMACompressionStream.WakeCompressionThread;
-begin
-  ReleaseSemaphore(FPendingWorkSemaphore, 1, nil);
-end;
-
 function TAbLZMACompressionStream.Write(const ABuffer; ACount: Integer): Integer;
 var
-  LPSource: PAnsiChar;
-  LPBufData: Pointer;
-  LPLargeBuf: PAbQueuedBuffer;
+  lCount, lFirst: Integer;
 begin
-  if FPIntermediateCompressionBuffer = nil then
-    raise Exception.Create('Write may not be called after NoMoreDataToCompress.');
-
-  if ACount <= 0 then
-  begin
-    Result := 0;
-    Exit;
+  Result := 0;
+  CheckError;
+  EnterCriticalSection(FLock);
+  try
+    if FInputComplete then
+      raise EAbLZMAException.Create('Write may not be called after NoMoreDataToCompress.');
+  finally
+    LeaveCriticalSection(FLock);
   end;
-
-  LPSource := @ABuffer;
-  {Get a pointer to the position in the intermediate buffer to be written.}
-  LPBufData := FPIntermediateCompressionBuffer.GetDataPointer(
-    UncompressedDataBufferSize - FIntermediateCompressionBufferAvailableBytes);
-  if FIntermediateCompressionBufferAvailableBytes > ACount then
+  while ACount > 0 do
   begin
-    {Copy the data into the intermediate buffer and exit.}
-    System.Move(LPSource^, LPBufData^, ACount);
-    Dec(FIntermediateCompressionBufferAvailableBytes, ACount);
-    Result := ACount;
-  end
-  else
-  begin
-    {Fill up the intermediate buffer}
-    System.Move(LPSource^, LPBufData^, FIntermediateCompressionBufferAvailableBytes);
-    Dec(ACount, FIntermediateCompressionBufferAvailableBytes);
-    Inc(LPSource, FIntermediateCompressionBufferAvailableBytes);
-    Result := FIntermediateCompressionBufferAvailableBytes;
-    {If we get here the current intermediate buffer is now full, and must be
-     queued.}
-    EnterCriticalSection(FBufferCriticalSection);
+    CheckError;
+    EnterCriticalSection(FLock);
     try
-      {Insert this buffer into the compression queue.}
-      FPIntermediateCompressionBuffer.DataSize := UncompressedDataBufferSize;
-      FPIntermediateCompressionBuffer.QueueBuffer(Self);
-      {Allocate a new intermediate compression buffer}
-      GetMem(FPIntermediateCompressionBuffer, UncompressedDataBufferSize + SizeOf(TAbQueuedBuffer));
-      FIntermediateCompressionBufferAvailableBytes := UncompressedDataBufferSize;
-      {Should the remaining data be copied into the intermediate compression
-       buffer, or is it too large and must it be queued separately?}
-      if ACount < UncompressedDataBufferSize then
+      lCount := cInputBufferCapacity - FBufferedCount;
+      if lCount > ACount then lCount := ACount;
+      if lCount <> 0 then
       begin
-        LPBufData := FPIntermediateCompressionBuffer.GetDataPointer(0);
-        System.Move(LPSource^, LPBufData^, ACount);
-        Dec(FIntermediateCompressionBufferAvailableBytes, ACount);
-      end
-      else
-      begin
-        {The remaining data is larger than the intermediate buffer: queue it
-         separately}
-        GetMem(LPLargeBuf, ACount + SizeOf(TAbQueuedBuffer));
-        LPLargeBuf.DataSize := ACount;
-        LPLargeBuf.QueueBuffer(Self);
-        {Copy the data across}
-        LPBufData := LPLargeBuf.GetDataPointer(0);
-        System.Move(LPSource^, LPBufData^, ACount);
+        lFirst := cInputBufferCapacity - FWritePosition;
+        if lFirst > lCount then lFirst := lCount;
+        Move(PByte(@ABuffer)[Result], FInputBuffer[FWritePosition], lFirst);
+        if lFirst < lCount then
+          Move(PByte(@ABuffer)[Result + lFirst], FInputBuffer[0], lCount - lFirst);
+        FWritePosition := (FWritePosition + lCount) mod cInputBufferCapacity;
+        Inc(FBufferedCount, lCount);
+        Inc(FTotalBytesWritten, lCount);
       end;
-      {Update the number of bytes written}
-      Inc(Result, ACount);
     finally
-      LeaveCriticalSection(FBufferCriticalSection);
+      LeaveCriticalSection(FLock);
     end;
-    {Wake up the compression thread to compress the newly queued data}
-    WakeCompressionThread;
+    if lCount <> 0 then
+    begin
+      Inc(Result, lCount);
+      Dec(ACount, lCount);
+      BasicEventSetEvent(FDataAvailable);
+    end
+    else if BasicEventWaitFor(cWaitForever, FSpaceAvailable) <> cEventSignaled then
+      RecordError(SZ_ERROR_THREAD);
   end;
-
-  Inc(FTotalBytesWritten, Result);
-end;
-
-{ TAbLZMACompressionThread }
-
-procedure TAbLZMACompressionThread.Execute;
-var
-  LInStreamRec: CSeqInStream_Compress;
-  LOutStreamRec: CSeqOutStream_Compress;
-begin
-  {Call the compression function and save the error code}
-  LInStreamRec.Intf.Read := ISeqInStream_Compress_Read;
-  LInStreamRec.CompressionStream := FCompressionStream;
-  LOutStreamRec.Intf.Write := ISeqOutStream_Compress_Write;
-  LOutStreamRec.OutputStream := FCompressionStream.FOutputStream;
-  FCompressionStream.FCompressionErrorCode := LzmaEnc_Encode(FCompressionStream.FLZMAEncHandle,
-    @LOutStreamRec.Intf, @LInStreamRec.Intf, nil, @PascalMMInterface, @PascalMMInterface);
-  {Free the compression handle}
-  LzmaEnc_Destroy(FCompressionStream.FLZMAEncHandle, @PascalMMInterface, @PascalMMInterface);
-  FCompressionStream.FLZMAEncHandle := nil;
+  CheckError;
 end;
 
 { TAbLZMADecompressionStream }

@@ -1,3 +1,0 @@
-[submodule "regexpr/external/tregexpr"]
-	path = regexpr/external/tregexpr
-	url = https://github.com/andgineer/TRegExpr.git

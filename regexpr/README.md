@@ -1,15 +1,16 @@
 # RegExpr
 
-Regular expressions through the upstream TRegExpr library. The package identity
-is `NXRP.RegExpr`. fpGUI uses the `regexpr` unit directly.
+Regular expressions through the TRegExpr library. The package identity
+is `NXRP.RegExpr`. fpGUI uses the `regexpr` unit directly. The library source
+and local corrections are maintained directly in this repository.
 
 ## Structure
 
 - `Package.nxscript`: intrinsic package metadata.
-- `external/tregexpr`: pinned upstream Git submodule.
+- `external/tregexpr`: imported library source, tracked directly here.
 - `external/tregexpr/src`: `regexpr.pas`, its compiler include and Unicode data.
 
-Upstream URL, pinned revision, import date, authors, and license indicators are
+Upstream URL, imported revision, import date, authors, and license indicators are
 maintained in the
 [central attribution record](https://github.com/nxrp-dev/nexus/blob/main/ATTRIBUTIONS.md#tregexpr).
 Original license texts and unit notices remain with the sources.

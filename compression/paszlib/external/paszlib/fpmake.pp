@@ -70,10 +70,10 @@ begin
     T:=P.Targets.AddImplicitUnit('ziputils.pas');
     T:=P.Targets.AddImplicitUnit('zstream.pp');
     T.ResourceStrings := True;
-    T:=P.Targets.AddExampleProgram('examples/example.pas');
-    T:=P.Targets.AddExampleProgram('examples/minigzip.pas');
-    T:=P.Targets.AddExampleProgram('examples/miniunz.pas');
-    T:=P.Targets.AddExampleProgram('examples/minizip.pas');
+    T:=P.Targets.AddExampleProgram('../../../../../../../nexus-lab/examples/data/compression/paszlib-external/example.pas');
+    T:=P.Targets.AddExampleProgram('../../../../../../../nexus-lab/examples/data/compression/paszlib-external/minigzip.pas');
+    T:=P.Targets.AddExampleProgram('../../../../../../../nexus-lab/examples/data/compression/paszlib-external/miniunz.pas');
+    T:=P.Targets.AddExampleProgram('../../../../../../../nexus-lab/examples/data/compression/paszlib-external/minizip.pas');
 
 
     P.NamespaceMap:='namespaces.lst';

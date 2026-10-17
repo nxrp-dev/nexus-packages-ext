@@ -27,7 +27,7 @@ $env:PATH = "C:/gitdev/tools/nexus-fpc/build/forge-bootstrap/package-sdk/package
 ```
 
 ```powershell
-output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=projects/nxbuild/examples/Abbrevia.nxpackage
+output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=../nexus-lab/examples/build/native/Abbrevia.nxpackage
 output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=packages/nexus-packages-ext/compression/abbrevia/test/AbbreviaTests.nxproject
 output/nxbuild-abbrevia/x86_64-win64/pascal/AbbreviaTests.exe packages/nexus-packages-ext/compression/abbrevia/test/testfiles
 ```

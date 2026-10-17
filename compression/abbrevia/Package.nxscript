@@ -31,7 +31,7 @@ Package Abbrevia {
         }
         CreateDirectory Objects { Path: @Abbrevia.Outputs.Objects; }
         Clang Compile {
-            Template: "../../../../projects/forge/examples/Clang.mustache";
+            Template: "../../../../projects/forge/templates/Clang.mustache";
             Executable: "C:/Program Files/LLVM/bin/clang.exe";
             Source: [
                 "external/abbrevia/thirdparty/lzma/*.c",
@@ -73,7 +73,7 @@ Package Abbrevia {
         Destination: "output/forge/runtime-libs/msvcrt.lib";
     }
     FPC CompileRuntimeUnits {
-        Template: "../../../../projects/forge/examples/FPC.mustache";
+        Template: "../../../../projects/forge/templates/FPC.mustache";
         Compiler: "../../../../../tools/nexus-fpc/build/forge-bootstrap/cycle3/ppcx64.exe";
         Source: ["output/forge/source/Abbrevia.Zip.pas"];
         EntryPoint: "output/forge/source/Abbrevia.Zip.pas";

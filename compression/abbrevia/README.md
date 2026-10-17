@@ -123,7 +123,7 @@ The package build no longer runs the superseded standalone linkage probe.
 From the Nexus root, use the ordered nxbuild recipe:
 
 ```powershell
-output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=projects/nxbuild/examples/Abbrevia.nxpackage
+output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=../nexus-lab/examples/build/native/Abbrevia.nxpackage
 ```
 
 It builds the LLVM codec objects, the bzip2 shared library, then `Abbrevia.nxpk`
@@ -191,7 +191,7 @@ The Pascal probe verifies linkage/startup of the core runtime with LLVM LZMA,
 PPMd and WavPack objects. It does not exercise every codec or archive operation.
 Bzip2 still uses runtime DLL loading; this object build does not create that DLL.
 The separately retained C/C++ bzip2 round-trip project is
-`projects/forge/examples/AbbreviaLLVM.Forge.nxscript` in the Nexus repository.
+`../nexus-lab/examples/build/orchestration/AbbreviaLLVM.Forge.nxscript` in the Nexus repository.
 
 The Win64 PPMd binding was corrected on 2026-10-12: imported records use C
 alignment, internal references occupy 32 bits, and the small packed records match

@@ -3,7 +3,7 @@
 This repository houses third-party libraries packaged for Nexus. Each package
 owns its descriptor and documentation. Libraries maintained here retain their
 original licenses and provenance under `external/`; their source and local fixes
-are tracked directly by this collective repository. Abbrevia, PasZLib, Mustache,
+are tracked directly by this collective repository. Abbrevia, Mustache,
 and RegExpr use this model.
 
 `Packages.RepositoryIndex.nxscript` explicitly lists the available packages.
@@ -14,7 +14,6 @@ Current packages:
 
 - [Abbrevia](compression/abbrevia/README.md): archive runtime units and the
   reproducible LLVM codec build, maintained directly in this repository.
-- [PasZLib](compression/paszlib/README.md): directly tracked compression sources.
 - [Mustache](mustache/README.md): DMustache template parsing and rendering,
   maintained directly in this repository.
 - [RegExpr](regexpr/README.md): Object Pascal regular expressions used by fpGUI,

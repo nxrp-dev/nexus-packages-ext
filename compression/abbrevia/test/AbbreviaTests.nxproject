@@ -30,7 +30,7 @@ Project AbbreviaTests {
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src",
                 @Tools.NexusFPC.SourcePath + "/packages/fcl-base/src",
-                @Tools.NexusFPC.SourcePath + "/packages/fcl-registry/src"
+                "packages/nexus-packages/fcl-registry/src"
             ];
             IncludePaths: [
                 @AbbreviaTests.SourceRoot + "/external/abbrevia/source",

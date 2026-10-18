@@ -33,4 +33,9 @@ RepositoryIndex NexusExternalPackages {
         Descriptor: "regexpr/Package.nxscript";
         Description: "Pure Object Pascal regular expression engine (TRegExpr).";
     }
+    LocalPackage HashLib4Pascal {
+        Id: "NXRP.HashLib4Pascal";
+        Descriptor: "hashlib4pascal/Package.nxscript";
+        Description: "HashLib4Pascal hashing, checksums, HMAC and KDFs.";
+    }
 }

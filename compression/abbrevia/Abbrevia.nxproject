@@ -10,10 +10,10 @@ Project Abbrevia {
     Author: "TurboPower, TurboPack and contributors";
     License: "MPL-1.1";
     Description: "Archive sources and native codec producers.";
-    Requires: [@Projects.FCLBase, @Projects.FCLRegistry];
+    Requires: [@Projects.NativeLibraries, @Projects.FCLBase, @Projects.FCLRegistry];
     RootDirectory: "../../../..";
     SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
-    OutputRoot: @Tools.OutputRoot + "/abbrevia/" + @Tools.Native.Name;
+    OutputRoot: @Tools.OutputRoot + "/abbrevia/" + @Tools.Native.Name + "/" + $BuildConfiguration;
     Publishes Directories {
         Sources: [@Abbrevia.SourceRoot + "/external/abbrevia/source"];
         Headers: [@Abbrevia.SourceRoot + "/external/abbrevia/source"];
@@ -41,7 +41,6 @@ Project Abbrevia {
         ConfigFiles: [@Abbrevia.SourceRoot + "/libbz2-" + @Tools.Native.OS + ".cfg"];
         SourceFiles: [@Abbrevia.SourceRoot + "/external/abbrevia/thirdparty/bzip2/*.c"];
         SystemIncludePaths: @Tools.Native.SystemIncludePaths;
-        LibraryPaths: @Tools.Native.LibraryPaths;
         RawOptions: ["-fuse-ld=lld"];
         OutputPath: @Abbrevia.OutputRoot + "/libraries";
     }

@@ -7,9 +7,9 @@ module Projects "../../../../../projects/nxbuild/Projects.nxscript";
 
 Project AbbreviaSourceTests {
     Id: "NXRP.Compression.Abbrevia.SourceTests";
-    Requires: [@Projects.Abbrevia, @Projects.NexusTest];
+    Requires: [@Projects.NexusRTL, @Projects.RTLObjPas, @Projects.RTLGenerics, @Projects.Abbrevia, @Projects.NexusTest];
     RootDirectory: "../../../../..";
-    OutputRoot: @Tools.OutputRoot + "/abbrevia-source-tests/" + @Tools.Native.Name;
+    OutputRoot: @Tools.OutputRoot + "/abbrevia-source-tests/" + @Tools.Native.Name + "/" + $BuildConfiguration;
     FPC Tests {
         CompilerPath: @Tools.Native.FPCCompiler;
         SourceFiles: ["packages/nexus-packages-ext/compression/abbrevia/test/AbbreviaTests.lpr"];
@@ -22,15 +22,6 @@ Project AbbreviaSourceTests {
         Debug Checks { LineInfo: Enabled; }
         Files Paths {
             CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
-            UnitPaths: [
-                @Tools.Native.RTLPath,
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src"
-            ];
-            IncludePaths: [
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
-            ];
         }
     }
 }

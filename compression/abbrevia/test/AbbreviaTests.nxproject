@@ -8,15 +8,15 @@ module "../../../../../projects/nxbuild/nxbuild.environment.nxscript";
 // One build sequence; target-specific installation settings come from the module.
 Project AbbreviaTests {
     Id: "NXRP.Tests.AbbreviaTests";
-    Requires: [@Projects.NexusTest, @Projects.FCLBase, @Projects.FCLRegistry, @Projects.Abbrevia, @Projects.AbbreviaRuntime];
+    Requires: [@Projects.PackageSDK, @Projects.NexusRTL, @Projects.RTLObjPas, @Projects.RTLGenerics, @Projects.NativeLibraries, @Projects.NexusTest, @Projects.FCLBase, @Projects.FCLRegistry, @Projects.Abbrevia, @Projects.AbbreviaRuntime];
     RootDirectory: "../../../../..";
     SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
-    OutputRoot: @Tools.OutputRoot + "/AbbreviaTests/" + @Tools.Native.Name;
+    OutputRoot: @Tools.OutputRoot + "/AbbreviaTests/" + @Tools.Native.Name + "/" + $BuildConfiguration;
 
     FPC Runtime {
         CompilerPath: @Tools.Native.FPCCompiler;
         SourceFiles: [@AbbreviaTests.SourceRoot + "/test/AbbreviaTests.lpr"];
-        OutputPath: @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name;
+        OutputPath: @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name + "/" + $BuildConfiguration;
         PackageSDKIdentity: @Tools.Native.PackageSDKIdentity;
         RequiredPackages: [nxrtl, Abbrevia];
         Target Platform { OperatingSystem: @Tools.Native.OS; }
@@ -26,18 +26,9 @@ Project AbbreviaTests {
         Debug Checks { LineInfo: Enabled; }
         Files Paths {
             UnitPaths: [
-                @AbbreviaTests.SourceRoot + "/test",
-                @Tools.Native.PackageSDKPath + "/units",
-                @Tools.Native.RTLPath,
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src"
+                @AbbreviaTests.SourceRoot + "/test"
             ];
-            IncludePaths: [
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
-            ];
-            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages", @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name];
-            LibraryPaths: @Tools.Native.PackageLibraryPaths;
+            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages", @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name + "/" + $BuildConfiguration];
             CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
         }
         Linking RuntimeLibraries {

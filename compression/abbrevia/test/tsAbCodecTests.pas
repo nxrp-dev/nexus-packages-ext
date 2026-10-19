@@ -162,6 +162,15 @@ begin
   end;
 end;
 
+procedure CheckBuffer(AContext: TNXTestContext; const AData: TBytes); forward;
+
+function ExpectedBZip2Library(const AFileName: string): string;
+begin
+  Result := GetEnvironmentVariable('NX_ABBREVIA_EXPECTED_BZIP2_LIBRARY');
+  if Result = '' then Result := ExtractFilePath(ParamStr(0)) + AFileName;
+  Result := ExpandFileName(Result);
+end;
+
 procedure CheckLoadedLibrary(AContext: TNXTestContext);
 {$IFDEF MSWINDOWS}
 var
@@ -169,17 +178,20 @@ var
   lLength: DWORD;
   lExpected: string;
 begin
+  CheckBuffer(AContext, MakeData(1));
   lLength := GetModuleFileNameA(GetModuleHandleA('libbz2.dll'), lName, Length(lName));
   AContext.AssertTrue((lLength > 0) and (lLength < Length(lName)), 'Cannot identify loaded bzip2 DLL');
-  lExpected := ExpandFileName(ExtractFilePath(ParamStr(0)) + 'libbz2.dll');
+  lExpected := ExpectedBZip2Library('libbz2.dll');
   AContext.AssertTrue(SameFileName(StrPas(lName), lExpected), 'Loaded a different bzip2 DLL: ' + StrPas(lName));
 {$ELSEIF DEFINED(LINUX)}
 var
   lMaps: TStringList;
-  lLine, lExpected: string;
+  lLine, lExpected, lLoaded: string;
+  lPathStart: Integer;
   lFound: Boolean;
 begin
-  lExpected := ExpandFileName(ExtractFilePath(ParamStr(0)) + 'libbz2.so.1');
+  CheckBuffer(AContext, MakeData(1));
+  lExpected := ExpectedBZip2Library('libbz2.so.1');
   lMaps := TStringList.Create;
   try
     lMaps.LoadFromFile('/proc/self/maps');
@@ -187,7 +199,11 @@ begin
     for lLine in lMaps do
       if Pos('/libbz2.so.1', lLine) > 0 then
       begin
-        AContext.AssertTrue(Pos(lExpected, lLine) > 0, 'Loaded a different bzip2 library: ' + lLine);
+        lPathStart := Pos(' /', lLine);
+        AContext.AssertTrue(lPathStart > 0, 'Cannot parse loaded library path: ' + lLine);
+        lLoaded := Trim(Copy(lLine, lPathStart + 1, MaxInt));
+        AContext.AssertTrue(SameFileName(lExpected, lLoaded),
+          'Loaded a different bzip2 library: ' + lLoaded + '; expected ' + lExpected);
         lFound := True;
       end;
     AContext.AssertTrue(lFound, 'Cannot identify loaded bzip2 library');

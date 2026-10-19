@@ -1,0 +1,43 @@
+// Copyright (c) 2026 Kevin Collins.
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "../../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module "../../../../projects/nxbuild/nxbuild.environment.nxscript";
+module Projects "../../../../projects/nxbuild/Projects.nxscript";
+
+// One build sequence; target-specific installation settings come from the module.
+Project Abbrevia {
+    Id: "NXRP.Compression.Abbrevia.RuntimePackage";
+    Requires: [@Projects.Abbrevia];
+    RootDirectory: "../../../..";
+    SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
+    OutputRoot: @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name;
+
+    FPC Runtime {
+        CompilerPath: @Tools.Native.FPCCompiler;
+        SourceFiles: [@Abbrevia.SourceRoot + "/Abbrevia.nxpk"];
+        OutputPath: @Abbrevia.OutputRoot;
+        PackageSDKIdentity: @Tools.Native.PackageSDKIdentity;
+        Target Platform { OperatingSystem: @Tools.Native.OS; }
+        Config Options { DisableDefaultConfigFiles: True; }
+        Language Pascal { Mode: Delphi; }
+        Files Paths {
+            UnitPaths: [
+                @Tools.Native.PackageSDKPath + "/units",
+                @Tools.Native.RTLPath,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src"
+            ];
+            IncludePaths: [
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
+            ];
+            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages"];
+            LibraryPaths: @Tools.Native.PackageLibraryPaths;
+            CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
+        }
+        Linking RuntimeLibraries {
+            LinkerOptions: @Tools.Native.LinkerOptions;
+        }
+    }
+}

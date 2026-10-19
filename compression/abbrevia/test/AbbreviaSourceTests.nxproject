@@ -1,0 +1,36 @@
+// Copyright (c) 2026 Kevin Collins.
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "../../../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module "../../../../../projects/nxbuild/nxbuild.environment.nxscript";
+module Projects "../../../../../projects/nxbuild/Projects.nxscript";
+
+Project AbbreviaSourceTests {
+    Id: "NXRP.Compression.Abbrevia.SourceTests";
+    Requires: [@Projects.Abbrevia, @Projects.NexusTest];
+    RootDirectory: "../../../../..";
+    OutputRoot: @Tools.OutputRoot + "/abbrevia-source-tests/" + @Tools.Native.Name;
+    FPC Tests {
+        CompilerPath: @Tools.Native.FPCCompiler;
+        SourceFiles: ["packages/nexus-packages-ext/compression/abbrevia/test/AbbreviaTests.lpr"];
+        OutputPath: @AbbreviaSourceTests.OutputRoot;
+        Target Platform { OperatingSystem: @Tools.Native.OS; }
+        Config Options { DisableDefaultConfigFiles: True; }
+        Assembler Native TargetOS[linux] { OutputFormat: "as-clang"; }
+        Language Pascal { Mode: Delphi; }
+        BuildControl Rebuild { BuildAllModules: Enabled; }
+        Debug Checks { LineInfo: Enabled; }
+        Files Paths {
+            CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
+            UnitPaths: [
+                @Tools.Native.RTLPath,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src"
+            ];
+            IncludePaths: [
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
+            ];
+        }
+    }
+}

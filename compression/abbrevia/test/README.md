@@ -15,41 +15,41 @@ See [RESULTS.md](RESULTS.md) for the latest results and remaining limitations.
 
 ## Build and run
 
-Run from the Nexus repository root. The shared nxbuild environment module supplies
-the compiler, RTL, LLVM, and platform paths. Build the package first to produce its
-native objects, bzip2 shared library, and `Abbrevia.nxpl`, then build the test
-executable. Configure PackageSDKPath and PackageSDKIdentity in the shared
-environment from the installed matching SDK. On Windows, make the SDK runtime
-package available for execution:
+`AbbreviaSourceTests.nxproject` requires the Abbrevia source/native provider and
+NexusTest. nxbuild builds the codecs first and inherits their directories; this
+source consumer requires no compiler package SDK. From the Nexus repository:
 
-```powershell
-$env:PATH = "C:/gitdev/tools/nexus-fpc/build/forge-bootstrap/package-sdk/packages;$env:PATH"
+```sh
+"$NXBUILD" /action=build /project=packages/nexus-packages-ext/compression/abbrevia/test/AbbreviaSourceTests.nxproject
 ```
 
-```powershell
-output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=../nexus-lab/examples/build/native/Abbrevia.nxpackage
-output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=packages/nexus-packages-ext/compression/abbrevia/test/AbbreviaTests.nxproject
-output/nxbuild-abbrevia/x86_64-win64/pascal/AbbreviaTests.exe packages/nexus-packages-ext/compression/abbrevia/test/testfiles
+Configure the external output root in the shared nxbuild environment. For an
+output root `$NX_OUT`, native Linux execution is:
+
+```sh
+export LD_LIBRARY_PATH="$NX_OUT/abbrevia/x86_64-linux/libraries"
+export NX_ABBREVIA_EXPECTED_BZIP2_LIBRARY="$LD_LIBRARY_PATH/libbz2.so.1"
+"$NX_OUT/abbrevia-source-tests/x86_64-linux/AbbreviaTests" "$TEST_DATA"
 ```
 
-On native Linux, use `output/nxbuild-next/x86_64-linux/nxbuild` for both builds and
-`output/nxbuild-abbrevia/x86_64-linux/pascal/AbbreviaTests` to run the suite, with the
-same testfiles argument. Native host OS/CPU defaults select the existing shared
-environment. Current verification covers x86-64 Windows and glibc Linux under WSL.
+`$TEST_DATA` is an untouched copy of `test/testfiles` under the external worktree.
+The library identity test compares the loaded module with the explicitly expected
+producer artifact. It rejects a system library or any other path. Without an
+explicit expectation, it checks beside the executable, which remains useful for
+deployments that place their runtime libraries there.
+
+`AbbreviaTests.nxproject` separately retains `RequiredPackages: [nxrtl, Abbrevia]`
+for compiler-native runtime-package consumption. It requires the ordinary
+`AbbreviaRuntime` project, which in turn requires the source/native provider.
+Configure the matching installed compiler package SDK and identity before using
+that test project. Provide `nxrtl.nxpl` and `Abbrevia.nxpl` on the native runtime
+loader path, as well as the bzip2 library, and set the same explicit bzip2
+expectation for its actual producer location.
 
 The executable returns nonzero for failures/errors or when no case passes. Skips
-are counted separately. An optional second argument selects test IDs containing
-that text, for example `Abbrevia.CabinetArchiveTests.TestExtract`. IDs and assertion
-messages are printed for every executed case; integer comparisons retain Int64
-precision in nxtest's expected/actual result fields.
-
-The test project declares RequiredPackages `[nxrtl, Abbrevia]` and uses the
-compiled package metadata. Abbrevia's source directory is retained only as an
-include path for the test declarations, not as a UnitPath. The test executable
-imports Abbrevia's runtime code, classes and globals from `Abbrevia.nxpl`.
-It expects the package and bzip2 library already built. Test files are
-never generated into the source tree: each fixture owns a unique OS temporary
-directory and removes it on completion, including failure paths.
+are counted separately. An optional second argument filters test IDs by substring,
+for example `Abbrevia.NativeCodecs`. Fixtures own temporary directories and remove
+them on completion, including failure paths. Build outputs remain outside source.
 
 ## Focused Win32 / Win64 core checks
 

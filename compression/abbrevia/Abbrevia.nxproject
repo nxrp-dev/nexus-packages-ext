@@ -1,0 +1,48 @@
+// Copyright (c) 2026 Kevin Collins.
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "../../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module "../../../../projects/nxbuild/nxbuild.environment.nxscript";
+module Projects "../../../../projects/nxbuild/Projects.nxscript";
+
+Project Abbrevia {
+    Id: "NXRP.Compression.Abbrevia";
+    Author: "TurboPower, TurboPack and contributors";
+    License: "MPL-1.1";
+    Description: "Archive sources and native codec producers.";
+    Requires: [@Projects.FCLBase, @Projects.FCLRegistry];
+    RootDirectory: "../../../..";
+    SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
+    OutputRoot: @Tools.OutputRoot + "/abbrevia/" + @Tools.Native.Name;
+    Publishes Directories {
+        Sources: [@Abbrevia.SourceRoot + "/external/abbrevia/source"];
+        Headers: [@Abbrevia.SourceRoot + "/external/abbrevia/source"];
+        Objects: [@Abbrevia.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory, @Abbrevia.OutputRoot + "/native"];
+        Libraries: [@Abbrevia.OutputRoot + "/libraries"];
+    }
+    LLVM Native {
+        CompilerPath: @Tools.Native.LLVMCompiler;
+        BuildKind: Object;
+        PositionIndependentCode: @Tools.Native.PositionIndependentCode;
+        Target: @Tools.Native.Triple;
+        SourceFiles: [
+            @Abbrevia.SourceRoot + "/external/abbrevia/thirdparty/lzma/*.c",
+            @Abbrevia.SourceRoot + "/external/abbrevia/thirdparty/ppmd/*.c",
+            @Abbrevia.SourceRoot + "/external/abbrevia/thirdparty/wavpack/*.c"
+        ];
+        SystemIncludePaths: @Tools.Native.SystemIncludePaths;
+        OutputPath: @Abbrevia.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory;
+    }
+    LLVM BZip2 {
+        CompilerPath: @Tools.Native.LLVMCompiler;
+        BuildKind: SharedLibrary;
+        PositionIndependentCode: @Tools.Native.PositionIndependentCode;
+        Target: @Tools.Native.Triple;
+        ConfigFiles: [@Abbrevia.SourceRoot + "/libbz2-" + @Tools.Native.OS + ".cfg"];
+        SourceFiles: [@Abbrevia.SourceRoot + "/external/abbrevia/thirdparty/bzip2/*.c"];
+        SystemIncludePaths: @Tools.Native.SystemIncludePaths;
+        LibraryPaths: @Tools.Native.LibraryPaths;
+        RawOptions: ["-fuse-ld=lld"];
+        OutputPath: @Abbrevia.OutputRoot + "/libraries";
+    }
+}

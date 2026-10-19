@@ -118,24 +118,24 @@ it does not require or invoke the Delphi compiler.
 Build and run the native nxtest suite using [test/README.md](test/README.md).
 The package build no longer runs the superseded standalone linkage probe.
 
-## Runtime package build
+## nxbuild projects
 
-From the Nexus root, use the ordered nxbuild recipe:
+[Abbrevia.nxproject](Abbrevia.nxproject) owns source/header publications and the
+native codec producers. Consumers require its catalog record and inherit their
+paths. [Source tests](test/AbbreviaSourceTests.nxproject) use this provider without
+an installed compiler package SDK.
 
-```powershell
-output/nxbuild-next/x86_64-win64/nxbuild.exe /action=build /project=../nexus-lab/examples/build/native/Abbrevia.nxpackage
-```
+[AbbreviaRuntime.nxproject](AbbreviaRuntime.nxproject) is a separate ordinary
+project for the compiler-native `.nxpk`/`.nxpl` product. It requires the same
+source/native provider. Configure the matching compiler, shared RTL, startup
+units, package SDK and identity in the shared nxbuild environment. Its generated
+products remain beneath the configured external output root.
 
-It builds the LLVM codec objects, the bzip2 shared library, then `Abbrevia.nxpk`
-in one FPC invocation. Products are under
-`output/nxbuild-abbrevia/<target>/pascal`. The installed package SDK and its
-identity are selected in `projects/nxbuild/nxbuild.environment.nxscript`.
-Use matching SDK compiler, shared RTL, and startup units together.
-
-`AbbreviaTests.nxproject` consumes `Abbrevia.nxpl` through RequiredPackages;
-it does not list the Abbrevia source directory as a UnitPath. At runtime the
-matching `nxrtl.nxpl` must be beside the executable or available on the platform
-library search path. See [test/README.md](test/README.md) for the commands.
+[AbbreviaTests.nxproject](test/AbbreviaTests.nxproject) retains explicit
+`RequiredPackages: [nxrtl, Abbrevia]` for runtime-package consumption.
+[Execution instructions](test/README.md) explain the native loader paths and the
+expected bzip2 producer artifact. Source and runtime-package validation are
+separate scenarios.
 
 ## Historical Forge build
 

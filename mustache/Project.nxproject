@@ -1,0 +1,24 @@
+// Copyright (c) 2026 Kevin Collins.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// This Source Code Form is "Incompatible With Secondary Licenses",
+// as defined by the Mozilla Public License, v. 2.0.
+//
+// SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
+
+dialect "../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module Projects "../../../projects/nxbuild/Projects.nxscript";
+
+Project Mustache {
+    Id: "NXRP.Mustache";
+    RootDirectory: "../../..";
+    Author: "Arnaud Bouchez and contributors";
+    Description: "Mustache template parsing and rendering using the locally maintained DMustache sources.";
+    License: "MPL 1.1 or later / GPL 2.0 or later / LGPL 2.1 or later";
+    Publishes Directories {
+        Sources: ["packages/nexus-packages-ext/mustache/external/dmustache"];
+    }
+}

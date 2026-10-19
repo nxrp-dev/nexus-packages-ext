@@ -2,18 +2,21 @@
 // SPDX-License-Identifier: MPL-2.0-no-copyleft-exception
 
 dialect "../../../../../projects/nxbuild/language/nxbuild.Language.nxscript";
+module Projects "../../../../../projects/nxbuild/Projects.nxscript";
 module "../../../../../projects/nxbuild/nxbuild.environment.nxscript";
 
 // One build sequence; target-specific installation settings come from the module.
 Project AbbreviaTests {
+    Id: "NXRP.Tests.AbbreviaTests";
+    Requires: [@Projects.NexusTest, @Projects.FCLBase, @Projects.FCLRegistry, @Projects.Abbrevia, @Projects.AbbreviaRuntime];
     RootDirectory: "../../../../..";
     SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
-    OutputRoot: @Tools.OutputRoot + "/nxbuild-abbrevia/" + @Tools.Native.Name;
+    OutputRoot: @Tools.OutputRoot + "/AbbreviaTests/" + @Tools.Native.Name;
 
     FPC Runtime {
         CompilerPath: @Tools.Native.FPCCompiler;
         SourceFiles: [@AbbreviaTests.SourceRoot + "/test/AbbreviaTests.lpr"];
-        OutputPath: @AbbreviaTests.OutputRoot + "/pascal";
+        OutputPath: @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name;
         PackageSDKIdentity: @Tools.Native.PackageSDKIdentity;
         RequiredPackages: [nxrtl, Abbrevia];
         Target Platform { OperatingSystem: @Tools.Native.OS; }
@@ -24,23 +27,17 @@ Project AbbreviaTests {
         Files Paths {
             UnitPaths: [
                 @AbbreviaTests.SourceRoot + "/test",
-                "packages/nexus-packages/nxtest/src",
                 @Tools.Native.PackageSDKPath + "/units",
                 @Tools.Native.RTLPath,
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
-                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src",
-                "packages/nexus-packages/fcl-base/src",
-                "packages/nexus-packages/fcl-registry/src"
+                @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src"
             ];
             IncludePaths: [
-                @AbbreviaTests.SourceRoot + "/external/abbrevia/source",
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/" + @Tools.Native.PascalPlatform,
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/x86_64"
             ];
-            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages", @AbbreviaTests.OutputRoot + "/pascal"];
+            PackagePaths: [@Tools.Native.PackageSDKPath + "/packages", @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name];
             LibraryPaths: @Tools.Native.PackageLibraryPaths;
-            // Codec object directives include their platform subdirectory.
-            ObjectPaths: [@AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory, @AbbreviaTests.OutputRoot + "/native/" + @Tools.Native.ObjectDirectory + "/.."];
             CompilerUtilitiesPath: @Tools.Native.CompilerUtilitiesPath;
         }
         Linking RuntimeLibraries {

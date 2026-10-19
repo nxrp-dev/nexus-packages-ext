@@ -8,7 +8,7 @@ module "../../../../../projects/nxbuild/nxbuild.environment.nxscript";
 Project AbbreviaTests {
     RootDirectory: "../../../../..";
     SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
-    OutputRoot: "output/nxbuild-abbrevia/" + @Tools.Native.Name;
+    OutputRoot: @Tools.OutputRoot + "/nxbuild-abbrevia/" + @Tools.Native.Name;
 
     FPC Runtime {
         CompilerPath: @Tools.Native.FPCCompiler;
@@ -29,7 +29,7 @@ Project AbbreviaTests {
                 @Tools.Native.RTLPath,
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-objpas/src/inc",
                 @Tools.NexusFPC.SourcePath + "/packages/rtl-generics/src",
-                @Tools.NexusFPC.SourcePath + "/packages/fcl-base/src",
+                "packages/nexus-packages/fcl-base/src",
                 "packages/nexus-packages/fcl-registry/src"
             ];
             IncludePaths: [

@@ -73,7 +73,7 @@ New-Item -ItemType Directory -Force -Path $out | Out-Null
     "-Fu$PWD/packages/nexus-packages/nxtest/src" `
     "-Fu$PWD/../tools/nexus-fpc/packages/rtl-objpas/src/inc" `
     "-Fu$PWD/../tools/nexus-fpc/packages/rtl-generics/src" `
-    "-Fu$PWD/../tools/nexus-fpc/packages/fcl-base/src" `
+    "-Fu$PWD/packages/nexus-packages/fcl-base/src" `
     "-Fi$PWD/../tools/nexus-fpc/packages/rtl-objpas/src/win" `
     "-FU$out" "-FE$out" "$abbrevia/test/AbbreviaCoreTests.lpr"
 if ($LASTEXITCODE -ne 0) { throw 'Core test build failed' }

@@ -1,5 +1,7 @@
 # External Nexus Package Instructions
 
+Follow the Nexus root [AGENTS.md](../../AGENTS.md), including its rules on instruction sources.
+
 - This repository packages third-party libraries for Nexus.
 - Follow `../../.ai/standards/pascal.md` for Nexus-owned Object Pascal code.
 - Keep upstream source and its license notices intact under each package's `external` folder.

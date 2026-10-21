@@ -11,7 +11,6 @@ cases with unavailable reference inputs were removed. The custom codec checks re
 previous byte comparisons/round trips plus the C layout and library checks.
 A shared-RTL regression also checks inline Trim/encoding references and checked
 Int64 arithmetic while consuming the compiled packages.
-See [RESULTS.md](RESULTS.md) for the latest results and remaining limitations.
 
 ## Build and run
 
@@ -120,7 +119,6 @@ and oversized input, queue wrap, empty input, output/header failures, blocked
 writer failure, constructor cleanup, exception unwinding, and truncated input.
 The full suite includes them. AbbreviaLZMAStreamTests.lpr runs those same cases
 independently, including on Win32, without other codecs or external fixtures.
-See RESULTS.md for the verified Win32 native build settings.
 
 ## Coverage and fixtures
 
@@ -163,9 +161,8 @@ tests, three standalone WavPack decodes, and the generated 90,000-entry ZIP64
 save/reload case remain. Supplied reference material remains under reference.
 
 DCL Implode, gzip regression 822243, and CAB AddFromStream are active passing
-regressions. DCL and gzip also pass on Linux. RESULTS.md records the root causes,
-fixes, malformed-input and stream-ownership checks, and the corrected Linux
-locale-filename decoding. ZIP filename regressions cover legacy and UTF-8 header
+regressions. DCL and gzip also pass on Linux. ZIP filename regressions cover
+legacy and UTF-8 header
 names plus Unicode Path checksums. The Windows-1252 fallback on UTF-8 hosts does
 not identify arbitrary untagged legacy codepages. Gzip TestItemAt validates every
 member; CRC/ISIZE checks

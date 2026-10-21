@@ -108,7 +108,7 @@ VCL tree-view population methods. Runtime units use FPC string/file helpers;
 Unix code uses `BaseUnix` instead of Delphi's `Posix.*` bindings. Compiler-version
 workarounds and Borland-only C header branches are gone.
 
-The supplied Pascal cases and native codec checks have been migrated to [nxtest](test/README.md) in the package test folder. See [current results](test/RESULTS.md) for verified coverage and failures.
+The supplied Pascal cases and native codec checks have been migrated to [nxtest](test/README.md) in the package test folder.
 
 The Forge `Mode: delphi` setting selects NexusFPC's Object Pascal language mode;
 it does not require or invoke the Delphi compiler.

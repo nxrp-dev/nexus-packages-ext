@@ -13,8 +13,8 @@ Project Abbrevia {
     SourceRoot: "packages/nexus-packages-ext/compression/abbrevia";
     OutputRoot: @Tools.OutputRoot + "/abbrevia-runtime/" + @Tools.Native.Name + "/" + $BuildConfiguration;
 
-    FPC Runtime {
-        CompilerPath: @Tools.Native.FPCCompiler;
+    NXPC Runtime {
+        CompilerPath: @Tools.Native.NXPCCompiler;
         SourceFiles: [@Abbrevia.SourceRoot + "/Abbrevia.nxpk"];
         OutputPath: @Abbrevia.OutputRoot;
         PackageSDKIdentity: @Tools.Native.PackageSDKIdentity;
